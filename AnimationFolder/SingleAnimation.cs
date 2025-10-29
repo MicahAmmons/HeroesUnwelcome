@@ -1,12 +1,9 @@
-﻿using Heroes_UnWelcomed.Assets;
+using Heroes_UnWelcomed.Assets;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Heroes_UnWelcomed.AnimationFolder
 {
@@ -20,6 +17,9 @@ namespace Heroes_UnWelcomed.AnimationFolder
         protected int FrameHeight;
         protected float FrameDurationMS;
         protected List<Rectangle> Frames = new List<Rectangle>();
+        protected int CurrentFrameIndex = 0;
+        protected float FrameTimer = 0f;
+        protected Vector2 Origin;
 
         public SingleAnimation(SpecificAnimationData data)
         {
@@ -29,6 +29,7 @@ namespace Heroes_UnWelcomed.AnimationFolder
             FrameWidth = data.FrameWidth;
             FrameHeight = data.FrameHeight;
             FrameDurationMS = data.FrameDurationMs;
+            Origin = new Vector2(FrameWidth / 2, FrameHeight);
 
             int framesPerRow = Math.Max(1, SpriteSheet.Width / data.FrameWidth);
             int startRowIndex = Math.Max(0, data.Row - 1);
@@ -50,6 +51,10 @@ namespace Heroes_UnWelcomed.AnimationFolder
             }
             Frames.AddRange(FinalizeRectangleList(frames));
             FrameCount = Frames.Count;
+        }
+        public Rectangle GetFrame()
+        {
+            return Frames[CurrentFrameIndex];
         }
         private List<Rectangle> FinalizeRectangleList(List<Rectangle> frames)
         {
@@ -95,6 +100,51 @@ namespace Heroes_UnWelcomed.AnimationFolder
             //    }
             //}
             return frames;
+        }
+        public int GetFrameCount()
+        {
+            return FrameCount;
+        }
+        public float GetFrameDurationMs()
+        {
+            return FrameDurationMS;
+        }
+
+        internal void UpdateTimer(float delta)
+        {
+            FrameTimer += delta;
+            if (FrameTimer >= FrameDurationMS)
+            {
+                UpdateCurrentFrame();
+                FrameTimer -= FrameDurationMS;
+            }
+
+        }
+        private void UpdateCurrentFrame()
+        {
+            var index = CurrentFrameIndex;
+            index += 1;
+            if (index < 0 || index >= Frames.Count)
+            {
+                CurrentFrameIndex = 0;
+                return;
+            }
+            CurrentFrameIndex = index;
+        }
+
+        internal Texture2D GetTexture()
+        {
+            return SpriteSheet;
+        }
+
+        internal SpriteEffects GetSpriteEffect()
+        {
+            return SpriteEffects.None;
+        }
+
+        internal Vector2 GetOrigin()
+        {
+            return Origin;
         }
     }
 }

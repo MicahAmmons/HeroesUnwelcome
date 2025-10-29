@@ -1,4 +1,4 @@
-﻿using Heroes_UnWelcomed.Assets;
+using Heroes_UnWelcomed.Assets;
 using Heroes_UnWelcomed.Heroes;
 using Heroes_UnWelcomed.InputTracker;
 using Heroes_UnWelcomed.Libraries;
@@ -50,7 +50,9 @@ namespace Heroes_UnWelcomed
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
+            _spriteBatch.Begin();
             HeroManager.DrawHeroes(_spriteBatch);
+            _spriteBatch.End();
             base.Draw(gameTime);
         }
     }

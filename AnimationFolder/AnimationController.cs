@@ -1,4 +1,4 @@
-﻿using Heroes_UnWelcomed.Libraries;
+using Heroes_UnWelcomed.Libraries;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -12,35 +12,31 @@ namespace Heroes_UnWelcomed.AnimationFolder
     internal class AnimationController
     {
         private AnimationType _currentAnimation = AnimationType.Idle;
-        private Dictionary<AnimationType, List<SingleAnimation>> _animations = new Dictionary<AnimationType, List<SingleAnimation>>();
+        private Dictionary<AnimationType, AnimationBunch> _animations = new Dictionary<AnimationType, AnimationBunch>();
 
         public AnimationController(string animationName)
         {
             Dictionary<AnimationType, List<SpecificAnimationData>> data = AnimationLibrary.GetAnimationData(animationName);
+
             foreach (var kvp in data)
             {
                 AnimationType type = kvp.Key;
                 List<SpecificAnimationData> animData = kvp.Value;
-                _animations[type] = new List<SingleAnimation>();
-                foreach (var animation in animData)
-                {
-                    _animations[type].Add(new SingleAnimation(animation));
-                }
+                _animations[type] = new AnimationBunch(animData);
             }
         }
 
         public void Update(GameTime g)
         {
-
+            UpdateBunch(g);
+        }
+        private void UpdateBunch(GameTime g)
+        {
+            _animations[_currentAnimation]?.Update(g);
         }
         public void Draw(SpriteBatch s)
         {
-            foreach (var anim in _animations[_currentAnimation])
-            {
-                
-
-
-            }
+            _animations[_currentAnimation]?.Draw(s);
         }
         protected virtual void SetCurrentAnimation(AnimationType type)
         {

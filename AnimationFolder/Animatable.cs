@@ -1,4 +1,4 @@
-﻿using Heroes_UnWelcomed.Assets;
+using Heroes_UnWelcomed.Assets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Heroes_UnWelcomed.AnimationFolder
 {
-    public abstract class Animatable
+    public abstract class Animatable 
     {
         private AnimationController AnimContr {  get; set; }
 
