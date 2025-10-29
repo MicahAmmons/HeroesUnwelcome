@@ -1,0 +1,77 @@
+{
+  "Turtle": {
+    "Idle": [
+
+      {
+        "Row": 3,
+        "FrameCount": 8,
+        "FrameDurationMs": 150,
+        "SpriteSheetName": "TurtleIdle",
+        "DefaultDirection": "Right",
+        "FrameWidth": 76,
+        "FrameHeight": 76
+      },
+      {
+        "Row": 2,
+        "FrameCount": 8,
+        "FrameDurationMs": 150,
+        "PulseTimer": 5,
+        "SpriteSheetName": "TurtleIdle",
+        "DefaultDirection": "Right",
+        "FrameWidth": 76,
+        "FrameHeight": 76
+      },
+      {
+        "Row": 1,
+        "FrameCount": 8,
+        "FrameDurationMs": 100,
+        "SpriteSheetName": "TurtleIdle",
+        "DefaultDirection": "Right",
+        "FrameWidth": 76,
+        "FrameHeight": 76
+      }
+    ],
+    "Walk": [
+      {
+        "Row": 4,
+        "FrameCount": 4,
+        "FrameDurationMs": 200,
+        "SpriteSheetName": "TurtleWalk",
+        "DefaultDirection": "Right",
+        "FrameWidth": 76,
+        "FrameHeight": 76
+      },
+      {
+        "Row": 3,
+        "FrameCount": 4,
+        "FrameDurationMs": 200,
+        "SpriteSheetName": "TurtleWalk",
+        "DefaultDirection": "Right",
+        "FrameWidth": 76,
+        "FrameHeight": 76
+      },
+      {
+
+        "Row": 2,
+        "FrameCount": 4,
+        "FrameDurationMs": 200,
+        "SpriteSheetName": "TurtleWalk",
+        "DefaultDirection": "Right",
+        "FrameWidth": 76,
+        "FrameHeight": 76
+      },
+      {
+
+        "Row": 1,
+        "FrameCount": 4,
+        "FrameDurationMs": 200,
+        "SpriteSheetName": "TurtleWalk",
+        "DefaultDirection": "Right",
+        "FrameWidth": 76,
+        "FrameHeight": 76
+      }
+    ]
+  }  
+
+}
+

@@ -1,0 +1,42 @@
+# Visual Studio / .NET build
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+
+# Rider/JetBrains
+.idea/
+*.iml
+
+# MonoGame Content Pipeline (ignore build outputs, commit sources + .mgcb)
+Content/bin/
+Content/obj/
+*.xnb
+
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs / caches
+*.log
+*.cache
+
+# NuGet
+*.nupkg
+packages/
+.nuget/
+
+# Publish artifacts
+*.publish.xml
+publish/
+AppPackages/
+*.appx
+*.appxbundle
+*.appxupload
+
+# OneDrive temp files
+~$*
