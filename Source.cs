@@ -1,4 +1,5 @@
 using Heroes_UnWelcomed.Assets;
+using Heroes_UnWelcomed.Cells;
 using Heroes_UnWelcomed.Heroes;
 using Heroes_UnWelcomed.InputTracker;
 using Heroes_UnWelcomed.Libraries;
@@ -26,6 +27,7 @@ namespace Heroes_UnWelcomed
             HeroLibrary.Initialize();
             AnimationLibrary.Initialize();
             HeroManager.Initialize();
+            CellManager.Initialize();
             base.Initialize();
         }
 
@@ -52,6 +54,7 @@ namespace Heroes_UnWelcomed
             GraphicsDevice.Clear(Color.CornflowerBlue);
             _spriteBatch.Begin();
             HeroManager.DrawHeroes(_spriteBatch);
+            CellManager.DrawCells(_spriteBatch);
             _spriteBatch.End();
             base.Draw(gameTime);
         }

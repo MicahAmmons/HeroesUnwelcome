@@ -26,6 +26,10 @@ namespace Heroes_UnWelcomed.AnimationFolder
         {
             AnimContr?.Draw(s);
         }
+        public virtual void ReplaceAnimation(string newAnimName)
+        {
+            AnimContr = new AnimationController(newAnimName);
+        }
 
     }
 }
