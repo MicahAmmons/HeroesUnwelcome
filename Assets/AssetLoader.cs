@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +16,15 @@ namespace Heroes_UnWelcomed.Assets
             AssetManager.LoadTexture("TurtleWalk", "Heroes/Turtle/Turtle_Walk_SS");
             AssetManager.LoadTexture("TurtleIdle", "Heroes/Turtle/Turtle_Idle_SS");
             AssetManager.LoadTexture("TurtleMoveStartTrans", "Heroes/Turtle/Turtle_Move_Start_Trans_SS");
+
+            AssetManager.LoadTexture("EmptyCell", "Cells/Empty_Cell");
+            AssetManager.LoadTexture("EmptyCellMask", "Cells/Empty_Cell_Mask");
+        }
+
+        public static void LoadShaders()
+        {
+           // AssetManager.LoadEffect("ScrollWrap", "Shaders/ScrollWrap");
+
         }
     }
 }

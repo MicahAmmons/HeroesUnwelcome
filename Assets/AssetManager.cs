@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Media;
 using System;
@@ -16,14 +17,17 @@ namespace Heroes_UnWelcomed.Assets
         private static Dictionary<string, SpriteFont> _fonts = new();
         private static Dictionary<string, Song> _songs = new();
         private static Dictionary<string, Effect> _effects = new();
-        public static void Initialize(ContentManager content)
+        public static void Initialize(ContentManager content, GraphicsDevice graphicsDevice)
         {
             _content = content;
+            CreatePixel(graphicsDevice);
             LoadAllAssets();
         }
         internal static void LoadAllAssets()
         {
             AssetLoader.LoadAllTextures();
+            AssetLoader.LoadShaders();
+
         }
         public static void LoadTexture(string key, string path)
         {
@@ -58,6 +62,12 @@ namespace Heroes_UnWelcomed.Assets
         internal static Effect GetEffect(string v)
         {
             return _effects[v];
+        }
+        public static void CreatePixel(GraphicsDevice device)
+        {
+            Texture2D pixel = new Texture2D(device, 1, 1);
+            pixel.SetData(new[] { Color.Black });
+            _textures["BlackPixel"] = pixel;
         }
     }
 }

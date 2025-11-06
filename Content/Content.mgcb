@@ -13,6 +13,30 @@
 
 #---------------------------------- Content ---------------------------------#
 
+#begin Cells/Empty_Cell_Mask.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Cells/Empty_Cell_Mask.png
+
+#begin Cells/Empty_Cell.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Cells/Empty_Cell.png
+
 #begin Heroes/Turtle/Turtle_Attack_SS.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -72,4 +96,5 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Heroes/Turtle/Turtle_Walk_SS.png;Heroes/Turtle/Turtle_Walk_SS
+
 

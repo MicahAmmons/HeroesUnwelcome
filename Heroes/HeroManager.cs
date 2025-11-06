@@ -1,4 +1,4 @@
-﻿using Heroes_UnWelcomed.AnimationFolder;
+using Heroes_UnWelcomed.AnimationFolder;
 using Heroes_UnWelcomed.Libraries;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;

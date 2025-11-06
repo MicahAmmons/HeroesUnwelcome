@@ -13,9 +13,9 @@ namespace Heroes_UnWelcomed.AnimationFolder
     {
         private AnimationController AnimContr {  get; set; }
 
-
         public Animatable(string animationName)
         {
+            if (animationName == "EmptyCell") { AnimContr = null; return; }
             AnimContr = new AnimationController(animationName);
         }
         public virtual void UpdateAnimatable(GameTime g)
