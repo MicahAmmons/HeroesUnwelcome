@@ -28,6 +28,8 @@ namespace Heroes_UnWelcomed.AnimationFolder
 
         }
 
+
+
         private void CreateMovePath(List<Vector2> destPoints)
         {
             foreach (var dest in  destPoints)

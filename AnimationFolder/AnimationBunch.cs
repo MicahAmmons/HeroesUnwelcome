@@ -15,7 +15,7 @@ namespace Heroes_UnWelcomed.AnimationFolder
             }
         }
 
-        internal void Draw(SpriteBatch s)
+        internal void Draw(SpriteBatch s, Vector2 pos)
         {
             foreach (var singleAnim in _animations)
             {
@@ -24,7 +24,7 @@ namespace Heroes_UnWelcomed.AnimationFolder
                     return;
                 s.Draw(
                     texture: singleAnim.GetTexture(),
-                    position: new Vector2(300, 200),
+                    position: pos,
                     sourceRectangle: singleAnim.GetFrame(),
                     color: Color.White,
                     rotation: 0f,

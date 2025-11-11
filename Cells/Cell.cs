@@ -38,6 +38,8 @@ namespace Heroes_UnWelcomed.Cells
         public Vector2 Origin { get; set; }
         public bool Full => _encounter != null;
         public string EmptyText = "EmptyCell";
+        public Vector2 PathStart;
+        public Vector2 PathEnd;
 
 
         public Cell(int x, int y, string animationName = "EmptyCell") : base(animationName)
@@ -47,6 +49,9 @@ namespace Heroes_UnWelcomed.Cells
             Position = new Vector2(x * Width, y * Height);
             DestinationRect = new Rectangle((int)Position.X, (int)Position.Y, Width, Height);
             Origin = Vector2.Zero;
+            PathStart = Position + new Vector2(0, Height /2);
+            PathEnd = PathStart + new Vector2(Width, 0);
+
         }
 
         public void AddEncounter(string encounter)
@@ -54,7 +59,6 @@ namespace Heroes_UnWelcomed.Cells
             _encounter = new Encounter();
             ReplaceAnimation(encounter);
         }
-
         internal void DrawEmptyCell(SpriteBatch s)
         {
             var tex = AssetManager.GetTexture(EmptyText);
@@ -62,20 +66,17 @@ namespace Heroes_UnWelcomed.Cells
                 texture: tex,
                 destinationRectangle: DestinationRect,
                 sourceRectangle: null,
-                color: Color.White
+                color: Color.Red
             );
 
 
 
 
         }
-
-
         internal void SetPosition(Vector2 pos)
         {
             Position = pos;
         }
-
         internal void DrawOutLine(SpriteBatch s)
         {
             var pixel = AssetManager.GetTexture("WhitePixel");
@@ -93,6 +94,17 @@ namespace Heroes_UnWelcomed.Cells
             s.Draw(pixel, new Rectangle(r.X, r.Y, t, r.Height), c);
             // Right
             s.Draw(pixel, new Rectangle(r.X + r.Width - t, r.Y, t, r.Height), c);
+        }
+
+        internal void DrawStaticCell(SpriteBatch s)
+        {
+            var tex = AssetManager.GetTexture(EmptyText);
+            s.Draw(
+                texture: tex,
+                destinationRectangle: DestinationRect,
+                sourceRectangle: null,
+                color: Color.Black
+            );
         }
     }
 }

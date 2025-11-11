@@ -13,28 +13,18 @@ namespace Heroes_UnWelcomed.Heroes
 {
     internal static class HeroManager
     {
-        private static List<Moving> _heroes = new List<Moving>();
-        public static List<Moving> AllHeroes => _heroes;
+        private static List<Hero> _heroes = new List<Hero>();
+        public static List<Hero> AllHeroes => _heroes;
         public static void Initialize()
         {
             _heroes.Add(new Hero(HeroLibrary.GetHeroData("Ranger")));
             _heroes.Add(new Hero(HeroLibrary.GetHeroData("Ranger")));
             _heroes.Add(new Hero(HeroLibrary.GetHeroData("Ranger")));
         }
-        public static void Update(GameTime gameTime)
-        {
-            foreach (var hero in _heroes)
-            {
-                hero.UpdateAnimatable(gameTime);
-            }
-        }
-        public static void DrawHeroes(SpriteBatch s)
-        {
-            foreach (var hero in _heroes)
-            {
-                hero.DrawAnimatable(s);
-            }
-        }
 
+        internal static List<Hero> GetParty()
+        {
+            return new List<Hero>(_heroes);
+        }
     }
 }

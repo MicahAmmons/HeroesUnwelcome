@@ -54,8 +54,7 @@ namespace Heroes_UnWelcomed
         {
             TapTap.Update(gameTime);
             CameraManager.Update(gameTime, GraphicsDevice);
-            HeroManager.Update(gameTime);
-
+            CellManager.Update(gameTime);
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
@@ -87,9 +86,10 @@ namespace Heroes_UnWelcomed
                  effect: null,
                  transformMatrix: _camera.GetViewMatrix(GraphicsDevice) // <-- camera applied here
              );
-            HeroManager.DrawHeroes(_spriteBatch);
+
             CellManager.DrawCells(_spriteBatch);
             CellManager.DrawCellOutLine(_spriteBatch);
+            CellManager.DrawParties(_spriteBatch);
             _spriteBatch.End();
         }
 

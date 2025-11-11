@@ -1,0 +1,21 @@
+{
+  "Goblin":
+  {
+    "OrderOfCharges": [
+      {
+        "Travel": {
+          "Begin": "MiddleLeft",
+          "End": "Middle"
+        },
+        "Combat": {
+          "AttackPower": 1,
+          "PauseProgression": true
+        },
+        "Exit": {
+          "Begin": "CurrentPos",
+          "End": "MiddleRight"
+        }
+      }
+    ]
+  }
+}

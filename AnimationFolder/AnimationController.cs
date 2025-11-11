@@ -34,9 +34,9 @@ namespace Heroes_UnWelcomed.AnimationFolder
         {
             _animations[_currentAnimation]?.Update(g);
         }
-        public void Draw(SpriteBatch s)
+        public void Draw(SpriteBatch s, Vector2 position)
         {
-            _animations[_currentAnimation]?.Draw(s);
+            _animations[_currentAnimation]?.Draw(s, position);
         }
         protected virtual void SetCurrentAnimation(AnimationType type)
         {

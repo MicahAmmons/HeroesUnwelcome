@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,4 +20,16 @@ public enum Direction
     Up,
     Down,
 
+}
+public enum Position
+{
+    TopLeft, TopMiddle, TopRight,
+    MiddleLeft, Middle, MiddleRight,
+    BottomLeft, BottomMiddle, BottomRight
+}
+public enum ChargeType
+{
+    Travel,
+    Exit,
+    Combat
 }

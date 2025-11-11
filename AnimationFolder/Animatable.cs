@@ -1,4 +1,5 @@
 using Heroes_UnWelcomed.Assets;
+using Heroes_UnWelcomed.Heroes;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -12,6 +13,7 @@ namespace Heroes_UnWelcomed.AnimationFolder
     public abstract class Animatable 
     {
         private AnimationController AnimContr {  get; set; }
+        public Vector2 CurrentPosition { get; set; }
 
         public Animatable(string animationName)
         {
@@ -24,7 +26,7 @@ namespace Heroes_UnWelcomed.AnimationFolder
         }
         public virtual void DrawAnimatable(SpriteBatch s)
         {
-            AnimContr?.Draw(s);
+            AnimContr?.Draw(s, CurrentPosition);
         }
         public virtual void ReplaceAnimation(string newAnimName)
         {
