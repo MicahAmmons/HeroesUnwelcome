@@ -17,7 +17,10 @@ namespace Heroes_UnWelcomed.Buttons
         internal void UpdateStatus(Point mouse, bool leftJustReleased)
         {
             _hovered = ButtonBoundary.Contains(mouse);
-
+            if (_hovered)
+            {
+                int th = 5;
+            }
             if (_hovered && leftJustReleased)
             {
                 _active = !_active;

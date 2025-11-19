@@ -18,5 +18,45 @@
         "End": "MiddleRight"
       }
     ]
+  },
+  "Orc": {
+    "Category": "Combat",
+    "Animation": "Turtle",
+    "AttackPower": 2,
+    "OrderOfCharges": [
+      {
+        "Type": "Travel",
+        "Begin": "MiddleLeft",
+        "End": "Middle"
+      },
+      {
+        "Type": "Combat"
+      },
+      {
+        "Type": "Exit",
+        "Begin": "CurrentPos",
+        "End": "MiddleRight"
+      }
+    ]
+  },
+  "Vampire": {
+    "Category": "Combat",
+    "Animation": "Turtle",
+    "AttackPower": 3,
+    "OrderOfCharges": [
+      {
+        "Type": "Travel",
+        "Begin": "MiddleLeft",
+        "End": "Middle"
+      },
+      {
+        "Type": "Combat"
+      },
+      {
+        "Type": "Exit",
+        "Begin": "CurrentPos",
+        "End": "MiddleRight"
+      }
+    ]
   }
 }

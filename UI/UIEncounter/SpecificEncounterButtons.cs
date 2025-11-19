@@ -4,6 +4,7 @@ using Heroes_UnWelcomed.Encounters;
 using Heroes_UnWelcomed.ScreenReso;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Formats.Tar;
@@ -16,6 +17,8 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
     {
         private Dictionary<EncounterType, Dictionary<string, Button>> _allButtons = new();
         private EncounterType _currentOptionType = EncounterType.None;
+        private Button _currentlySelectedButton = null;
+        public event Action<string> OnEncounterButtonSelected;
 
         public SpecificEncounterButtons()
         {
@@ -25,6 +28,7 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
         {
             if (_currentOptionType == EncounterType.None) return;
             UpdateButtons(input);
+            ResetButtonsToInactive();
         }
         public void DrawButtons(SpriteBatch s)
         {
@@ -106,12 +110,37 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
                 index++;
             }
         }
+        private void ResetButtonsToInactive()
+        {
+            foreach (var dict in _allButtons.Values)
+            foreach (var kvp in dict)
+                {
+                    if (_currentlySelectedButton == kvp.Value) continue;
+                    kvp.Value.ResetButton();
+                }
+            
+        }
         public void UpdateButtons(UIInput input)
         {
-            foreach (var kvp in _allButtons[_currentOptionType])
+            var buttons = _allButtons[_currentOptionType];
+            foreach (var kvp in buttons)
             {
-                kvp.Value.UpdateStatus(input.MousePos, input.LeftPressed);
+                Button btn = kvp.Value;
+                btn.UpdateStatus(input.MousePos, input.LeftPressed);
+
+                if (btn.IsActive)
+                {
+                    if (btn == _currentlySelectedButton) continue;
+                    UpdateCurrentlySelectedButton(btn, kvp.Key);
+                }
             }
+        }
+        private void UpdateCurrentlySelectedButton( Button btn, string key = null)
+        {
+            if (btn == null || key ==null)_currentlySelectedButton = null;
+            _currentlySelectedButton = btn;
+            OnEncounterButtonSelected?.Invoke(key);
+            ResetButtonsToInactive();
         }
         public void UpdateCurrentEncOptions(EncounterType category)
         {
@@ -119,11 +148,13 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
             ResetAllButtons();
 
         }
-        private void ResetAllButtons()
+        private void ResetAllButtons(Button excludedButton = null)
         {
             foreach (var dict in _allButtons.Values)
                 foreach (var button in dict.Values)
                     button.ResetButton();
+            _currentlySelectedButton = null;
+            OnEncounterButtonSelected?.Invoke(null);
         }
 
 

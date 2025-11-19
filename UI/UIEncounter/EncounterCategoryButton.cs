@@ -82,7 +82,6 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
                 OnCategoryChanged?.Invoke(_selectedCategory);
             }
         }
-
         internal Dictionary<EncounterType, Rectangle> GetCategoryRectangles()
         {
             Dictionary<EncounterType, Rectangle> dict = new Dictionary<EncounterType, Rectangle>();

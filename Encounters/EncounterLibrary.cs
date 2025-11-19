@@ -34,7 +34,10 @@ namespace Heroes_UnWelcomed.Encounters
 
             return unlocked;
         }
-
+        public static EncounterData GetEncounterData(string name)
+        {
+            return _data[name];
+        }
         internal static List<string> ReturnUnlockedCategories()
         {
             var unlocked = new List<string>();

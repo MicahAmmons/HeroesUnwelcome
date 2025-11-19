@@ -1,7 +1,10 @@
 ﻿{
   "Encounters": {
     "Combat": {
-      "Goblin": true
+      "Goblin": true,
+      "Vampire": true,
+      "Orc": true
+
     }
   }
 }

@@ -17,6 +17,8 @@
     <None Remove="Content\Encounter\CategoryIcons\CombatIcon.png" />
     <None Remove="Content\Encounter\CategoryIcons\TrapIcon.png" />
     <None Remove="Content\Encounter\Goblin\GoblinIcon.png" />
+    <None Remove="Content\Encounter\Orc\OrcIcon.png" />
+    <None Remove="Content\Encounter\Vampire\VampireIcon.png" />
     <None Remove="Content\Heroes\Turtle\Turtle_Attack_SS.png" />
     <None Remove="Content\Heroes\Turtle\Turtle_Attack_VE_SS.png" />
     <None Remove="Content\Heroes\Turtle\Turtle_Idle_SS.png" />
@@ -41,6 +43,12 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Encounter\Goblin\GoblinIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Orc\OrcIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Vampire\VampireIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Heroes\Turtle\Turtle_Attack_SS.png">
