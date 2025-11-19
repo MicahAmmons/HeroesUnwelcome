@@ -9,6 +9,8 @@ namespace Heroes_UnWelcomed.Encounters
 {
     public class EncounterData
     {
-        public Dictionary<string, Charge> OrderOfCharges { get; set; }
+        public EncounterType Category;
+        public int AttackPower { get; set; }
+        public List<ChargeData> OrderOfCharges { get; set; }
     }
 }

@@ -19,6 +19,9 @@ namespace Heroes_UnWelcomed.Assets
 
             AssetManager.LoadTexture("EmptyCell", "Cells/Empty_Cell");
             AssetManager.LoadTexture("EmptyCellMask", "Cells/Empty_Cell_Mask");
+
+            AssetManager.LoadTexture("CombatCategoryIcon", "Encounter/CategoryIcons/CombatIcon");
+            AssetManager.LoadTexture("TrapCategoryIcon", "Encounter/CategoryIcons/TrapIcon");
         }
 
         public static void LoadShaders()

@@ -1,20 +1,21 @@
 {
-  "Goblin":
-  {
+  "Goblin": {
+    "Category": "Combat",
+    "Animation": "Turtle",
+    "AttackPower": 1,
     "OrderOfCharges": [
       {
-        "Travel": {
-          "Begin": "MiddleLeft",
-          "End": "Middle"
-        },
-        "Combat": {
-          "AttackPower": 1,
-          "PauseProgression": true
-        },
-        "Exit": {
-          "Begin": "CurrentPos",
-          "End": "MiddleRight"
-        }
+        "Type": "Travel",
+        "Begin": "MiddleLeft",
+        "End": "Middle"
+      },
+      {
+        "Type": "Combat"
+      },
+      {
+        "Type": "Exit",
+        "Begin": "CurrentPos",
+        "End": "MiddleRight"
       }
     ]
   }

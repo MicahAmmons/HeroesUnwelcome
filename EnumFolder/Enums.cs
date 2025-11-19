@@ -25,11 +25,21 @@ public enum Position
 {
     TopLeft, TopMiddle, TopRight,
     MiddleLeft, Middle, MiddleRight,
-    BottomLeft, BottomMiddle, BottomRight
+    BottomLeft, BottomMiddle, BottomRight,
+    CurrentPos,
+    Null
 }
 public enum ChargeType
 {
     Travel,
     Exit,
     Combat
+}
+public enum EncounterType
+{
+    None,
+    Combat,
+    Trap,
+    Puzzle,
+    LockedDoor
 }

@@ -1,0 +1,48 @@
+using Heroes_UnWelcomed.InputTracker;
+using Heroes_UnWelcomed.UI.UIEncounter;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+
+
+namespace Heroes_UnWelcomed.UI
+{
+    public static class UIManager
+    {
+
+        private static UIEncounterController _encUIController;
+        private static UIInput _input;
+        public static void Initialize()
+        {
+             _encUIController = new UIEncounterController();
+        }
+        public static void Draw(SpriteBatch s)
+        {
+            _encUIController?.Draw(s);
+        }
+        public static void Update(GameTime gameTime)
+        {
+            UpdateInput();
+            _encUIController?.Update(gameTime, _input);
+        }
+        private static void UpdateInput()
+        {
+            _input = new UIInput
+            {
+                MousePos = TapTap.Position,          // Vector2
+                LeftPressed = TapTap.IsLeftPressed(),
+                LeftJustReleased = TapTap.IsLeftReleased(),
+                EscapePressed = TapTap.IsKeyPressed(Keys.Escape),
+                SpacePressed = TapTap.IsKeyPressed(Keys.Space)
+            };
+        }
+    }
+    public readonly struct UIInput
+    {
+        public Point MousePos { get; init; }
+        public bool LeftPressed { get; init; }
+        public bool LeftJustReleased { get; init; }
+        public bool EscapePressed { get; init; }
+        public bool SpacePressed { get; init; }
+    }
+}

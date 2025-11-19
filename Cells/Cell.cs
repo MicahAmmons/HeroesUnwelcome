@@ -41,7 +41,6 @@ namespace Heroes_UnWelcomed.Cells
         public Vector2 PathStart;
         public Vector2 PathEnd;
 
-
         public Cell(int x, int y, string animationName = "EmptyCell") : base(animationName)
         {
             GridX = x;
@@ -53,12 +52,21 @@ namespace Heroes_UnWelcomed.Cells
             PathEnd = PathStart + new Vector2(Width, 0);
 
         }
-
         public void AddEncounter(string encounter)
         {
             _encounter = new Encounter();
             ReplaceAnimation(encounter);
         }
+
+        internal void SetPosition(Vector2 pos)
+        {
+            Position = pos;
+        }
+
+
+
+
+
         internal void DrawEmptyCell(SpriteBatch s)
         {
             var tex = AssetManager.GetTexture(EmptyText);
@@ -72,10 +80,6 @@ namespace Heroes_UnWelcomed.Cells
 
 
 
-        }
-        internal void SetPosition(Vector2 pos)
-        {
-            Position = pos;
         }
         internal void DrawOutLine(SpriteBatch s)
         {
@@ -95,7 +99,6 @@ namespace Heroes_UnWelcomed.Cells
             // Right
             s.Draw(pixel, new Rectangle(r.X + r.Width - t, r.Y, t, r.Height), c);
         }
-
         internal void DrawStaticCell(SpriteBatch s)
         {
             var tex = AssetManager.GetTexture(EmptyText);
@@ -106,5 +109,10 @@ namespace Heroes_UnWelcomed.Cells
                 color: Color.Black
             );
         }
+
+
+
+
+
     }
 }

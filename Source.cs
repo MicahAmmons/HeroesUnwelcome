@@ -1,10 +1,13 @@
 using Heroes_UnWelcomed.Assets;
 using Heroes_UnWelcomed.Cells;
+using Heroes_UnWelcomed.Data.SaveData;
+using Heroes_UnWelcomed.Encounters;
 using Heroes_UnWelcomed.Heroes;
 using Heroes_UnWelcomed.InputTracker;
 using Heroes_UnWelcomed.Libraries;
 using Heroes_UnWelcomed.Movement;
 using Heroes_UnWelcomed.ScreenReso;
+using Heroes_UnWelcomed.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -41,6 +44,9 @@ namespace Heroes_UnWelcomed
             HeroManager.Initialize();
             CameraManager.Intitialize();
             CellManager.Initialize();
+            EncounterLibrary.Initialize();
+            SaveStateLibrary.Initialize();
+            UIManager.Initialize();
             base.Initialize();
         }
 
@@ -53,6 +59,7 @@ namespace Heroes_UnWelcomed
         protected override void Update(GameTime gameTime)
         {
             TapTap.Update(gameTime);
+            UIManager.Update(gameTime);
             CameraManager.Update(gameTime, GraphicsDevice);
             CellManager.Update(gameTime);
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
@@ -65,7 +72,8 @@ namespace Heroes_UnWelcomed
         {
             GraphicsDevice.Clear(Color.Pink);
             DrawZoomableLayers();
-
+            DrawUINonZoomableLaters();
+            
  
            // DrawScroll(gameTime);
 
@@ -74,6 +82,12 @@ namespace Heroes_UnWelcomed
 
 
             base.Draw(gameTime);
+        }
+        protected void DrawUINonZoomableLaters()
+        {
+            _spriteBatch.Begin();
+            UIManager.Draw(_spriteBatch);
+            _spriteBatch.End();
         }
         protected void DrawZoomableLayers()
         {
