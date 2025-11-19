@@ -66,17 +66,17 @@ namespace Heroes_UnWelcomed.Data.SaveData
         {
             JsonLoader.SaveSaveData(_saveState);
         }
-        public static List<string> ReturnUnlockedEncounterCategories()
+        public static List<EncounterType> ReturnUnlockedEncounterCategories()
         {
-            var categories = new List<string>();
+            var categories = new List<EncounterType>();
             var encounter = _saveState.Encounters;
 
-            var dicts = new (Dictionary<string, bool> Dict, string Name)[]
+            var dicts = new (Dictionary<string, bool> Dict, EncounterType Type)[]
             {
-        (encounter.Combat, "Combat"),
-        (encounter.Puzzle, "Puzzle"),
-        (encounter.Trap, "Trap"),
-        (encounter.LockedDoor, "LockedDoor")
+    (encounter.Combat, EncounterType.Combat),
+    (encounter.Puzzle, EncounterType.Puzzle),
+    (encounter.Trap, EncounterType.Trap),
+    (encounter.LockedDoor, EncounterType.LockedDoor)
             };
 
             foreach (var (dict, name) in dicts)

@@ -14,7 +14,6 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
     {
         private Dictionary<string, EncounterData> _unlockedEncData;
         private bool _showCategories = true;
-        private EncounterType _selectedCategory = EncounterType.None;
 
         private EncounterCategoryButton EncCategoryButtons = new EncounterCategoryButton();
         private SpecificEncounterButtons _specificEncButtons = new SpecificEncounterButtons();
@@ -25,6 +24,9 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
             UpdateSpecificEncounterButtons();
             SaveStateLibrary.EncounterSaveStateUpdated += UpdateUnlockedEncounters;
             SaveStateLibrary.EncounterSaveStateUpdated += UpdateUnlockedCategoryButtons;
+            SaveStateLibrary.EncounterSaveStateUpdated += UpdateSpecificEncounterButtons;
+
+            EncCategoryButtons.OnCategoryChanged += UpdateSelectedEncounterCategory;
         }
         internal void Draw(SpriteBatch s)
         {
@@ -33,11 +35,13 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
         }
         private void UpdateSpecificEncounterButtons()
         {
-            _specificEncButtons.UpdateUnlockedEncounters(_unlockedEncData);
+            Dictionary<EncounterType, Rectangle> catRectangles = EncCategoryButtons.GetCategoryRectangles();
+
+            _specificEncButtons.UpdateUnlockedEncounters(_unlockedEncData, catRectangles);
         }
         private void UpdateUnlockedCategoryButtons()
         {
-            List<string> unlockedCategories = SaveStateLibrary.ReturnUnlockedEncounterCategories();
+            List<EncounterType> unlockedCategories = SaveStateLibrary.ReturnUnlockedEncounterCategories();
             EncCategoryButtons.RecreateButtons(unlockedCategories);
 
         }
@@ -54,7 +58,11 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
         internal void UpdateInput(UIInput input)
         {
             EncCategoryButtons.UpdateButtons(input);
-            _specificEncButtons.Update(_selectedCategory, input);
+            _specificEncButtons.Update(input);
+        }
+        internal void UpdateSelectedEncounterCategory(EncounterType category)
+        {
+            _specificEncButtons.UpdateCurrentEncOptions(category);
         }
     }
 }

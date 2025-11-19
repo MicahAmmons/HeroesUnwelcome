@@ -22,6 +22,8 @@ namespace Heroes_UnWelcomed.Assets
 
             AssetManager.LoadTexture("CombatCategoryIcon", "Encounter/CategoryIcons/CombatIcon");
             AssetManager.LoadTexture("TrapCategoryIcon", "Encounter/CategoryIcons/TrapIcon");
+
+            AssetManager.LoadTexture("GoblinIcon", "Encounter/Goblin/GoblinIcon");
         }
 
         public static void LoadShaders()

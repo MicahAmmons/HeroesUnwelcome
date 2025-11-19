@@ -23,7 +23,6 @@ namespace Heroes_UnWelcomed.Buttons
                 _active = !_active;
             }
         }
-
         internal void DrawButton(SpriteBatch s)
         {
             var color = _active
@@ -42,6 +41,10 @@ namespace Heroes_UnWelcomed.Buttons
                 effects: SpriteEffects.None,
                 layerDepth: 0f
             );
+        }
+        internal void ResetButton()
+        {
+            _active = false;
         }
     }
 }

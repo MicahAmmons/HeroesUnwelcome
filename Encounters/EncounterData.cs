@@ -9,7 +9,7 @@ namespace Heroes_UnWelcomed.Encounters
 {
     public class EncounterData
     {
-        public EncounterType Category;
+        public EncounterType Category { get; set; } = EncounterType.None;
         public int AttackPower { get; set; }
         public List<ChargeData> OrderOfCharges { get; set; }
     }
