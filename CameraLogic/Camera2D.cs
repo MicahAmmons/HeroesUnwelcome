@@ -64,15 +64,27 @@ public sealed class Camera2D
         Position = new Vector2(clampedX, clampedY);
     }
 
-    public Matrix GetViewMatrix(GraphicsDevice gd)
+    public Matrix GetViewMatrix(GraphicsDevice graphicsDevice)
     {
-        var vp = gd.Viewport;
+        float zoom = Zoom;
+        Vector2 pos = Position;
+
+        // Snap the camera position so that (pos * zoom) lands on whole pixels
+        var snappedPos = new Vector2(
+            (float)Math.Round(pos.X * zoom) / zoom,
+            (float)Math.Round(pos.Y * zoom) / zoom
+        );
+
         return
-            Matrix.CreateTranslation(new Vector3(-Position, 0f)) *
-            Matrix.CreateRotationZ(Rotation) *
-            Matrix.CreateScale(Zoom, Zoom, 1f) *
-            Matrix.CreateTranslation(vp.Width * 0.5f, vp.Height * 0.5f, 0f);
+            Matrix.CreateTranslation(new Vector3(-snappedPos, 0f)) *
+            Matrix.CreateScale(zoom, zoom, 1f) *
+            Matrix.CreateTranslation(
+                graphicsDevice.Viewport.Width * 0.5f,
+                graphicsDevice.Viewport.Height * 0.5f,
+                0f
+            );
     }
+
     public void ClampZoom()
     {
         Zoom = MathHelper.Clamp(Zoom, MinZoom, MaxZoom);

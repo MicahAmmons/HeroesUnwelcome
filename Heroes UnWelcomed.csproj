@@ -12,13 +12,41 @@
     <ApplicationIcon>Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Content\Cells\EmptyCellAnimation\EmptyCell1.png" />
+    <None Remove="Content\Cells\EmptyCellAnimation\EmptyCell2.png" />
+    <None Remove="Content\Cells\EmptyCellAnimation\EmptyCell3.png" />
+    <None Remove="Content\Cells\EmptyCellAnimation\EmptyCell4.png" />
     <None Remove="Content\Cells\Empty_Cell.png" />
     <None Remove="Content\Cells\Empty_Cell_Mask.png" />
     <None Remove="Content\Encounter\CategoryIcons\CombatIcon.png" />
     <None Remove="Content\Encounter\CategoryIcons\TrapIcon.png" />
+    <None Remove="Content\Encounter\Goblin\Animation\GoblinAttack1.png" />
+    <None Remove="Content\Encounter\Goblin\Animation\GoblinAttack2.png" />
+    <None Remove="Content\Encounter\Goblin\Animation\GoblinBlock1.png" />
+    <None Remove="Content\Encounter\Goblin\Animation\GoblinBlock2.png" />
+    <None Remove="Content\Encounter\Goblin\Animation\GoblinDeath1.png" />
+    <None Remove="Content\Encounter\Goblin\Animation\GoblinDeath2.png" />
+    <None Remove="Content\Encounter\Goblin\Animation\GoblinIdle1.png" />
+    <None Remove="Content\Encounter\Goblin\Animation\GoblinIdle2.png" />
+    <None Remove="Content\Encounter\Goblin\Animation\GoblinPrepare1.png" />
+    <None Remove="Content\Encounter\Goblin\Animation\GoblinPrepare2.png" />
     <None Remove="Content\Encounter\Goblin\GoblinIcon.png" />
+    <None Remove="Content\Encounter\Hallway\Hallway1.png" />
+    <None Remove="Content\Encounter\Hallway\Hallway2.png" />
     <None Remove="Content\Encounter\Orc\OrcIcon.png" />
+    <None Remove="Content\Encounter\Vampire\Animation\Vampire-6.png" />
+    <None Remove="Content\Encounter\Vampire\Animation\VampireAttack1.png" />
+    <None Remove="Content\Encounter\Vampire\Animation\VampireAttack2.png" />
+    <None Remove="Content\Encounter\Vampire\Animation\VampireBlock1.png" />
+    <None Remove="Content\Encounter\Vampire\Animation\VampireBlock2.png" />
+    <None Remove="Content\Encounter\Vampire\Animation\VampireDeath1.png" />
+    <None Remove="Content\Encounter\Vampire\Animation\VampireDeath2.png" />
+    <None Remove="Content\Encounter\Vampire\Animation\VampireIdle1.png" />
+    <None Remove="Content\Encounter\Vampire\Animation\VampireIdle2.png" />
+    <None Remove="Content\Encounter\Vampire\Animation\VampirePrepare1.png" />
+    <None Remove="Content\Encounter\Vampire\Animation\VampirePrepare2.png" />
     <None Remove="Content\Encounter\Vampire\VampireIcon.png" />
+    <None Remove="Content\Font\Default.spritefont" />
     <None Remove="Content\Heroes\Turtle\Turtle_Attack_SS.png" />
     <None Remove="Content\Heroes\Turtle\Turtle_Attack_VE_SS.png" />
     <None Remove="Content\Heroes\Turtle\Turtle_Idle_SS.png" />
@@ -28,6 +56,20 @@
     <None Remove="Data\Encounters\EncounterData.json" />
     <None Remove="Data\Heroes\HeroData.json" />
     <None Remove="Data\SaveData\saveState.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\Cells\EmptyCellAnimation\EmptyCell1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Cells\EmptyCellAnimation\EmptyCell2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Cells\EmptyCellAnimation\EmptyCell3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Cells\EmptyCellAnimation\EmptyCell4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Cells\Empty_Cell.png">
@@ -42,13 +84,85 @@
     <Content Include="Content\Encounter\CategoryIcons\TrapIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Encounter\Goblin\Animation\GoblinAttack1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Goblin\Animation\GoblinAttack2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Goblin\Animation\GoblinBlock1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Goblin\Animation\GoblinBlock2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Goblin\Animation\GoblinDeath1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Goblin\Animation\GoblinDeath2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Goblin\Animation\GoblinIdle1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Goblin\Animation\GoblinIdle2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Goblin\Animation\GoblinPrepare1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Goblin\Animation\GoblinPrepare2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Encounter\Goblin\GoblinIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Hallway\Hallway1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Hallway\Hallway2.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Encounter\Orc\OrcIcon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Content\Encounter\Vampire\Animation\Vampire-6.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Vampire\Animation\VampireAttack1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Vampire\Animation\VampireAttack2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Vampire\Animation\VampireBlock1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Vampire\Animation\VampireBlock2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Vampire\Animation\VampireDeath1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Vampire\Animation\VampireDeath2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Vampire\Animation\VampireIdle1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Vampire\Animation\VampireIdle2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Vampire\Animation\VampirePrepare1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Encounter\Vampire\Animation\VampirePrepare2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\Encounter\Vampire\VampireIcon.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Font\Default.spritefont">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Heroes\Turtle\Turtle_Attack_SS.png">

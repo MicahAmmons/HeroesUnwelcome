@@ -55,5 +55,14 @@ namespace Heroes_UnWelcomed.Encounters
             }
             return unlocked;
         }
+        internal static List<string> ReturnAllEncounterNames()
+        {
+            var list = new List<string>();
+            foreach (var kvp in _data)
+            {
+                list.Add(kvp.Key);
+            }
+            return list;    
+        }
     }
 }

@@ -37,6 +37,54 @@
 /processorParam:TextureFormat=Color
 /build:Cells/Empty_Cell.png
 
+#begin Cells/EmptyCellAnimation/EmptyCell1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Cells/EmptyCellAnimation/EmptyCell1.png
+
+#begin Cells/EmptyCellAnimation/EmptyCell2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Cells/EmptyCellAnimation/EmptyCell2.png
+
+#begin Cells/EmptyCellAnimation/EmptyCell3.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Cells/EmptyCellAnimation/EmptyCell3.png
+
+#begin Cells/EmptyCellAnimation/EmptyCell4.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Cells/EmptyCellAnimation/EmptyCell4.png
+
 #begin Encounter/CategoryIcons/CombatIcon.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -61,6 +109,126 @@
 /processorParam:TextureFormat=Color
 /build:Encounter/CategoryIcons/TrapIcon.png;Encounter/CategoryIcons/TrapIcon
 
+#begin Encounter/Goblin/Animation/GoblinAttack1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Goblin/Animation/GoblinAttack1.png;Encounter/Goblin/GoblinAttack1
+
+#begin Encounter/Goblin/Animation/GoblinAttack2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Goblin/Animation/GoblinAttack2.png;Encounter/Goblin/GoblinAttack2
+
+#begin Encounter/Goblin/Animation/GoblinBlock1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Goblin/Animation/GoblinBlock1.png;Encounter/Goblin/GoblinBlock1
+
+#begin Encounter/Goblin/Animation/GoblinBlock2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Goblin/Animation/GoblinBlock2.png;Encounter/Goblin/GoblinBlock2
+
+#begin Encounter/Goblin/Animation/GoblinDeath1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Goblin/Animation/GoblinDeath1.png;Encounter/Goblin/GoblinDeath1
+
+#begin Encounter/Goblin/Animation/GoblinDeath2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Goblin/Animation/GoblinDeath2.png;Encounter/Goblin/GoblinDeath2
+
+#begin Encounter/Goblin/Animation/GoblinIdle1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Goblin/Animation/GoblinIdle1.png;Encounter/Goblin/GoblinIdle1
+
+#begin Encounter/Goblin/Animation/GoblinIdle2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Goblin/Animation/GoblinIdle2.png;Encounter/Goblin/GoblinIdle2
+
+#begin Encounter/Goblin/Animation/GoblinPrepare1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Goblin/Animation/GoblinPrepare1.png;Encounter/Goblin/GoblinPrepare1
+
+#begin Encounter/Goblin/Animation/GoblinPrepare2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Goblin/Animation/GoblinPrepare2.png;Encounter/Goblin/GoblinPrepare2
+
 #begin Encounter/Goblin/GoblinIcon.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -72,6 +240,30 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Encounter/Goblin/GoblinIcon.png
+
+#begin Encounter/Hallway/Hallway1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Hallway/Hallway1.png
+
+#begin Encounter/Hallway/Hallway2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Hallway/Hallway2.png
 
 #begin Encounter/Orc/OrcIcon.png
 /importer:TextureImporter
@@ -85,6 +277,138 @@
 /processorParam:TextureFormat=Color
 /build:Encounter/Orc/OrcIcon.png
 
+#begin Encounter/Vampire/Animation/Vampire-6.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Vampire/Animation/Vampire-6.png;Encounter/Vampire/Vampire-6
+
+#begin Encounter/Vampire/Animation/VampireAttack1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Vampire/Animation/VampireAttack1.png;Encounter/Vampire/VampireAttack1
+
+#begin Encounter/Vampire/Animation/VampireAttack2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Vampire/Animation/VampireAttack2.png;Encounter/Vampire/VampireAttack2
+
+#begin Encounter/Vampire/Animation/VampireBlock1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Vampire/Animation/VampireBlock1.png;Encounter/Vampire/VampireBlock1
+
+#begin Encounter/Vampire/Animation/VampireBlock2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Vampire/Animation/VampireBlock2.png;Encounter/Vampire/VampireBlock2
+
+#begin Encounter/Vampire/Animation/VampireDeath1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Vampire/Animation/VampireDeath1.png;Encounter/Vampire/VampireDeath1
+
+#begin Encounter/Vampire/Animation/VampireDeath2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Vampire/Animation/VampireDeath2.png;Encounter/Vampire/VampireDeath2
+
+#begin Encounter/Vampire/Animation/VampireIdle1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Vampire/Animation/VampireIdle1.png;Encounter/Vampire/VampireIdle1
+
+#begin Encounter/Vampire/Animation/VampireIdle2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Vampire/Animation/VampireIdle2.png;Encounter/Vampire/VampireIdle2
+
+#begin Encounter/Vampire/Animation/VampirePrepare1.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Vampire/Animation/VampirePrepare1.png;Encounter/Vampire/VampirePrepare1
+
+#begin Encounter/Vampire/Animation/VampirePrepare2.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Encounter/Vampire/Animation/VampirePrepare2.png;Encounter/Vampire/VampirePrepare2
+
 #begin Encounter/Vampire/VampireIcon.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -96,6 +420,13 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Encounter/Vampire/VampireIcon.png
+
+#begin Font/Default.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Font/Default.spritefont
 
 #begin Heroes/Turtle/Turtle_Attack_SS.png
 /importer:TextureImporter

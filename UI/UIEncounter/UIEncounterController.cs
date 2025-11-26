@@ -1,5 +1,7 @@
 using Heroes_UnWelcomed.AnimationFolder;
+using Heroes_UnWelcomed.Cells;
 using Heroes_UnWelcomed.Data.SaveData;
+using Heroes_UnWelcomed.DebugBugger;
 using Heroes_UnWelcomed.Encounters;
 using Heroes_UnWelcomed.InputTracker;
 using Microsoft.Xna.Framework;
@@ -18,6 +20,8 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
         private EncounterCategoryButton EncCategoryButtons = new EncounterCategoryButton();
         private SpecificEncounterButtons _specificEncButtons = new SpecificEncounterButtons();
 
+        public event Action UIButtonPressed;
+
         private EncounterData _selectedEncounter = null;
         public UIEncounterController()
         {
@@ -30,15 +34,26 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
 
             EncCategoryButtons.OnCategoryChanged += UpdateSelectedEncounterCategory;
             _specificEncButtons.OnEncounterButtonSelected += UpdateCurrentlySelectedEncounter;
+
+
         }
         private void UpdateCurrentlySelectedEncounter(string name) 
-        { 
+        {
+            Debug.UpdatePlayerSelectedEncounter(name);
             if (name == null)
             {
-                _selectedEncounter = null;
+                if ( _selectedEncounter != null)
+                {
+                    _selectedEncounter = null;
+                    CellManager.UpdatePlayerSelectedEncounter(null);
+                }
+
+                
                 return;
             }
             _selectedEncounter = EncounterLibrary.GetEncounterData(name);
+            UIButtonPressed?.Invoke();
+            CellManager.UpdatePlayerSelectedEncounter(name);
         }
         internal void Draw(SpriteBatch s)
         {
@@ -73,6 +88,7 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
         }
         internal void UpdateSelectedEncounterCategory(EncounterType category)
         {
+            UIButtonPressed?.Invoke();
             _specificEncButtons.UpdateCurrentEncOptions(category);
         }
     }

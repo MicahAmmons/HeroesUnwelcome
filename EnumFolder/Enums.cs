@@ -12,6 +12,10 @@ public enum AnimationType
 {
     Idle,
     Walk,
+    Attack,
+    Block,
+    Prepare,
+    Death
 }
 public enum Direction
 {
@@ -21,13 +25,11 @@ public enum Direction
     Down,
 
 }
-public enum Position
+public enum DrawPosition
 {
-    TopLeft, TopMiddle, TopRight,
-    MiddleLeft, Middle, MiddleRight,
-    BottomLeft, BottomMiddle, BottomRight,
-    CurrentPos,
-    Null
+    Combatant,
+    Hallway,
+    Cell,
 }
 public enum ChargeType
 {
@@ -41,5 +43,7 @@ public enum EncounterType
     Combat,
     Trap,
     Puzzle,
-    LockedDoor
+    LockedDoor,
+    Hallway,
+    Exit
 }

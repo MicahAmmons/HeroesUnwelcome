@@ -1,6 +1,7 @@
 using Heroes_UnWelcomed.Assets;
 using Heroes_UnWelcomed.Cells;
 using Heroes_UnWelcomed.Data.SaveData;
+using Heroes_UnWelcomed.DebugBugger;
 using Heroes_UnWelcomed.Encounters;
 using Heroes_UnWelcomed.Heroes;
 using Heroes_UnWelcomed.InputTracker;
@@ -37,14 +38,16 @@ namespace Heroes_UnWelcomed
         protected override void Initialize()
         {
 
- 
+
+            EncounterLibrary.Initialize();
             AssetManager.Initialize(Content, GraphicsDevice);
             HeroLibrary.Initialize();
             AnimationLibrary.Initialize();
             HeroManager.Initialize();
             CameraManager.Intitialize();
             CellManager.Initialize();
-            EncounterLibrary.Initialize();
+            Debug.Initialize();
+
             SaveStateLibrary.Initialize();
             UIManager.Initialize();
             base.Initialize();
@@ -59,9 +62,10 @@ namespace Heroes_UnWelcomed
         protected override void Update(GameTime gameTime)
         {
             TapTap.Update(gameTime);
-            UIManager.Update(gameTime);
+            UIManager.Update(gameTime); // if UI calls after Cell Manager, we'll run into the issue of clicking through a UI elements onto teh world
             CameraManager.Update(gameTime, GraphicsDevice);
             CellManager.Update(gameTime);
+            Debug.Update();
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
@@ -70,7 +74,7 @@ namespace Heroes_UnWelcomed
 
         protected override void Draw(GameTime gameTime)
         {
-            GraphicsDevice.Clear(Color.Pink);
+            GraphicsDevice.Clear(Color.Black);
             DrawZoomableLayers();
             DrawUINonZoomableLaters();
             
@@ -87,6 +91,7 @@ namespace Heroes_UnWelcomed
         {
             _spriteBatch.Begin();
             UIManager.Draw(_spriteBatch);
+            Debug.Draw(_spriteBatch);
             _spriteBatch.End();
         }
         protected void DrawZoomableLayers()
@@ -105,6 +110,7 @@ namespace Heroes_UnWelcomed
             CellManager.DrawCellOutLine(_spriteBatch);
             CellManager.DrawParties(_spriteBatch);
             _spriteBatch.End();
+            
         }
 
         protected void DrawScroll(GameTime gameTime)

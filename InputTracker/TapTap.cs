@@ -1,5 +1,7 @@
-﻿using Microsoft.Xna.Framework;
+using Heroes_UnWelcomed.DebugBugger;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 namespace Heroes_UnWelcomed.InputTracker
 {
@@ -12,20 +14,27 @@ namespace Heroes_UnWelcomed.InputTracker
         private static MouseState _previousMouse;
 
         private static double _lastLeftClickMs;
-        private static Point _lastLeftClickPos;
+        private static Vector2 _lastLeftClickPos;
         private const int DoubleClickTimeMs = 300;
         private const int DoubleClickMaxDistSq = 16;
 
         private static bool _isDragging;
         private static Point _dragStartPos;
-        private const int DragStartThresholdSq = 9; 
+        private const int DragStartThresholdSq = 9;
+
+        private static bool _uIElementClickedThisFrame = false;
+        public static bool UIElementClickedThisFrame => _uIElementClickedThisFrame;
 
         private static double _timeMs;
 
         public static void Update(GameTime gameTime)
         {
+
+            _uIElementClickedThisFrame = false;
+            StartFrameDebug();
             _previousKeyboard = _currentKeyboard;
             _previousMouse = _currentMouse;
+
 
             _currentKeyboard = Keyboard.GetState();
             _currentMouse = Mouse.GetState();
@@ -46,6 +55,15 @@ namespace Heroes_UnWelcomed.InputTracker
             }
             if (IsLeftReleased())
                 _isDragging = false;
+            EndFrameDebug();
+        }
+        private static void StartFrameDebug()
+        {
+            Debug.UpdateStartOfFrameInput(UIElementClickedThisFrame);
+        }
+        private static void EndFrameDebug()
+        {
+            Debug.UpdateEndOfFrameInput(UIElementClickedThisFrame);
         }
         public static bool IsKeyDown(Keys key) =>
             _currentKeyboard.IsKeyDown(key);
@@ -64,9 +82,14 @@ namespace Heroes_UnWelcomed.InputTracker
                     return true;
             return false;
         }
+        public static void UIElementClicked()
+        {
+            _uIElementClickedThisFrame = true;
+        }
         public static Point Position => _currentMouse.Position;
+        public static Vector2 WorldPositon => CameraManager.GetMouseWorldPosition(_currentMouse.Position);
         public static Point PreviousPosition => _previousMouse.Position;
-        public static Point Delta => new Point(Position.X - PreviousPosition.X, Position.Y - PreviousPosition.Y);
+       // public static Point Delta => new Point(Position.X - PreviousPosition.X, Position.Y - PreviousPosition.Y);
 
         public static int ScrollDelta => _currentMouse.ScrollWheelValue - _previousMouse.ScrollWheelValue;
 
@@ -101,43 +124,15 @@ namespace Heroes_UnWelcomed.InputTracker
 
         public static bool LeftClickIn(Rectangle rect) =>
             IsLeftPressed() && rect.Contains(Position);
-
+        public static bool LeftClickInWorldView(Rectangle rect) =>
+            IsLeftPressed() && rect.Contains(WorldPositon);
         public static bool LeftReleaseIn(Rectangle rect) =>
             IsLeftReleased() && rect.Contains(Position);
 
-        public static bool HoverIn(Rectangle rect) => rect.Contains(Position);
+        public static bool IsUIElementClicked() =>_uIElementClickedThisFrame;
 
-
-        public static bool IsLeftDoubleClick()
-        {
-            if (!IsLeftPressed())
-                return false;
-
-            var dt = _timeMs - _lastLeftClickMs;
-            var dx = Position.X - _lastLeftClickPos.X;
-            var dy = Position.Y - _lastLeftClickPos.Y;
-
-            bool isDouble = dt <= DoubleClickTimeMs && (dx * dx + dy * dy) <= DoubleClickMaxDistSq;
-
-            _lastLeftClickMs = _timeMs;
-            _lastLeftClickPos = Position;
-
-            return isDouble;
-        }
         public static bool IsDragging => _isDragging && IsLeftDown();
         public static Point DragStartPosition => _dragStartPos;
-        public static Rectangle DragRectangle
-        {
-            get
-            {
-                var p0 = _dragStartPos;
-                var p1 = Position;
-                var x = System.Math.Min(p0.X, p1.X);
-                var y = System.Math.Min(p0.Y, p1.Y);
-                var w = System.Math.Abs(p1.X - p0.X);
-                var h = System.Math.Abs(p1.Y - p0.Y);
-                return new Rectangle(x, y, w, h);
-            }
-        }
+
     }
 }

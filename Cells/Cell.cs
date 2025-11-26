@@ -4,7 +4,6 @@ using Heroes_UnWelcomed.Encounters;
 using Heroes_UnWelcomed.ScreenReso;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SharpDX.Direct3D9;
 using System;
 
 using System.Linq;
@@ -16,70 +15,84 @@ namespace Heroes_UnWelcomed.Cells
 {
     public class Cell : Animatable
     {
-        private Encounter _encounter;
-        public Encounter Encounter
+        private EncounterBunch _encounterBunch = null;
+        public bool Full => _encounterBunch != null;
+        public EncounterBunch Encounter
         {
-            get => _encounter;
+            get => _encounterBunch;
             set
             {
-                if (_encounter == value) return;
-                bool wasEmpty = _encounter == null;
-                _encounter = value;
-                if (wasEmpty && _encounter != null)
+                if (_encounterBunch == value) return;
+                bool wasEmpty = _encounterBunch == null;
+                _encounterBunch = value;
+                if (wasEmpty && _encounterBunch != null)
                     CellManager.MarkFull(this);
             }
         }
         public int GridX { get; set; }
         public int GridY { get; set; }
-        private Vector2 Position { get; set; }
-        public const int Width = 3840;
-        public const int Height = 2160;
+        public const int Width = 1920;
+        public const int Height = 1080;
         public Rectangle DestinationRect { get; private set; }
         public Vector2 Origin { get; set; }
-        public bool Full => _encounter != null;
-        public string EmptyText = "EmptyCell";
-        public Vector2 PathStart;
-        public Vector2 PathEnd;
+
+        private AnimationController _encHoverAnimation = null;
+        private int _hoverAnimTimer = 0;
+
 
         public Cell(int x, int y, string animationName = "EmptyCell") : base(animationName)
         {
             GridX = x;
             GridY = y;
-            Position = new Vector2(x * Width, y * Height);
-            DestinationRect = new Rectangle((int)Position.X, (int)Position.Y, Width, Height);
+            Initialize(x,y);
             Origin = Vector2.Zero;
-            PathStart = Position + new Vector2(0, Height /2);
-            PathEnd = PathStart + new Vector2(Width, 0);
+        }
+        public override void DrawAnimatable(SpriteBatch s)
+        {
+            if (_encHoverAnimation != null)
+            {
+                _encHoverAnimation.Draw(s, CurrentPosition, true);
+            }
+            else if (_encounterBunch != null)
+            {
+                _encounterBunch.Draw(s);
+            }
+            else
+                base.DrawAnimatable(s);
+        }
+        public override void UpdateAnimatable(GameTime g)
+        {
+            if (_encHoverAnimation != null)
+            {
+                _encHoverAnimation.Update(g);
+                CheckIfShouldDelete();
+            }
+            else if (_encounterBunch != null)
+            {
+                _encounterBunch.UpdateEncounters(g);
+            }
+            else
+                base.UpdateAnimatable(g);
+        }
 
+        private void CheckIfShouldDelete()
+        {
+            _hoverAnimTimer++;
+            if (_hoverAnimTimer >= 1)
+            {
+                _encHoverAnimation = null;
+                _hoverAnimTimer = 0;
+            }
+        }
+
+        private void Initialize(int x, int y)
+        {
+            CurrentPosition = new Vector2(x * Width, y * Height);
+            DestinationRect = new Rectangle((int)CurrentPosition.X, (int)CurrentPosition.Y, Width, Height);
         }
         public void AddEncounter(string encounter)
         {
-            _encounter = new Encounter();
-            ReplaceAnimation(encounter);
-        }
-
-        internal void SetPosition(Vector2 pos)
-        {
-            Position = pos;
-        }
-
-
-
-
-
-        internal void DrawEmptyCell(SpriteBatch s)
-        {
-            var tex = AssetManager.GetTexture(EmptyText);
-            s.Draw(
-                texture: tex,
-                destinationRectangle: DestinationRect,
-                sourceRectangle: null,
-                color: Color.Red
-            );
-
-
-
-
+            _encounterBunch = new EncounterBunch(EncounterLibrary.GetEncounterData(encounter), encounter, DestinationRect);
         }
         internal void DrawOutLine(SpriteBatch s)
         {
@@ -90,29 +103,48 @@ namespace Heroes_UnWelcomed.Cells
             var c = Color.Magenta;
             var r = DestinationRect;
 
-            // Top
-            s.Draw(pixel, new Rectangle(r.X, r.Y, r.Width, t), c);
-            // Bottom
-            s.Draw(pixel, new Rectangle(r.X, r.Y + r.Height - t, r.Width, t), c);
-            // Left
-            s.Draw(pixel, new Rectangle(r.X, r.Y, t, r.Height), c);
-            // Right
-            s.Draw(pixel, new Rectangle(r.X + r.Width - t, r.Y, t, r.Height), c);
+            // helper local clamp so width/height never overflow
+            int ClampX(int x) => Math.Clamp(x, r.X, r.X + r.Width);
+            int ClampY(int y) => Math.Clamp(y, r.Y, r.Y + r.Height);
+            int ClampW(int w) => Math.Clamp(w, 0, r.Width);
+            int ClampH(int h) => Math.Clamp(h, 0, r.Height);
+
+            // BORDER --------------------------------------------------------------------
+
+            s.Draw(pixel, new Rectangle(ClampX(r.X), ClampY(r.Y), ClampW(r.Width), t), c); // Top
+            s.Draw(pixel, new Rectangle(ClampX(r.X), ClampY(r.Y + r.Height - t), ClampW(r.Width), t), c); // Bottom
+            s.Draw(pixel, new Rectangle(ClampX(r.X), ClampY(r.Y), t, ClampH(r.Height)), c); // Left
+            s.Draw(pixel, new Rectangle(ClampX(r.X + r.Width - t), ClampY(r.Y), t, ClampH(r.Height)), c); // Right
+
+            // CENTER VERTICAL LINE ------------------------------------------------------
+
+            int centerX = ClampX(r.X + r.Width / 2);
+            s.Draw(pixel, new Rectangle(centerX, ClampY(r.Y), t, ClampH(r.Height)), Color.Cyan);
+
+            // 80% HORIZONTAL ------------------------------------------------------------
+
+            int y80 = ClampY(r.Y + (int)(r.Height * 0.80f));
+            s.Draw(pixel, new Rectangle(ClampX(r.X), y80, ClampW(r.Width), t), Color.Yellow);
+
+            // 75% VERTICAL --------------------------------------------------------------
+
+            int x75 = ClampX(r.X + (int)(r.Width * 0.75f));
+            s.Draw(pixel, new Rectangle(x75, ClampY(r.Y), t, ClampH(r.Height)), Color.LimeGreen);
+
+            // 16% HORIZONTAL ------------------------------------------------------------
+
+            int y16 = ClampY(r.Y + (int)(r.Height * 0.16f));
+            s.Draw(pixel, new Rectangle(ClampX(r.X), y16, ClampW(r.Width), t), Color.Orange);
+
         }
-        internal void DrawStaticCell(SpriteBatch s)
+        internal void UpdateEncounterHover(string playerChosenEnc)
         {
-            var tex = AssetManager.GetTexture(EmptyText);
-            s.Draw(
-                texture: tex,
-                destinationRectangle: DestinationRect,
-                sourceRectangle: null,
-                color: Color.Black
-            );
+            _hoverAnimTimer = 0;
+            if (_encHoverAnimation == null)
+            {
+                _encHoverAnimation = new AnimationController(playerChosenEnc);
+            }
         }
-
-
-
-
-
     }
+
 }

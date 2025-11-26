@@ -9,19 +9,53 @@ using System.Threading.Tasks;
 
 namespace Heroes_UnWelcomed.AnimationFolder
 {
-    internal class AnimationController
+    public class AnimationController
     {
-        private AnimationType _currentAnimation = AnimationType.Idle;
+        private AnimationType _currentAnimationType = AnimationType.Idle;
         private Dictionary<AnimationType, AnimationBunch> _animations = new Dictionary<AnimationType, AnimationBunch>();
 
         public AnimationController(string animationName)
         {
-            Dictionary<AnimationType, List<SpecificAnimationData>> data = AnimationLibrary.GetAnimationData(animationName);
+            if (animationName == null) return;
+
+            //placeholder for hallway constructor 
+            if(animationName == "Hallway")
+            {
+                Dictionary<AnimationType, AnimationData> hallwayData = new Dictionary<AnimationType, AnimationData>();
+                var specific = new SpecificAnimationData()
+                {
+                    TotalFrames = 2,
+                    Frames = new List<string>()
+                    {
+                        "Hallway1",
+                        "Hallway2"
+                    },
+                    DefaultDirection = Direction.Right,
+                    
+                };
+
+                hallwayData[AnimationType.Idle] = new AnimationData()
+                {
+                    AllAnimationsPerType = new List<SpecificAnimationData>()
+                    {
+                        specific
+                    }
+                };
+                foreach (var kvp in hallwayData)
+                {
+                    AnimationType type = kvp.Key;
+                    AnimationData animData = kvp.Value;
+                    _animations[type] = new AnimationBunch(animData);
+                }
+                return;
+
+            }
+            Dictionary<AnimationType, AnimationData> data = AnimationLibrary.GetAnimationData(animationName);
 
             foreach (var kvp in data)
             {
                 AnimationType type = kvp.Key;
-                List<SpecificAnimationData> animData = kvp.Value;
+                AnimationData animData = kvp.Value;
                 _animations[type] = new AnimationBunch(animData);
             }
         }
@@ -32,15 +66,15 @@ namespace Heroes_UnWelcomed.AnimationFolder
         }
         private void UpdateBunch(GameTime g)
         {
-            _animations[_currentAnimation]?.Update(g);
+            _animations[_currentAnimationType]?.Update(g);
         }
-        public void Draw(SpriteBatch s, Vector2 position)
+        public void Draw(SpriteBatch s, Vector2 position, bool isPreview = false)
         {
-            _animations[_currentAnimation]?.Draw(s, position);
+            _animations[_currentAnimationType]?.Draw(s, position, isPreview);
         }
         protected virtual void SetCurrentAnimation(AnimationType type)
         {
-            _currentAnimation = type;
+            _currentAnimationType = type;
         }
     }
 }

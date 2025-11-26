@@ -130,14 +130,15 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
 
                 if (btn.IsActive)
                 {
-                    if (btn == _currentlySelectedButton) continue;
+                    if (btn == _currentlySelectedButton) return;
                     UpdateCurrentlySelectedButton(btn, kvp.Key);
+                    return;
                 }
             }
+                UpdateCurrentlySelectedButton(null, null);
         }
         private void UpdateCurrentlySelectedButton( Button btn, string key = null)
         {
-            if (btn == null || key ==null)_currentlySelectedButton = null;
             _currentlySelectedButton = btn;
             OnEncounterButtonSelected?.Invoke(key);
             ResetButtonsToInactive();

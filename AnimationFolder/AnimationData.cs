@@ -1,4 +1,5 @@
-﻿using System;
+using Microsoft.Xna.Framework.Graphics;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,18 +7,16 @@ using System.Threading.Tasks;
 
 namespace Heroes_UnWelcomed.AnimationFolder
 {
-    public class AnimationData :
-    Dictionary<string, Dictionary<AnimationType, List<SpecificAnimationData>>>
+    public class AnimationData
     {
+        public List<SpecificAnimationData> AllAnimationsPerType { get; set; } = new List<SpecificAnimationData>();
+
     }
     public class SpecificAnimationData
     {
-        public string SpriteSheetName { get; set; }
-        public int FrameCount { get; set; }
-        public int FrameWidth { get; set; }
-        public int FrameHeight { get; set; }
-        public float FrameDurationMs { get; set; }
-        public int Row { get; set; }
+        public int TotalFrames { get; set; }
+        public List<string> Frames { get; set; } = new List<string>();
         public Direction DefaultDirection { get; set; }
+        public DrawPosition DrawPos { get; set; }
     }
 }

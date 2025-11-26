@@ -1,4 +1,7 @@
+using Heroes_UnWelcomed.DebugBugger;
+using Heroes_UnWelcomed.Encounters;
 using Heroes_UnWelcomed.Heroes;
+using Heroes_UnWelcomed.InputTracker;
 using Heroes_UnWelcomed.ScreenReso;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -23,16 +26,21 @@ namespace Heroes_UnWelcomed.Cells
 
         private static List<Vector2> DungeonPath = new List<Vector2>();
         private static PartyController _partyContr = null;
+        private static Cell _currentlyHoveredCell = null;
+        public static Cell CurrentHoveredCell => _currentlyHoveredCell;
+        private static PreviewWindow _previewWindow;
+
+
         public static void Initialize()
         {
             AddCell(new Cell(0, 0));
-            AddCell(new Cell(1, 0));
-            AddCell(new Cell(-1, 0));
-            AddCell(new Cell(0, 1));
-            //AddCell(new Cell(0, -1));
-            MarkFull(_all.First());
+            //AddCell(new Cell(1, 0));
+            //AddCell(new Cell(-1, 0));
+            //AddCell(new Cell(0, 1));
+           // AddCell(new Cell(0, -1));
+            //MarkFull(_all.First());
             _partyContr = new PartyController(HeroManager.GetParty());
-
+            _previewWindow = new PreviewWindow();
         }
         public static void AddCell(Cell c)
         {
@@ -41,7 +49,7 @@ namespace Heroes_UnWelcomed.Cells
             AdjustWorldRectangle();
             _empty.Add(c);
         }
-        private static Rectangle _contentRect = Rectangle.Empty; // tight bounds around cells (no padding)
+        private static Rectangle _contentRect = Rectangle.Empty; 
         public static Rectangle ContentRectangle => _contentRect;
         public static Rectangle WorldRectangle { get; private set; } = Rectangle.Empty; // padded rect you expose
         private static void AdjustWorldRectangle( int totalPadX = 600)
@@ -91,18 +99,13 @@ namespace Heroes_UnWelcomed.Cells
         {
             _empty.Remove(cell);
             _full.Add(cell); 
-            UpdateFullDungeonPath();
+            //UpdateFullDungeonPath();
         }
         public static void DrawCells(SpriteBatch s)
         {
-            foreach (var cell in _full)
+            foreach (var cell in _all)
             {
-                cell.DrawStaticCell(s);
                 cell.DrawAnimatable(s);
-            }
-            foreach (var cell in _empty)
-            {
-                cell.DrawEmptyCell(s);
             }
         }
         internal static void DrawCellOutLine(SpriteBatch spriteBatch)
@@ -112,25 +115,111 @@ namespace Heroes_UnWelcomed.Cells
                 cell.DrawOutLine(spriteBatch);
             }
         }
-        private static void UpdateFullDungeonPath()
+        public static void UpdateAllCells(GameTime g)
         {
-            List<Vector2> final = new List<Vector2>();
-
-            for (int i = 0; i < _full.Count; i++)
+            foreach (var cell in _all)
             {
-                final.Add(_full[i].PathStart);
-                final.Add(_full[i].PathEnd);
+                cell.UpdateAnimatable(g);
             }
-
-            DungeonPath = new List<Vector2>(final);
         }
         internal static void Update(GameTime gameTime)
         {
+  
+
+            UpdateAllCells(gameTime);
+
             _partyContr?.Update(gameTime);
+
+            ShowPlayerChosenEncounterToSpawn();
+
+            UpdatePreviewWindow();
+
+            UpdatePlayerCurrentCellHover();
+        }
+        private static void UpdatePreviewWindow()
+        {
+            if (!_drawPreviewWindow) return;
+            if (CurrentHoveredCell != null || _playerChosenEnc == null) return;
+            //_previewWindow.UpdatePos(TapTap.Position);
+        }
+        private static void UpdatePlayerCurrentCellHover()
+        {
+            foreach (var cell in _all)
+            {
+                Vector2 pos = TapTap.WorldPositon;
+                if (cell.DestinationRect.Contains(pos))
+                {
+                    _currentlyHoveredCell = cell;
+                    Debug.UpdateHoveredCell(cell.GridX, cell.GridY);
+                    return;
+                }
+            }
+                _currentlyHoveredCell = null;
+                Debug.UpdateHoveredCell();
+            }
+        private static string _playerChosenEnc = null;
+        private static void ShowPlayerChosenEncounterToSpawn()
+        {
+            ToggleEncounterPreviewDrawn();
+        }
+
+        private static void ToggleEncounterPreviewDrawn()
+        {
+            if (_playerChosenEnc == null)
+            {
+                _drawPreviewWindow = false;
+                return;
+            }
+            var cell = _currentlyHoveredCell;
+
+            //Draw preview window
+            if (cell == null)
+            {
+                _drawPreviewWindow = true;
+                return;
+            }
+
+            switch (cell.Full)
+            {
+                case false: // If cell is empty, draw the preview in the cell
+                    cell.UpdateEncounterHover(_playerChosenEnc);
+                    _drawPreviewWindow = false;
+                    if (TapTap.LeftClickInWorldView(cell.DestinationRect) && !TapTap.IsUIElementClicked())
+                    {
+                        ConfirmNewEncounter();
+                    }
+                    return;
+                case true: // if cell is full, maintain the preview window draw
+                    _drawPreviewWindow = true;
+                    break;
+
+            }
+
+        }
+        private static void ConfirmNewEncounter()
+        {
+            // Reset Catregory and specific enc controller if needed
+            // Send new encounter to Cell
+            var chosenEnc = _playerChosenEnc;
+            _playerChosenEnc = null;
+            _currentlyHoveredCell.AddEncounter(chosenEnc);
+        }
+        public static void UpdatePlayerSelectedEncounter(string name)
+        {
+            _playerChosenEnc = name;
+            _previewWindow.ReplaceAnimation(name);
         }
         internal static void DrawParties(SpriteBatch s)
         {
             _partyContr?.DrawHeroes(s);
+        }
+
+        private static bool _drawPreviewWindow = false;
+        public static void DrawPreviewWindow(SpriteBatch s)
+        {
+            if (!_drawPreviewWindow) return;
+            _previewWindow.DrawAnimatable(s);
+
         }
     }
 }

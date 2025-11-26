@@ -1,6 +1,8 @@
 using Heroes_UnWelcomed.Assets;
+using Heroes_UnWelcomed.Cells;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SharpDX.Mathematics.Interop;
 using System;
 using System.Collections.Generic;
 
@@ -9,107 +11,30 @@ namespace Heroes_UnWelcomed.AnimationFolder
 {
     public class SingleAnimation
     {
-        protected Texture2D SpriteSheet;
+
+        protected List<Texture2D> Frames = new List<Texture2D>();
         protected int FrameCount;
-        protected int DrawWidth;
-        protected int DrawHeight;
-        protected int FrameWidth;
-        protected int FrameHeight;
         protected float FrameDurationMS;
-        protected List<Rectangle> Frames = new List<Rectangle>();
         protected int CurrentFrameIndex = 0;
         protected float FrameTimer = 0f;
         protected Vector2 Origin;
+        protected DrawPosition DrawPos;
 
         public SingleAnimation(SpecificAnimationData data)
         {
-            SpriteSheet = AssetManager.GetTexture(data.SpriteSheetName);
-           // DrawWidth = data.DrawWidth;
-          //  DrawHeight = data.DrawHeight;
-            FrameWidth = data.FrameWidth;
-            FrameHeight = data.FrameHeight;
-            FrameDurationMS = data.FrameDurationMs;
-            Origin = new Vector2(FrameWidth / 2, FrameHeight);
-
-            int framesPerRow = Math.Max(1, SpriteSheet.Width / data.FrameWidth);
-            int startRowIndex = Math.Max(0, data.Row - 1);
-            var frames = new List<Rectangle>(data.FrameCount);
-            for (int i = 0; i < data.FrameCount; i++)
+            foreach (var key in data.Frames)
             {
-                int col = i % framesPerRow;
-                int rowOffset = i / framesPerRow;
-
-                int x = col * data.FrameWidth;
-                int y = (startRowIndex + rowOffset) * data.FrameHeight;
-
-                if (y + data.FrameHeight > SpriteSheet.Height)
-                    break;
-
-
-                // main overlay frame
-                frames.Add(new Rectangle(x, y, data.FrameWidth, data.FrameHeight));               
+                Frames.Add(AssetManager.GetTexture(key));
             }
-            Frames.AddRange(FinalizeRectangleList(frames));
-            FrameCount = Frames.Count;
-        }
-        public Rectangle GetFrame()
-        {
-            return Frames[CurrentFrameIndex];
-        }
-        private List<Rectangle> FinalizeRectangleList(List<Rectangle> frames)
-        {
-            //if (ReverseBuild)
-            //{
-            //    frames.Reverse();
-            //}
-            //if (EndCyclePause > 0)
-            //{
-            //    for (int i = 0; i < EndCyclePause; i++)
-            //    {
-            //        var dupedFrame = frames[frames.Count - 1];
-            //        var frame = new Rectangle()
-            //        {
-            //            X = dupedFrame.X,
-            //            Y = dupedFrame.Y,
-            //            Width = dupedFrame.Width,
-            //            Height = dupedFrame.Height
-            //        };
-            //        frames.Add(frame);
-            //    }
-            //}
-            //if (PingPong)
-            //{
-            //    for (int i = frames.Count - 1; i >= 0; i--)
-            //    {
-            //        var currentFrame = frames[i];
-            //        var newFrame = new Rectangle()
-            //        {
-            //            X = currentFrame.X,
-            //            Y = currentFrame.Y,
-            //            Width = currentFrame.Width,
-            //            Height = currentFrame.Height
-            //        };
-            //        frames.Add(newFrame);
-            //    }
-            //}
-            //if (StartCyclePause > 0)
-            //{
-            //    for (int i = 0; i < StartCyclePause; i++)
-            //    {
-            //        Frames.Add(new Rectangle());
-            //    }
-            //}
-            return frames;
+            FrameDurationMS = 300;
+            DrawPos = data.DrawPos;
+            FrameCount = data.TotalFrames;
+
         }
         public int GetFrameCount()
         {
             return FrameCount;
         }
-        public float GetFrameDurationMs()
-        {
-            return FrameDurationMS;
-        }
-
         internal void UpdateTimer(float delta)
         {
             FrameTimer += delta;
@@ -131,12 +56,6 @@ namespace Heroes_UnWelcomed.AnimationFolder
             }
             CurrentFrameIndex = index;
         }
-
-        internal Texture2D GetTexture()
-        {
-            return SpriteSheet;
-        }
-
         internal SpriteEffects GetSpriteEffect()
         {
             return SpriteEffects.None;
@@ -144,7 +63,58 @@ namespace Heroes_UnWelcomed.AnimationFolder
 
         internal Vector2 GetOrigin()
         {
-            return Origin;
+            Vector2 final = Vector2.One;
+            switch (DrawPos)
+            {
+                case DrawPosition.Cell:
+                    final = new Vector2(0, 0);
+                    break;
+
+                case DrawPosition.Hallway:
+                    final = new Vector2(0, 0);
+                    break;
+                case DrawPosition.Combatant:
+                    final = new Vector2(Frames[0].Width / 2, Frames[0].Height);
+                    break;
+            }
+            return final;
+        }
+
+        internal Texture2D GetTexture()
+        {
+            return Frames[CurrentFrameIndex];
+        }
+        internal Vector2 GetDrawFromVector(Vector2 pos)
+        {
+
+            int cellWidth = Cell.Width;
+            const float floor = Cell.Height * .80f;
+            Vector2 basePos = pos;
+            Vector2 drawPoint = Vector2.Zero;
+            switch (DrawPos)
+            {
+                case DrawPosition.Cell:
+                    drawPoint = pos;
+                    break;
+
+                case DrawPosition.Hallway:
+                    drawPoint = pos;
+                    break;
+                case DrawPosition.Combatant:
+                    drawPoint = new Vector2(cellWidth * .875f, floor);
+                    break;
+            }
+            return drawPoint;
+        }
+
+        internal int GetWidth()
+        {
+            return Math.Clamp(Frames[CurrentFrameIndex].Width, 0, Cell.Width);
+        }
+
+        internal int GetHeight()
+        {
+            return Math.Clamp(Frames[CurrentFrameIndex].Height, 0, Cell.Height);
         }
     }
 }

@@ -2,6 +2,7 @@ using Heroes_UnWelcomed.Cells;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework;
 using System;
+using Heroes_UnWelcomed.InputTracker;
 
 public static class CameraManager
 {
@@ -42,7 +43,20 @@ public static class CameraManager
 
         _camera.ClampPositionToWorld(_graphics);
     }
+    public static Vector2 ScreenToWorld(Vector2 screenPos)
+    {
+        if (_graphics == null)
+            throw new InvalidOperationException("CameraManager.ScreenToWorld called before _graphics was set.");
 
+        return _camera.ScreenToWorld(screenPos, _graphics);
+    }
+    public static Vector2 GetMouseWorldPosition(Point mouse)
+    {
+        if (_graphics == null)
+            return Vector2.One;
+
+        return _camera.ScreenToWorld(mouse.ToVector2(), _graphics);
+    }
     internal static void Update(GameTime gameTime, GraphicsDevice graphicsDevice)
     {
         _graphics = graphicsDevice;

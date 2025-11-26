@@ -27,11 +27,19 @@ namespace Heroes_UnWelcomed.Assets
         {
             AssetLoader.LoadAllTextures();
             AssetLoader.LoadShaders();
+            AssetLoader.LoadCombatEncounters();
+            AssetLoader.LoadFonts();
+            AssetLoader.LoadCellAnimations();
+            AssetLoader.LoadHallwayEncounter();
 
         }
         public static void LoadTexture(string key, string path)
         {
             Texture2D texture = _content.Load<Texture2D>(path);
+            _textures[key] = texture;
+        }
+        public static void LoadTexture(Texture2D texture, string key)
+        {
             _textures[key] = texture;
         }
         public static Texture2D GetTexture(string key)
@@ -51,7 +59,13 @@ namespace Heroes_UnWelcomed.Assets
         }
         public static void LoadFont(string key, string path) =>
        _fonts[key] = _content.Load<SpriteFont>(path);
-        public static SpriteFont GetFont(string key) => _fonts[key];
+        public static SpriteFont GetFont(string key)
+        {
+            if (_fonts.TryGetValue(key, out var font))
+                return font;
+
+            return _fonts["Default"];
+        }
 
         public static void LoadEffect(string key, string path)
         {
@@ -66,8 +80,23 @@ namespace Heroes_UnWelcomed.Assets
         public static void CreatePixel(GraphicsDevice device)
         {
             Texture2D pixel = new Texture2D(device, 1, 1);
-            pixel.SetData(new[] { Color.Black });
-            _textures["BlackPixel"] = pixel;
+            pixel.SetData(new[] { Color.White });
+            _textures["WhitePixel"] = pixel;
         }
+        public static bool TryLoadRawTexture(string key, string path)
+        {
+            try
+            {
+                Texture2D texture = _content.Load<Texture2D>(path);
+                _textures[key] = texture;
+                return true;
+            }
+            catch
+            {
+
+                return false;
+            }
+        }
+
     }
 }

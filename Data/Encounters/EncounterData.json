@@ -1,62 +1,12 @@
 {
   "Goblin": {
     "Category": "Combat",
-    "Animation": "Turtle",
     "AttackPower": 1,
-    "OrderOfCharges": [
-      {
-        "Type": "Travel",
-        "Begin": "MiddleLeft",
-        "End": "Middle"
-      },
-      {
-        "Type": "Combat"
-      },
-      {
-        "Type": "Exit",
-        "Begin": "CurrentPos",
-        "End": "MiddleRight"
-      }
-    ]
-  },
-  "Orc": {
-    "Category": "Combat",
-    "Animation": "Turtle",
-    "AttackPower": 2,
-    "OrderOfCharges": [
-      {
-        "Type": "Travel",
-        "Begin": "MiddleLeft",
-        "End": "Middle"
-      },
-      {
-        "Type": "Combat"
-      },
-      {
-        "Type": "Exit",
-        "Begin": "CurrentPos",
-        "End": "MiddleRight"
-      }
-    ]
+    "EncounterOrder": [ "Hallway", "Combat", "Exit" ]
   },
   "Vampire": {
     "Category": "Combat",
-    "Animation": "Turtle",
     "AttackPower": 3,
-    "OrderOfCharges": [
-      {
-        "Type": "Travel",
-        "Begin": "MiddleLeft",
-        "End": "Middle"
-      },
-      {
-        "Type": "Combat"
-      },
-      {
-        "Type": "Exit",
-        "Begin": "CurrentPos",
-        "End": "MiddleRight"
-      }
-    ]
+    "EncounterOrder": [ "Hallway", "Combat", "Exit" ]
   }
 }

@@ -12,9 +12,11 @@ namespace Heroes_UnWelcomed.UI
 
         private static UIEncounterController _encUIController;
         private static UIInput _input;
+
         public static void Initialize()
         {
              _encUIController = new UIEncounterController();
+            _encUIController.UIButtonPressed += UIElementClickedThisFrame;
         }
         public static void Draw(SpriteBatch s)
         {
@@ -25,11 +27,15 @@ namespace Heroes_UnWelcomed.UI
             UpdateInput();
             _encUIController?.Update(gameTime, _input);
         }
+        private static void UIElementClickedThisFrame()
+        {
+            TapTap.UIElementClicked();
+        }
         private static void UpdateInput()
         {
             _input = new UIInput
             {
-                MousePos = TapTap.Position,          // Vector2
+                MousePos = TapTap.Position.ToVector2(),          // Vector2
                 LeftPressed = TapTap.IsLeftPressed(),
                 LeftJustReleased = TapTap.IsLeftReleased(),
                 EscapePressed = TapTap.IsKeyPressed(Keys.Escape),
@@ -39,7 +45,7 @@ namespace Heroes_UnWelcomed.UI
     }
     public readonly struct UIInput
     {
-        public Point MousePos { get; init; }
+        public Vector2 MousePos { get; init; }
         public bool LeftPressed { get; init; }
         public bool LeftJustReleased { get; init; }
         public bool EscapePressed { get; init; }

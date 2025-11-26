@@ -11,18 +11,19 @@ using System.Threading.Tasks;
 namespace Heroes_UnWelcomed.AnimationFolder
 {
     public abstract class Animatable 
-    {
-        private AnimationController AnimContr {  get; set; }
+    {   
+        public AnimationController AnimContr {  get; set; }
         public Vector2 CurrentPosition { get; set; }
 
         public Animatable(string animationName)
         {
-            if (animationName == "EmptyCell") { AnimContr = null; return; }
+            if (animationName is "Null" or null) { AnimContr = null; return; }
             AnimContr = new AnimationController(animationName);
         }
         public virtual void UpdateAnimatable(GameTime g)
         {
             AnimContr?.Update(g);
+
         }
         public virtual void DrawAnimatable(SpriteBatch s)
         {
@@ -30,7 +31,13 @@ namespace Heroes_UnWelcomed.AnimationFolder
         }
         public virtual void ReplaceAnimation(string newAnimName)
         {
+
             AnimContr = new AnimationController(newAnimName);
+        }
+
+        public virtual void SelfDeleteAnimContr()
+        {
+            AnimContr = null;
         }
 
     }

@@ -1,3 +1,4 @@
+using Heroes_UnWelcomed.Assets;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System.Collections.Generic;
@@ -7,35 +8,59 @@ namespace Heroes_UnWelcomed.AnimationFolder
     public class AnimationBunch
     {
         private List<SingleAnimation> _animations = new List<SingleAnimation>();
-        public AnimationBunch(List<SpecificAnimationData> animData)
+        public AnimationBunch(AnimationData animData)
         {
-            foreach (var animation in animData)
+            foreach (var animation in animData.AllAnimationsPerType)
             {
                 _animations.Add(new SingleAnimation(animation));
             }
         }
 
-        internal void Draw(SpriteBatch s, Vector2 pos)
+        internal void Draw(SpriteBatch s, Vector2 pos, bool preview = false)
         {
             foreach (var singleAnim in _animations)
             {
-                int frameCount = singleAnim.GetFrameCount();
-                if (singleAnim == null || frameCount < 1)
-                    return;
+                if (singleAnim == null || singleAnim.GetFrameCount() < 1)
+                    continue;
+
+                Texture2D text = singleAnim.GetTexture();
+                Vector2 drawFrom = singleAnim.GetDrawFromVector(pos);
+                int width = singleAnim.GetWidth();
+                int height = singleAnim.GetHeight();
+                // We still read these if you need them for other stuff:
+                // Vector2 origin = singleAnim.GetOrigin();
+                SpriteEffects effects = singleAnim.GetSpriteEffect();
+                Rectangle dest = new Rectangle((int)drawFrom.X, (int)drawFrom.Y, width, height);
+
                 s.Draw(
-                    texture: singleAnim.GetTexture(),
-                    position: pos,
-                    sourceRectangle: singleAnim.GetFrame(),
+                    texture: text,
+                    destinationRectangle: dest,
+                    sourceRectangle: null,
                     color: Color.White,
                     rotation: 0f,
-                    origin: singleAnim.GetOrigin(),
-                    scale: new Vector2(1f, 1f),
-                    effects: singleAnim.GetSpriteEffect(),
+                    origin: Vector2.Zero,          // <--- key change
+                    effects: effects,              // flipping still fine
                     layerDepth: 0f
                 );
 
+                DrawOutline(s, dest);
             }
         }
+
+        internal void DrawOutline(SpriteBatch s, Rectangle r)
+        {
+            var pixel = AssetManager.GetTexture("WhitePixel");
+            if (pixel == null) return;
+
+            int t = 3;
+            Color c = Color.HotPink;
+
+            s.Draw(pixel, new Rectangle(r.X, r.Y, r.Width, t), c);
+            s.Draw(pixel, new Rectangle(r.X, r.Y + r.Height - t, r.Width, t), c);
+            s.Draw(pixel, new Rectangle(r.X, r.Y, t, r.Height), c);
+            s.Draw(pixel, new Rectangle(r.X + r.Width - t, r.Y, t, r.Height), c);
+        }
+
 
         internal void Update(GameTime g)
         {
