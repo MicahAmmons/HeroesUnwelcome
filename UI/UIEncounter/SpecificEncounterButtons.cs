@@ -123,29 +123,54 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
         public void UpdateButtons(UIInput input)
         {
             var buttons = _allButtons[_currentOptionType];
+
+            Button selectedButton = null;
+            string key = null;
+
             foreach (var kvp in buttons)
             {
                 Button btn = kvp.Value;
                 btn.UpdateStatus(input.MousePos, input.LeftPressed);
 
+                //This catches all buttons that are active
                 if (btn.IsActive)
                 {
-                    if (btn == _currentlySelectedButton) return;
-                    UpdateCurrentlySelectedButton(btn, kvp.Key);
-                    return;
+                    if (btn != _currentlySelectedButton)
+                    {
+                        selectedButton = btn;
+                        key = kvp.Key;
+                        UpdateCurrentlySelectedButton(selectedButton, key);
+                        ResetButtonsToInactive();
+                    }
+                        continue;
                 }
+                else if (btn == _currentlySelectedButton)
+                {
+                    ResetAllButtons();
+                }
+                
             }
-                UpdateCurrentlySelectedButton(null, null);
         }
-        private void UpdateCurrentlySelectedButton( Button btn, string key = null)
+        public void UpdateCurrentlySelectedButton( Button btn = null, string key = null)
         {
-            _currentlySelectedButton = btn;
-            OnEncounterButtonSelected?.Invoke(key);
+            if (_currentlySelectedButton == btn)
+            {
+                _currentlySelectedButton = null;
+                OnEncounterButtonSelected?.Invoke(null);
+            }
+            else
+            {
+                _currentlySelectedButton = btn;
+                OnEncounterButtonSelected?.Invoke(key);
+            }
+
+
             ResetButtonsToInactive();
         }
         public void UpdateCurrentEncOptions(EncounterType category)
         {
             _currentOptionType = category;
+
             ResetAllButtons();
 
         }

@@ -3,6 +3,7 @@ using Heroes_UnWelcomed.UI.UIEncounter;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 
 
 namespace Heroes_UnWelcomed.UI
@@ -41,6 +42,15 @@ namespace Heroes_UnWelcomed.UI
                 EscapePressed = TapTap.IsKeyPressed(Keys.Escape),
                 SpacePressed = TapTap.IsKeyPressed(Keys.Space)
             };
+        }
+        internal static void ResetSpecificEncounter()
+        {
+            _encUIController.ResetCurrentlySelectedSpecificEnc();
+        }
+
+        internal static void ResetEncounterCategory()
+        {
+            _encUIController.UpdateSelectedEncounterCategory(EncounterType.None);
         }
     }
     public readonly struct UIInput

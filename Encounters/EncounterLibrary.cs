@@ -64,5 +64,6 @@ namespace Heroes_UnWelcomed.Encounters
             }
             return list;    
         }
+
     }
 }

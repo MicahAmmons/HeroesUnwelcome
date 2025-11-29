@@ -31,6 +31,7 @@ namespace Heroes_UnWelcomed.AnimationFolder
                         "Hallway2"
                     },
                     DefaultDirection = Direction.Right,
+                    DrawPos = DrawPosition.Hallway,
                     
                 };
 

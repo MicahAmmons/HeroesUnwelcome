@@ -37,7 +37,7 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
 
 
         }
-        private void UpdateCurrentlySelectedEncounter(string name) 
+        public void UpdateCurrentlySelectedEncounter(string name) 
         {
             Debug.UpdatePlayerSelectedEncounter(name);
             if (name == null)
@@ -80,6 +80,7 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
         internal void Update(GameTime gameTime, UIInput input)
         {
             UpdateInput(input);
+
         }
         internal void UpdateInput(UIInput input)
         {
@@ -88,8 +89,14 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
         }
         internal void UpdateSelectedEncounterCategory(EncounterType category)
         {
+            //Player clicks an encounter category
             UIButtonPressed?.Invoke();
+            Debug.UpdateSelectedEncCategory(category);
             _specificEncButtons.UpdateCurrentEncOptions(category);
+        }
+        internal void ResetCurrentlySelectedSpecificEnc()
+        {
+            _specificEncButtons.UpdateCurrentlySelectedButton();
         }
     }
 }

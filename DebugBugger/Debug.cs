@@ -15,6 +15,7 @@ namespace Heroes_UnWelcomed.DebugBugger
     {
         private static string _currentHoveredCell = null;
         private static string _playerSelectedEncounter = null;
+        private static string _playerSelectedEncCategory = null;
         private static bool _showing = false;
         private static SpriteFont _font;
         private static bool _uIButtonStartOfFrame;
@@ -62,6 +63,13 @@ namespace Heroes_UnWelcomed.DebugBugger
             string encounterText = _playerSelectedEncounter ?? "No selected EncounterData";
             string startFrameUI = $"Start Frame UI Pressed : {_uIButtonStartOfFrame}";
             string endFrameUI = $"End Frame UI Pressed : {_uIButtonEndOfFrame}";
+            string encCatSelection = $"Selected Encounter Category: {_playerSelectedEncCategory}";
+            if (_playerSelectedEncCategory == null)
+            {
+                encCatSelection = "No Selected Enc Category";
+            }
+
+
 
 
             string[] lines =
@@ -70,6 +78,7 @@ namespace Heroes_UnWelcomed.DebugBugger
                 encounterText,
                 startFrameUI,
                 endFrameUI,
+                encCatSelection,
             };
 
             // Find max width for right-align
@@ -102,6 +111,14 @@ namespace Heroes_UnWelcomed.DebugBugger
             _uIButtonEndOfFrame = isPressed;
         }
 
-
+        internal static void UpdateSelectedEncCategory(EncounterType type)
+        {
+            if (type == EncounterType.None)
+            {
+                _playerSelectedEncCategory = null;
+                return;
+            }
+            _playerSelectedEncCategory = type.ToString();
+        }
     }
 }

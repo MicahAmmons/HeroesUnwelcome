@@ -17,7 +17,8 @@ namespace Heroes_UnWelcomed.AnimationFolder
         protected float FrameDurationMS;
         protected int CurrentFrameIndex = 0;
         protected float FrameTimer = 0f;
-        protected Vector2 Origin;
+        protected Vector2 Origin = Vector2.Zero;
+        protected Vector2 DrawPoint = Vector2.Zero;
         protected DrawPosition DrawPos;
 
         public SingleAnimation(SpecificAnimationData data)
@@ -63,21 +64,23 @@ namespace Heroes_UnWelcomed.AnimationFolder
 
         internal Vector2 GetOrigin()
         {
-            Vector2 final = Vector2.One;
+            if (Origin != Vector2.Zero)
+                return Origin;
+
             switch (DrawPos)
             {
                 case DrawPosition.Cell:
-                    final = new Vector2(0, 0);
+                    Origin = new Vector2(0, 0);
                     break;
 
                 case DrawPosition.Hallway:
-                    final = new Vector2(0, 0);
+                    Origin = new Vector2(0, 0);
                     break;
                 case DrawPosition.Combatant:
-                    final = new Vector2(Frames[0].Width / 2, Frames[0].Height);
+                    Origin = new Vector2(Frames[0].Width / 2, Frames[0].Height);
                     break;
             }
-            return final;
+            return Origin;
         }
 
         internal Texture2D GetTexture()
@@ -86,35 +89,52 @@ namespace Heroes_UnWelcomed.AnimationFolder
         }
         internal Vector2 GetDrawFromVector(Vector2 pos)
         {
-
-            int cellWidth = Cell.Width;
+            if (DrawPoint != Vector2.Zero)
+                return DrawPoint;
+ 
             const float floor = Cell.Height * .80f;
             Vector2 basePos = pos;
-            Vector2 drawPoint = Vector2.Zero;
             switch (DrawPos)
             {
                 case DrawPosition.Cell:
-                    drawPoint = pos;
+                    DrawPoint = pos;
                     break;
 
                 case DrawPosition.Hallway:
-                    drawPoint = pos;
+                    DrawPoint = new Vector2(pos.X, (Cell.Height *.38f) + pos.Y);
                     break;
                 case DrawPosition.Combatant:
-                    drawPoint = new Vector2(cellWidth * .875f, floor);
+                    DrawPoint = new Vector2((Cell.Width * .875f) + pos.X, floor + pos.Y);
                     break;
             }
-            return drawPoint;
+            return DrawPoint;
         }
 
         internal int GetWidth()
         {
+            if (DrawPos == DrawPosition.Hallway)
+            {
+                return 960;
+            }
             return Math.Clamp(Frames[CurrentFrameIndex].Width, 0, Cell.Width);
         }
 
         internal int GetHeight()
         {
+            if (DrawPos == DrawPosition.Hallway)
+            {
+                return 455;
+            }
             return Math.Clamp(Frames[CurrentFrameIndex].Height, 0, Cell.Height);
+        }
+
+        internal Color GetColor()
+        {
+            if (DrawPos == DrawPosition.Hallway)
+            {
+                return Color.DarkBlue * .5f;
+            }
+            return Color.White; 
         }
     }
 }

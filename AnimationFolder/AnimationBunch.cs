@@ -27,27 +27,32 @@ namespace Heroes_UnWelcomed.AnimationFolder
                 Vector2 drawFrom = singleAnim.GetDrawFromVector(pos);
                 int width = singleAnim.GetWidth();
                 int height = singleAnim.GetHeight();
-                // We still read these if you need them for other stuff:
-                // Vector2 origin = singleAnim.GetOrigin();
+                Vector2 origin = singleAnim.GetOrigin();
                 SpriteEffects effects = singleAnim.GetSpriteEffect();
+                Color col = singleAnim.GetColor();
                 Rectangle dest = new Rectangle((int)drawFrom.X, (int)drawFrom.Y, width, height);
 
                 s.Draw(
                     texture: text,
                     destinationRectangle: dest,
                     sourceRectangle: null,
-                    color: Color.White,
+                    color: col,
                     rotation: 0f,
-                    origin: Vector2.Zero,          // <--- key change
+                    origin: origin,          // <--- key change
                     effects: effects,              // flipping still fine
                     layerDepth: 0f
                 );
-
-                DrawOutline(s, dest);
+                Rectangle outlineRect = new Rectangle(
+    dest.X - (int)origin.X,
+    dest.Y - (int)origin.Y,
+    dest.Width,
+    dest.Height
+);
+                DrawOutline(s, outlineRect, origin);
             }
         }
 
-        internal void DrawOutline(SpriteBatch s, Rectangle r)
+        internal void DrawOutline(SpriteBatch s, Rectangle r, Vector2 origin)
         {
             var pixel = AssetManager.GetTexture("WhitePixel");
             if (pixel == null) return;

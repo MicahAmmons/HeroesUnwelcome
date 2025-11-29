@@ -3,6 +3,7 @@ using Heroes_UnWelcomed.Encounters;
 using Heroes_UnWelcomed.Heroes;
 using Heroes_UnWelcomed.InputTracker;
 using Heroes_UnWelcomed.ScreenReso;
+using Heroes_UnWelcomed.UI;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -201,8 +202,10 @@ namespace Heroes_UnWelcomed.Cells
             // Reset Catregory and specific enc controller if needed
             // Send new encounter to Cell
             var chosenEnc = _playerChosenEnc;
-            _playerChosenEnc = null;
+
             _currentlyHoveredCell.AddEncounter(chosenEnc);
+            UIManager.ResetSpecificEncounter();
+            UIManager.ResetEncounterCategory();
         }
         public static void UpdatePlayerSelectedEncounter(string name)
         {
