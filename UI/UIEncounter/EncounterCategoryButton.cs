@@ -59,6 +59,12 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
                 kvp.Value.DrawButton(s);
             }
         }
+        public void ResetAllButtons()
+        {
+            foreach (var but in _categoryButtons.Values)
+                but.ResetButton();
+                    
+        }
         public void UpdateButtons(UIInput input)
         {
             foreach (var kvp in _categoryButtons)

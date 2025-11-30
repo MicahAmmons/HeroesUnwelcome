@@ -199,14 +199,54 @@ namespace Heroes_UnWelcomed.Cells
         }
         private static void ConfirmNewEncounter()
         {
+            var chosenCell = _currentlyHoveredCell;
             // Reset Catregory and specific enc controller if needed
             // Send new encounter to Cell
             var chosenEnc = _playerChosenEnc;
 
-            _currentlyHoveredCell.AddEncounter(chosenEnc);
+            chosenCell.AddEncounter(chosenEnc);
+            MarkFull(chosenCell);
             UIManager.ResetSpecificEncounter();
             UIManager.ResetEncounterCategory();
+            TryToAddEmptyCells(chosenCell);
         }
+
+        private static void TryToAddEmptyCells(Cell chosenCell)
+        {
+            int x = chosenCell.GridX;
+            int y = chosenCell.GridY;
+
+            // North, East, South, West offsets
+            var directions = new (int dx, int dy)[]
+            {
+        (0, -1), // north
+        (1, 0),  // east
+        (0, 1),  // south
+        (-1, 0), // west
+            };
+
+            foreach (var (dx, dy) in directions)
+            {
+                int nx = x + dx;
+                int ny = y + dy;
+
+                // Does a cell already exist at this grid coordinate?
+                bool exists = _all.Any(c => c.GridX == nx && c.GridY == ny);
+                if (exists)
+                    continue;
+
+                // Create a new empty cell (adjust this to your actual constructor / flags)
+                var newCell = new Cell(nx, ny)
+                {
+                    // Example: mark this as empty if you have such a property
+                    // IsEmpty = true
+                };
+
+                AddCell(newCell);
+            }
+        }
+
+
         public static void UpdatePlayerSelectedEncounter(string name)
         {
             _playerChosenEnc = name;

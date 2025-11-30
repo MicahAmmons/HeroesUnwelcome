@@ -92,6 +92,8 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
             //Player clicks an encounter category
             UIButtonPressed?.Invoke();
             Debug.UpdateSelectedEncCategory(category);
+            if (category == EncounterType.None)
+                EncCategoryButtons.ResetAllButtons();
             _specificEncButtons.UpdateCurrentEncOptions(category);
         }
         internal void ResetCurrentlySelectedSpecificEnc()
