@@ -11,16 +11,13 @@ namespace Heroes_UnWelcomed.Buttons
         public Rectangle ButtonBoundary;
         public Texture2D Texture;
 
+        public bool CanBeUnselected = true;
         public bool IsActive => _active;
         public bool IsHovered => _hovered;
 
         internal void UpdateStatus(Vector2 mouse, bool leftJustReleased)
         {
             _hovered = ButtonBoundary.Contains(mouse);
-            if (_hovered)
-            {
-                int th = 5;
-            }
             if (_hovered && leftJustReleased)
             {
                 _active = !_active;
@@ -48,6 +45,10 @@ namespace Heroes_UnWelcomed.Buttons
         internal void ResetButton()
         {
             _active = false;
+        }
+        internal void ActivateButton()
+        {
+            _active = true;
         }
     }
 }

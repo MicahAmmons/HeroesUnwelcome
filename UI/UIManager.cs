@@ -1,4 +1,5 @@
 using Heroes_UnWelcomed.InputTracker;
+using Heroes_UnWelcomed.Overlord;
 using Heroes_UnWelcomed.UI.UIEncounter;
 using Heroes_UnWelcomed.UI.UISpeed;
 using Microsoft.Xna.Framework;
@@ -20,7 +21,9 @@ namespace Heroes_UnWelcomed.UI
         {
              _encUIController = new UIEncounterController();
             _speedController = new UISpeedController();
+
             _encUIController.UIButtonPressed += UIElementClickedThisFrame;
+            _speedController.OnSpeedButtonClicked += SendSpeedToOverLord;
         }
         public static void Draw(SpriteBatch s)
         {
@@ -32,6 +35,11 @@ namespace Heroes_UnWelcomed.UI
             UpdateInput();
             _encUIController?.Update(_input);
             _speedController?.Update(_input);
+        }
+        private static void SendSpeedToOverLord(string speed)
+        {
+            UIElementClickedThisFrame();
+            OverLord.PlayerChoseSpeed(speed);
         }
         private static void UIElementClickedThisFrame()
         {

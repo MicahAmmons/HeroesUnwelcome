@@ -11,13 +11,43 @@ namespace Heroes_UnWelcomed.Overlord
     {
         private static float _delta;
         public static float Delta => _delta;
-        private static float _timeMod = 2f;
+        private static float _timeMod = 1f;
+
+        private const float _pauseSpeed = 0f;
+        private const float _playSpeed = 1f;
+        private const float _2xSpeed = 2f;
+        private const float _3xSpeed = 3f;
 
         public static float Update(GameTime g)
         {
             _delta = (float)g.ElapsedGameTime.TotalMilliseconds * _timeMod;
 
             return _delta;
+        }
+        public static void PlayerChoseSpeed(string speed)
+        {
+            float timeMod = 0f;
+            switch (speed)
+            {
+                case "Play":
+                    timeMod = _playSpeed;
+                    break;
+                case "Pause":
+                    timeMod = _pauseSpeed;
+                    break;
+                case "2xSpeed":
+                    timeMod = _2xSpeed;
+                    break;
+                case "3xSpeed":
+                    timeMod = _3xSpeed;
+                    break;
+                case null:
+                    return;
+            }
+            if (timeMod != _timeMod)
+            {
+                _timeMod = timeMod;
+            }
         }
     }
 }

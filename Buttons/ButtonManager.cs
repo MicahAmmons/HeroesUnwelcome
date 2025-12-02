@@ -44,9 +44,10 @@ namespace Heroes_UnWelcomed.Buttons
         }
         public virtual void UpdateCurrentlySelectedButton(Button btn = null, string key = null)
         {
+            // This unselects the button if its clicked while selected
             if (_currentlySelectedButton == btn)
             {
-                _currentlySelectedButton = null;
+                if (btn.CanBeUnselected) _currentlySelectedButton = null;
                 ButtonClicked(key);
 
             }
