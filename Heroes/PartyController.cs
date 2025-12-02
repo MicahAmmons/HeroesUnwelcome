@@ -26,11 +26,11 @@ namespace Heroes_UnWelcomed.Heroes
                 _heroes[i].SetCurrentPosition(i);
             }
         }
-        public void Update(GameTime gameTime)
+        public void Update(float delta)
         {
             foreach (var hero in _heroes)
             {
-                hero.UpdateAnimatable(gameTime);
+                hero.UpdateAnimatable(delta);
             }
         }
         public void DrawHeroes(SpriteBatch s)

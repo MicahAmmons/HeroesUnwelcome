@@ -61,13 +61,13 @@ namespace Heroes_UnWelcomed.AnimationFolder
             }
         }
 
-        public void Update(GameTime g)
+        public void Update(float delta)
         {
-            UpdateBunch(g);
+            UpdateBunch(delta);
         }
-        private void UpdateBunch(GameTime g)
+        private void UpdateBunch(float delta)
         {
-            _animations[_currentAnimationType]?.Update(g);
+            _animations[_currentAnimationType]?.Update(delta);
         }
         public void Draw(SpriteBatch s, Vector2 position, bool isPreview = false)
         {

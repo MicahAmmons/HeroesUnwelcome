@@ -20,9 +20,9 @@ namespace Heroes_UnWelcomed.AnimationFolder
             if (animationName is "Null" or null) { AnimContr = null; return; }
             AnimContr = new AnimationController(animationName);
         }
-        public virtual void UpdateAnimatable(GameTime g)
+        public virtual void UpdateAnimatable(float delta)
         {
-            AnimContr?.Update(g);
+            AnimContr?.Update(delta);
 
         }
         public virtual void DrawAnimatable(SpriteBatch s)

@@ -57,7 +57,7 @@ public static class CameraManager
 
         return _camera.ScreenToWorld(mouse.ToVector2(), _graphics);
     }
-    internal static void Update(GameTime gameTime, GraphicsDevice graphicsDevice)
+    internal static void Update(GraphicsDevice graphicsDevice)
     {
         _graphics = graphicsDevice;
 
@@ -68,7 +68,7 @@ public static class CameraManager
             _deferredWorldRect = null;
         }
 
-        _zoom.Update(gameTime, _camera, _graphics);
+        _zoom.Update(_camera, _graphics);
 
         // If you support window resize, call this from Game.Window.ClientSizeChanged:
         // OnViewportChanged();

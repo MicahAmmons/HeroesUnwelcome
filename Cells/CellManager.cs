@@ -116,20 +116,20 @@ namespace Heroes_UnWelcomed.Cells
                 cell.DrawOutLine(spriteBatch);
             }
         }
-        public static void UpdateAllCells(GameTime g)
+        public static void UpdateAllCells(float delta)
         {
             foreach (var cell in _all)
             {
-                cell.UpdateAnimatable(g);
+                cell.UpdateAnimatable(delta);
             }
         }
-        internal static void Update(GameTime gameTime)
+        internal static void Update(float delta)
         {
   
 
-            UpdateAllCells(gameTime);
+            UpdateAllCells(delta);
 
-            _partyContr?.Update(gameTime);
+            _partyContr?.Update(delta);
 
             ShowPlayerChosenEncounterToSpawn();
 

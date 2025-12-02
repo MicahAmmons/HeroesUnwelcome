@@ -13,32 +13,29 @@ using System.Security.AccessControl;
 
 namespace Heroes_UnWelcomed.UI.UIEncounter
 {
-    internal class SpecificEncounterButtons
+    internal class SpecificEncounterButtons : ButtonManager
     {
         private Dictionary<EncounterType, Dictionary<string, Button>> _allButtons = new();
         private EncounterType _currentOptionType = EncounterType.None;
-        private Button _currentlySelectedButton = null;
         public event Action<string> OnEncounterButtonSelected;
 
         public SpecificEncounterButtons()
         {
 
         }
-        public void Update( UIInput input)
-        {
-            if (_currentOptionType == EncounterType.None) return;
-            UpdateButtons(input);
-            ResetButtonsToInactive();
-        }
-        public void DrawButtons(SpriteBatch s)
+        public override bool CheckIfButtonsAreActive()
         {
             if (_currentOptionType == EncounterType.None)
-                return;
+                return false;
             if (!_allButtons.TryGetValue(_currentOptionType, out var buttons))
-                return;
-
-            foreach (var button in buttons.Values)
-                button.DrawButton(s);
+                return false;
+            UpdateCurrentButtonDictionary();
+            return true;
+        }
+        private void UpdateCurrentButtonDictionary()
+        {
+            if (_allCurrentButtons == _allButtons[_currentOptionType]) return;
+            _allCurrentButtons = _allButtons[_currentOptionType];
         }
         public void UpdateUnlockedEncounters(Dictionary<string, EncounterData> unlockedEncData, Dictionary<EncounterType, Rectangle> catRectangles)
         {
@@ -110,63 +107,6 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
                 index++;
             }
         }
-        private void ResetButtonsToInactive()
-        {
-            foreach (var dict in _allButtons.Values)
-            foreach (var kvp in dict)
-                {
-                    if (_currentlySelectedButton == kvp.Value) continue;
-                    kvp.Value.ResetButton();
-                }
-            
-        }
-        public void UpdateButtons(UIInput input)
-        {
-            var buttons = _allButtons[_currentOptionType];
-
-            Button selectedButton = null;
-            string key = null;
-
-            foreach (var kvp in buttons)
-            {
-                Button btn = kvp.Value;
-                btn.UpdateStatus(input.MousePos, input.LeftPressed);
-
-                //This catches all buttons that are active
-                if (btn.IsActive)
-                {
-                    if (btn != _currentlySelectedButton)
-                    {
-                        selectedButton = btn;
-                        key = kvp.Key;
-                        UpdateCurrentlySelectedButton(selectedButton, key);
-                        ResetButtonsToInactive();
-                    }
-                        continue;
-                }
-                else if (btn == _currentlySelectedButton)
-                {
-                    ResetAllButtons();
-                }
-                
-            }
-        }
-        public void UpdateCurrentlySelectedButton( Button btn = null, string key = null)
-        {
-            if (_currentlySelectedButton == btn)
-            {
-                _currentlySelectedButton = null;
-                OnEncounterButtonSelected?.Invoke(null);
-            }
-            else
-            {
-                _currentlySelectedButton = btn;
-                OnEncounterButtonSelected?.Invoke(key);
-            }
-
-
-            ResetButtonsToInactive();
-        }
         public void UpdateCurrentEncOptions(EncounterType category)
         {
             _currentOptionType = category;
@@ -174,15 +114,11 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
             ResetAllButtons();
 
         }
-        private void ResetAllButtons(Button excludedButton = null)
+        public override void ButtonClicked(string key)
         {
-            foreach (var dict in _allButtons.Values)
-                foreach (var button in dict.Values)
-                    button.ResetButton();
-            _currentlySelectedButton = null;
-            OnEncounterButtonSelected?.Invoke(null);
+            OnEncounterButtonSelected?.Invoke(key);
         }
-
+        
 
     }
 }

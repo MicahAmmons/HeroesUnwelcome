@@ -44,7 +44,7 @@ public sealed class SmoothZoomInputController
 
     public SmoothZoomInputController() { }
 
-    public void Update(GameTime gt, Camera2D cam, GraphicsDevice gd)
+    public void Update(Camera2D cam, GraphicsDevice gd)
     {
         if (!_initialized)
         {

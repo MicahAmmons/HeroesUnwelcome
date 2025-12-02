@@ -77,7 +77,7 @@ namespace Heroes_UnWelcomed.UI.UIEncounter
             _unlockedEncData = EncounterLibrary.ReturnUnlockedDictionary();
 
         }
-        internal void Update(GameTime gameTime, UIInput input)
+        internal void Update( UIInput input)
         {
             UpdateInput(input);
 

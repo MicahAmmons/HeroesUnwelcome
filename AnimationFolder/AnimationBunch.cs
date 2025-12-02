@@ -67,9 +67,8 @@ namespace Heroes_UnWelcomed.AnimationFolder
         }
 
 
-        internal void Update(GameTime g)
+        internal void Update(float delta)
         {
-            float delta = (float)g.ElapsedGameTime.TotalMilliseconds;
             foreach (var singleAnim in _animations)
             {
                 if (singleAnim == null || singleAnim.GetFrameCount() < 1)

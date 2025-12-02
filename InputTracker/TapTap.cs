@@ -25,9 +25,7 @@ namespace Heroes_UnWelcomed.InputTracker
         private static bool _uIElementClickedThisFrame = false;
         public static bool UIElementClickedThisFrame => _uIElementClickedThisFrame;
 
-        private static double _timeMs;
-
-        public static void Update(GameTime gameTime)
+        public static void Update()
         {
 
             _uIElementClickedThisFrame = false;
@@ -38,8 +36,6 @@ namespace Heroes_UnWelcomed.InputTracker
 
             _currentKeyboard = Keyboard.GetState();
             _currentMouse = Mouse.GetState();
-
-            _timeMs = gameTime.TotalGameTime.TotalMilliseconds;
 
             if (IsLeftPressed())
             {

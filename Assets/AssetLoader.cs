@@ -98,7 +98,6 @@ namespace Heroes_UnWelcomed.Assets
         }
         private static void LoadAttackTextures(string encounter, DrawPosition drawPos)
             => LoadAnimationTextures(encounter, AnimationType.Attack, drawPos);
-
         private static void LoadBlockTextures(string encounter, DrawPosition drawPos)
             => LoadAnimationTextures(encounter, AnimationType.Block, drawPos);
 
@@ -111,5 +110,13 @@ namespace Heroes_UnWelcomed.Assets
         private static void LoadPrepareTextures(string encounter, DrawPosition drawPos)
             => LoadAnimationTextures(encounter, AnimationType.Prepare, drawPos);
 
+
+        public static void LoadSpeedControlTextures()
+        {
+            AssetManager.LoadTexture("Pause", "SpeedControl/Pause");
+            AssetManager.LoadTexture("Play", "SpeedControl/Play");
+            AssetManager.LoadTexture("2xSpeed", "SpeedControl/2xSpeed");
+            AssetManager.LoadTexture("3xSpeed", "SpeedControl/3xSpeed");
+        }
     }
 }

@@ -60,19 +60,19 @@ namespace Heroes_UnWelcomed.Cells
             else
                 base.DrawAnimatable(s);
         }
-        public override void UpdateAnimatable(GameTime g)
+        public override void UpdateAnimatable(float delta)
         {
             if (_encHoverAnimation != null)
             {
-                _encHoverAnimation.Update(g);
+                _encHoverAnimation.Update(delta);
                 CheckIfShouldDelete();
             }
             else if (_encounterBunch != null)
             {
-                _encounterBunch.UpdateEncounters(g);
+                _encounterBunch.UpdateEncounters(delta);
             }
             else
-                base.UpdateAnimatable(g);
+                base.UpdateAnimatable(delta);
         }
 
         private void CheckIfShouldDelete()

@@ -73,11 +73,11 @@ namespace Heroes_UnWelcomed.Encounters
             enc.DrawAnimatable(s);
         }
     }
-    internal void UpdateEncounters(GameTime g)
+    internal void UpdateEncounters(float delta)
     {
         foreach (var enc in Encounters)
         {
-            enc.UpdateAnimatable(g);
+            enc.UpdateAnimatable(delta);
         }
     }
 }

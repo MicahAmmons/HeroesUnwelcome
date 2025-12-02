@@ -1,5 +1,6 @@
 using Heroes_UnWelcomed.InputTracker;
 using Heroes_UnWelcomed.UI.UIEncounter;
+using Heroes_UnWelcomed.UI.UISpeed;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -13,20 +14,24 @@ namespace Heroes_UnWelcomed.UI
 
         private static UIEncounterController _encUIController;
         private static UIInput _input;
+        private static UISpeedController _speedController;
 
         public static void Initialize()
         {
              _encUIController = new UIEncounterController();
+            _speedController = new UISpeedController();
             _encUIController.UIButtonPressed += UIElementClickedThisFrame;
         }
         public static void Draw(SpriteBatch s)
         {
             _encUIController?.Draw(s);
+            _speedController?.Draw(s);
         }
-        public static void Update(GameTime gameTime)
+        public static void Update()
         {
             UpdateInput();
-            _encUIController?.Update(gameTime, _input);
+            _encUIController?.Update(_input);
+            _speedController?.Update(_input);
         }
         private static void UIElementClickedThisFrame()
         {
@@ -47,12 +52,20 @@ namespace Heroes_UnWelcomed.UI
         {
             _encUIController.ResetCurrentlySelectedSpecificEnc();
         }
-
         internal static void ResetEncounterCategory()
         {
             _encUIController.UpdateSelectedEncounterCategory(EncounterType.None);
         }
     }
+
+
+
+
+
+
+
+
+
     public readonly struct UIInput
     {
         public Vector2 MousePos { get; init; }

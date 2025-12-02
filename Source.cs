@@ -7,6 +7,7 @@ using Heroes_UnWelcomed.Heroes;
 using Heroes_UnWelcomed.InputTracker;
 using Heroes_UnWelcomed.Libraries;
 using Heroes_UnWelcomed.Movement;
+using Heroes_UnWelcomed.Overlord;
 using Heroes_UnWelcomed.ScreenReso;
 using Heroes_UnWelcomed.UI;
 using Microsoft.Xna.Framework;
@@ -61,10 +62,11 @@ namespace Heroes_UnWelcomed
 
         protected override void Update(GameTime gameTime)
         {
-            TapTap.Update(gameTime);
-            UIManager.Update(gameTime); // if UI calls after Cell Manager, we'll run into the issue of clicking through a UI elements onto teh world
-            CameraManager.Update(gameTime, GraphicsDevice);
-            CellManager.Update(gameTime);
+            float delta = OverLord.Update(gameTime);
+            TapTap.Update();
+            UIManager.Update(); // if UI calls after Cell Manager, we'll run into the issue of clicking through a UI elements onto teh world
+            CameraManager.Update(GraphicsDevice);
+            CellManager.Update(delta);
             Debug.Update();
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();

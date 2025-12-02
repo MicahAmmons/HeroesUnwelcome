@@ -3,7 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Heroes_UnWelcomed.Buttons
 {
-    internal class Button
+    public class Button
     {
         private bool _active;
         private bool _hovered;
