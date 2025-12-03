@@ -20,6 +20,7 @@ namespace Heroes_UnWelcomed.Buttons
             _hovered = ButtonBoundary.Contains(mouse);
             if (_hovered && leftJustReleased)
             {
+                if (_active && !CanBeUnselected) return;
                 _active = !_active;
             }
         }

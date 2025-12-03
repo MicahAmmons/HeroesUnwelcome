@@ -39,7 +39,7 @@ namespace Heroes_UnWelcomed
         protected override void Initialize()
         {
 
-
+            OverLord.Initialize();
             EncounterLibrary.Initialize();
             AssetManager.Initialize(Content, GraphicsDevice);
             HeroLibrary.Initialize();

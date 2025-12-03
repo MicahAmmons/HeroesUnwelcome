@@ -17,9 +17,8 @@ namespace Heroes_UnWelcomed.Heroes
         public static List<Hero> AllHeroes => _heroes;
         public static void Initialize()
         {
-           // _heroes.Add(new Hero(HeroLibrary.GetHeroData("Ranger")));
-            //_heroes.Add(new Hero(HeroLibrary.GetHeroData("Ranger")));
-            //_heroes.Add(new Hero(HeroLibrary.GetHeroData("Ranger")));
+           _heroes.Add(new Hero("Vampire"));
+           _heroes.Add(new Hero("Goblin"));
         }
 
         internal static List<Hero> GetParty()

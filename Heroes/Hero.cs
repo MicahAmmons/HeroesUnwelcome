@@ -6,7 +6,10 @@ namespace Heroes_UnWelcomed.Heroes
     public class Hero : Moving
     {
         public int PosInParty;
-        public Hero(HeroData data) : base(data.Animation)
+        public int Attack = 5;
+        public int Agility = 5;
+        public int Intelligence = 5;
+        public Hero(string name) : base(name)
         {
 
         }
