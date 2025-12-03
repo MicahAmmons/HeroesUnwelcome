@@ -12,7 +12,6 @@ namespace Heroes_UnWelcomed.Encounters
         public string EncounterName { get; set; }   
         public EncounterType Category { get; set; } = EncounterType.None;
         public int AttackPower { get; set; }
-        public List<ChargeData> OrderOfCharges { get; set; }
         public List<EncounterType> EncounterOrder { get; set; }
     }
 }

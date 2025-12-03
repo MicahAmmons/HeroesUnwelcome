@@ -1,11 +1,12 @@
 using Heroes_UnWelcomed.AnimationFolder;
 using Heroes_UnWelcomed.Assets;
+using Heroes_UnWelcomed.Charges;
 using Heroes_UnWelcomed.Encounters;
 using Heroes_UnWelcomed.ScreenReso;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -123,7 +124,7 @@ namespace Heroes_UnWelcomed.Cells
 
             // 80% HORIZONTAL ------------------------------------------------------------
 
-            int y80 = ClampY(r.Y + (int)(r.Height * 0.80f));
+            int y80 = ClampY(r.Y + (int)(r.Height * .8f));
             s.Draw(pixel, new Rectangle(ClampX(r.X), y80, ClampW(r.Width), t), Color.Yellow);
 
             // 75% VERTICAL --------------------------------------------------------------
@@ -144,6 +145,11 @@ namespace Heroes_UnWelcomed.Cells
             {
                 _encHoverAnimation = new AnimationController(playerChosenEnc);
             }
+        }
+
+        internal List<ChargeData> FetchCharges()
+        {
+            return _encounterBunch.EncCharges;
         }
     }
 

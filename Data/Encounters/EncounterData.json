@@ -3,12 +3,12 @@
     "EncounterName": "Goblin",
     "Category": "Combat",
     "AttackPower": 1,
-    "EncounterOrder": [ "Hallway", "Combat", "Exit" ]
+    "EncounterOrder": [ "Hallway", "LockedDoor", "Combat", "Exit" ]
   },
   "Vampire": {
     "EncounterName": "Vampire",
     "Category": "Combat",
     "AttackPower": 3,
-    "EncounterOrder": [ "Hallway", "Combat", "Exit" ]
+    "EncounterOrder": [ "Hallway", "LockedDoor", "Combat", "Exit" ]
   }
 }

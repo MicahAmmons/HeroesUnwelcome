@@ -1,3 +1,4 @@
+using Heroes_UnWelcomed.Charges;
 using Heroes_UnWelcomed.DebugBugger;
 using Heroes_UnWelcomed.Encounters;
 using Heroes_UnWelcomed.Heroes;
@@ -24,9 +25,8 @@ namespace Heroes_UnWelcomed.Cells
         public static IReadOnlyCollection<Cell> Full => _full;
 
         public static event Action<Rectangle> TheWorldRectChanged;
+        public static event Action<List<ChargeData>> EncounterAdded;
 
-        private static List<Vector2> DungeonPath = new List<Vector2>();
-        private static PartyController _partyContr = null;
         private static Cell _currentlyHoveredCell = null;
         public static Cell CurrentHoveredCell => _currentlyHoveredCell;
         private static PreviewWindow _previewWindow;
@@ -40,7 +40,6 @@ namespace Heroes_UnWelcomed.Cells
             //AddCell(new Cell(0, 1));
            // AddCell(new Cell(0, -1));
             //MarkFull(_all.First());
-            _partyContr = new PartyController(HeroManager.GetParty());
             _previewWindow = new PreviewWindow();
         }
         public static void AddCell(Cell c)
@@ -129,8 +128,6 @@ namespace Heroes_UnWelcomed.Cells
 
             UpdateAllCells(delta);
 
-            _partyContr?.Update(delta);
-
             ShowPlayerChosenEncounterToSpawn();
 
             UpdatePreviewWindow();
@@ -163,7 +160,6 @@ namespace Heroes_UnWelcomed.Cells
         {
             ToggleEncounterPreviewDrawn();
         }
-
         private static void ToggleEncounterPreviewDrawn()
         {
             if (_playerChosenEnc == null)
@@ -200,17 +196,16 @@ namespace Heroes_UnWelcomed.Cells
         private static void ConfirmNewEncounter()
         {
             var chosenCell = _currentlyHoveredCell;
-            // Reset Catregory and specific enc controller if needed
-            // Send new encounter to Cell
             var chosenEnc = _playerChosenEnc;
 
             chosenCell.AddEncounter(chosenEnc);
+            List<ChargeData> chargesToAdd = chosenCell.FetchCharges();
+            EncounterAdded?.Invoke(chargesToAdd);
             MarkFull(chosenCell);
             UIManager.ResetSpecificEncounter();
             UIManager.ResetEncounterCategory();
             TryToAddEmptyCells(chosenCell);
         }
-
         private static void TryToAddEmptyCells(Cell chosenCell)
         {
             int x = chosenCell.GridX;
@@ -251,10 +246,6 @@ namespace Heroes_UnWelcomed.Cells
         {
             _playerChosenEnc = name;
             _previewWindow.ReplaceAnimation(name);
-        }
-        internal static void DrawParties(SpriteBatch s)
-        {
-            _partyContr?.DrawHeroes(s);
         }
 
         private static bool _drawPreviewWindow = false;

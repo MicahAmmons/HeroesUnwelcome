@@ -13,23 +13,15 @@ namespace Heroes_UnWelcomed.Heroes
     public class PartyController
     {
         private List<Hero> _heroes;
-        private Vector2 _leadPos;
         public PartyController(List<Hero> heroes)
         {
             _heroes = new List<Hero>(heroes);
-            SetStartingPositions();
-        }
-        private void SetStartingPositions()
-        {
-            for (int i = 0;  i < _heroes.Count; i++)
-            {
-                _heroes[i].SetCurrentPosition(i);
-            }
         }
         public void Update(float delta)
         {
             foreach (var hero in _heroes)
             {
+
                 hero.UpdateAnimatable(delta);
             }
         }

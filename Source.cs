@@ -110,7 +110,6 @@ namespace Heroes_UnWelcomed
 
             CellManager.DrawCells(_spriteBatch);
             CellManager.DrawCellOutLine(_spriteBatch);
-            CellManager.DrawParties(_spriteBatch);
             _spriteBatch.End();
             
         }

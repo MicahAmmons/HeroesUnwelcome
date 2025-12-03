@@ -1,22 +1,21 @@
 using Heroes_UnWelcomed.AnimationFolder;
+using Heroes_UnWelcomed.Charges;
 using System;
 
 namespace Heroes_UnWelcomed.Heroes
 {
     public class Hero : Moving
     {
-        public int PosInParty;
         public int Attack = 5;
         public int Agility = 5;
         public int Intelligence = 5;
+        public string Name;
+        private Charge CurrentCharge = null;
         public Hero(string name) : base(name)
         {
-
+            Name = name;
         }
-
-        internal void SetCurrentPosition(int i)
-        {
-            PosInParty = i;
-        }
+        public bool HasCurrentCharge => CurrentCharge != null;
+        public bool ChargeIsFinished => CurrentCharge.IsFinished;
     }
 }
