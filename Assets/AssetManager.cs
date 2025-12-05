@@ -32,6 +32,7 @@ namespace Heroes_UnWelcomed.Assets
             AssetLoader.LoadCellAnimations();
             AssetLoader.LoadHallwayEncounter();
             AssetLoader.LoadSpeedControlTextures();
+            AssetLoader.LoadHeroTextures();
 
         }
         public static void LoadTexture(string key, string path)

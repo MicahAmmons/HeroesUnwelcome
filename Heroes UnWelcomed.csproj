@@ -52,6 +52,13 @@
     <None Remove="Content\Heroes\Turtle\Turtle_Idle_SS.png" />
     <None Remove="Content\Heroes\Turtle\Turtle_Move_Start_Trans_SS.png" />
     <None Remove="Content\Heroes\Turtle\Turtle_Walk_SS.png" />
+    <None Remove="Content\Heroes\WalkAnimation\Walk1.png" />
+    <None Remove="Content\Heroes\WalkAnimation\Walk2.png" />
+    <None Remove="Content\Heroes\WalkAnimation\Walk3.png" />
+    <None Remove="Content\Heroes\WalkAnimation\Walk4.png" />
+    <None Remove="Content\Heroes\WalkAnimation\Walk5.png" />
+    <None Remove="Content\Heroes\WalkAnimation\Walk6.png" />
+    <None Remove="Content\Heroes\WalkAnimation\Walk7.png" />
     <None Remove="Data\Animations\AnimationData.json" />
     <None Remove="Data\Encounters\EncounterData.json" />
     <None Remove="Data\Heroes\HeroData.json" />
@@ -178,6 +185,27 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\Heroes\Turtle\Turtle_Walk_SS.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Heroes\WalkAnimation\Walk1.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Heroes\WalkAnimation\Walk2.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Heroes\WalkAnimation\Walk3.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Heroes\WalkAnimation\Walk4.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Heroes\WalkAnimation\Walk5.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Heroes\WalkAnimation\Walk6.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\Heroes\WalkAnimation\Walk7.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Data\Animations\AnimationData.json">

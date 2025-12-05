@@ -23,7 +23,7 @@ namespace Heroes_UnWelcomed.Heroes
         private static int maxPartyCapacity = 1;
         public static void Initialize()
         {
-           _standbyHeroes.Add(new Hero("Vampire"));
+           _standbyHeroes.Add(new Hero("Hero"));
           // _standbyHeroes.Add(new Hero("Goblin"));
             GenerateParty();
             CellManager.EncounterAdded += AddChargesData;
@@ -56,6 +56,12 @@ namespace Heroes_UnWelcomed.Heroes
             {
                 contr.Update(delta);
             }
+        }
+
+        internal static void Draw(SpriteBatch s)
+        {
+            foreach (var contr in _allParties)
+                contr.DrawHeroes(s);
         }
     }
 }

@@ -67,6 +67,7 @@ namespace Heroes_UnWelcomed
             UIManager.Update(); // if UI calls after Cell Manager, we'll run into the issue of clicking through a UI elements onto teh world
             CameraManager.Update(GraphicsDevice);
             CellManager.Update(delta);
+            HeroManager.Update(delta);
             Debug.Update();
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
@@ -98,7 +99,7 @@ namespace Heroes_UnWelcomed
         }
         protected void DrawZoomableLayers()
         {
-                        _spriteBatch.Begin(
+            _spriteBatch.Begin(
                  SpriteSortMode.Deferred,
                  BlendState.AlphaBlend,
                  SamplerState.LinearClamp,   // smoother scaling when zoomed
@@ -110,6 +111,7 @@ namespace Heroes_UnWelcomed
 
             CellManager.DrawCells(_spriteBatch);
             CellManager.DrawCellOutLine(_spriteBatch);
+            HeroManager.Draw(_spriteBatch);
             _spriteBatch.End();
             
         }

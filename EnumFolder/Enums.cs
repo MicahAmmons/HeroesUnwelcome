@@ -30,6 +30,7 @@ public enum DrawPosition
     Combatant,
     Hallway,
     Cell,
+    Hero
 }
 public enum ChargeType
 {

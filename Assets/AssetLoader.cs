@@ -52,6 +52,10 @@ namespace Heroes_UnWelcomed.Assets
            // AssetManager.LoadEffect("ScrollWrap", "Shaders/ScrollWrap");
 
         }
+        public static void LoadHeroTextures()
+        {
+            LoadWalkTextures("Hero", AnimationType.Walk, DrawPosition.Hero);
+        }
         public static void LoadCombatEncounters()
         {
             var list = EncounterLibrary.ReturnAllEncounterNames();
@@ -81,6 +85,21 @@ namespace Heroes_UnWelcomed.Assets
             }
             AnimationLibrary.AddAnimationFrame("Hallway", AnimationType.Idle, list, DrawPosition.Hallway);
         }
+        private static void LoadHeroAnimationTextures(string hero, AnimationType animName, DrawPosition drawPos)
+        {
+            List<string> allKeys = new List<string>();
+            for (int i = 1; ; i++)
+            {
+                string key = $"{animName}{i}";
+                string path = $"Heroes/{animName}Animation/{key}";
+                if (!AssetManager.TryLoadRawTexture(key, path))
+                {
+                    break;
+                }
+                allKeys.Add(key);
+            }
+            AnimationLibrary.AddAnimationFrame(hero, animName, allKeys, drawPos);
+        }
         private static void LoadAnimationTextures(string encounter, AnimationType animName, DrawPosition drawPos )
         {
             List<string> allKeys = new List<string>();
@@ -98,6 +117,8 @@ namespace Heroes_UnWelcomed.Assets
         }
         private static void LoadAttackTextures(string encounter, DrawPosition drawPos)
             => LoadAnimationTextures(encounter, AnimationType.Attack, drawPos);
+        private static void LoadWalkTextures(string hero, AnimationType animName, DrawPosition drawPos) 
+            => LoadHeroAnimationTextures(hero, AnimationType.Walk, drawPos);
         private static void LoadBlockTextures(string encounter, DrawPosition drawPos)
             => LoadAnimationTextures(encounter, AnimationType.Block, drawPos);
 

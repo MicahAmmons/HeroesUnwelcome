@@ -11,11 +11,12 @@ namespace Heroes_UnWelcomed.Heroes
         public int Intelligence = 5;
         public string Name;
         private Charge CurrentCharge = null;
+        private int _chargeIndex = 0;
         public Hero(string name) : base(name)
         {
             Name = name;
         }
         public bool HasCurrentCharge => CurrentCharge != null;
-        public bool ChargeIsFinished => CurrentCharge.IsFinished;
+        public bool ChargeIsFinished => CurrentCharge != null && CurrentCharge.IsFinished;
     }
 }
