@@ -20,19 +20,21 @@ namespace Heroes_UnWelcomed.DebugBugger
         private static SpriteFont _font;
         private static bool _uIButtonStartOfFrame;
         private static bool _uIButtonEndOfFrame;
+        private static string _currentHoveredEncounter = null;
         internal static void Initialize()
         {
             _font = AssetManager.GetFont("Debug");
         }
         public static void UpdateHoveredCell(int x = 1000, int y = 1000)
         {
-            if (x == 1000 || y == 1000l)
+            if (x == 1000 || y == 1000)
             {
                 _currentHoveredCell = $"No Hovered Cell";
                 return;
                 
             }
             _currentHoveredCell = $"Hovered Cell: {x}, {y}";
+
         }
         public static void UpdatePlayerSelectedEncounter(string data)
         {
@@ -64,6 +66,7 @@ namespace Heroes_UnWelcomed.DebugBugger
             string startFrameUI = $"Start Frame UI Pressed : {_uIButtonStartOfFrame}";
             string endFrameUI = $"End Frame UI Pressed : {_uIButtonEndOfFrame}";
             string encCatSelection = $"Selected Encounter Category: {_playerSelectedEncCategory}";
+            string currentHoveredEnc = $"Encounter: {_currentHoveredEncounter}";
             if (_playerSelectedEncCategory == null)
             {
                 encCatSelection = "No Selected Enc Category";
@@ -79,6 +82,7 @@ namespace Heroes_UnWelcomed.DebugBugger
                 startFrameUI,
                 endFrameUI,
                 encCatSelection,
+                currentHoveredEnc
             };
 
             // Find max width for right-align
@@ -110,7 +114,10 @@ namespace Heroes_UnWelcomed.DebugBugger
         {
             _uIButtonEndOfFrame = isPressed;
         }
-
+        public static void UpdateCurrentHoveredEncounter(string name)
+        {
+            _currentHoveredEncounter = name;
+        }
         internal static void UpdateSelectedEncCategory(EncounterType type)
         {
             if (type == EncounterType.None)

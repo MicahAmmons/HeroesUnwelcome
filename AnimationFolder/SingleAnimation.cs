@@ -106,6 +106,9 @@ namespace Heroes_UnWelcomed.AnimationFolder
                 case DrawPosition.Combatant:
                     DrawPoint = new Vector2((Cell.Width * .875f) + pos.X, floor + pos.Y);
                     break;
+                case DrawPosition.Hero:
+                    DrawPoint = pos;
+                    break;
             }
             return DrawPoint;
         }

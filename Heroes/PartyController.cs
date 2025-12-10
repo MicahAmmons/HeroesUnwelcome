@@ -1,4 +1,7 @@
 using Heroes_UnWelcomed.AnimationFolder;
+using Heroes_UnWelcomed.Cells;
+using Heroes_UnWelcomed.Charges;
+using Heroes_UnWelcomed.Encounters;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
@@ -32,5 +35,30 @@ namespace Heroes_UnWelcomed.Heroes
                 hero.DrawAnimatable(s);
             }
         }
+        internal void SetStartingPositions()
+        {
+            float doorX = Encounter.DoorX;
+            float floor = Encounter.GroundFloor;
+            Rectangle cellRect = new Rectangle(0, 0, Cell.Width, Cell.Height);
+            int count = _heroes.Count;
+            float startX = cellRect.Width * doorX;
+            float endX = cellRect.Width;
+            float y = cellRect.Height * floor;
+
+            float spacing = 0f;
+            if (count > 1)
+                spacing = (endX - startX) / (count - 1);
+
+            for (int i = 0; i < count; i++)
+            {
+                var hero = _heroes[i];
+                int reversedIndex = (count - 1) - i;
+
+                float x = startX + (spacing * reversedIndex);
+
+                hero.SetCurrentPosition(new Vector2(x, y));
+            }
+        }
+
     }
 }

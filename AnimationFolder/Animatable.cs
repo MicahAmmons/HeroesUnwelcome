@@ -34,10 +34,9 @@ namespace Heroes_UnWelcomed.AnimationFolder
 
             AnimContr = new AnimationController(newAnimName);
         }
-
-        public virtual void SelfDeleteAnimContr()
+        public virtual void SetCurrentPosition(Vector2 newPosition)
         {
-            AnimContr = null;
+            CurrentPosition = newPosition;
         }
 
     }

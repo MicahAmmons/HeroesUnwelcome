@@ -34,7 +34,12 @@ namespace Heroes_UnWelcomed.Cells
 
         public static void Initialize()
         {
-            AddCell(new Cell(0, 0));
+            Cell firstCell = new Cell(0, 0);
+            AddCell(firstCell);
+            _currentlyHoveredCell = firstCell;
+            _playerChosenEnc = "SpawnIn";
+            ConfirmNewEncounter();
+            _playerChosenEnc = null;
             //AddCell(new Cell(1, 0));
             //AddCell(new Cell(-1, 0));
             //AddCell(new Cell(0, 1));
@@ -149,7 +154,18 @@ namespace Heroes_UnWelcomed.Cells
                 {
                     _currentlyHoveredCell = cell;
                     Debug.UpdateHoveredCell(cell.GridX, cell.GridY);
-                    return;
+                    if (_currentlyHoveredCell.Encounter != null)
+                    {
+                        foreach (var enc in _currentlyHoveredCell.Encounter.Encounters)
+                        {
+                            Debug.UpdateCurrentHoveredEncounter(enc.Name);
+                            break;
+                        }
+                        Debug.UpdateCurrentHoveredEncounter(null);
+                    }
+                    else
+                        Debug.UpdateCurrentHoveredEncounter(null);
+                        return;
                 }
             }
                 _currentlyHoveredCell = null;
@@ -240,8 +256,6 @@ namespace Heroes_UnWelcomed.Cells
                 AddCell(newCell);
             }
         }
-
-
         public static void UpdatePlayerSelectedEncounter(string name)
         {
             _playerChosenEnc = name;

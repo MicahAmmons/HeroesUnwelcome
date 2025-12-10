@@ -76,12 +76,22 @@ namespace Heroes_UnWelcomed.Encounters
             OrderOfCharges.Add(new TravelChargeData(new Vector2(x,y), new Vector2(x + (Cell.Width * DoorX), y)));
         }
     }
+    public class SpawnInEncounter : Encounter
+    {
+        public SpawnInEncounter(string enc) : base(enc)
+        {
+        }
+
+        public override void GenerateChargeData()
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
     public class EncounterBunch
     {
         public List<ChargeData> EncCharges;
         public List<Encounter> Encounters { get; set; } = new List<Encounter> { };
-
         public EncounterBunch(EncounterData data, string key, Rectangle dest)
         {
         List<ChargeData> cellCharges = new List<ChargeData>();
@@ -100,6 +110,9 @@ namespace Heroes_UnWelcomed.Encounters
                     cellCharges.AddRange(hallwayEnc.OrderOfCharges);
                     Encounters.Add(hallwayEnc);
                         break;
+                case EncounterType.SpawnIn:
+                   
+                    break;
                     //case EncounterType.LockedDoor:
                     //LockedDoorEncounter lockedDoor = new LockedDoorEncounter(data, key, dest);
                     //    break;

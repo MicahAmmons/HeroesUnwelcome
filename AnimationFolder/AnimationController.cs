@@ -13,13 +13,16 @@ namespace Heroes_UnWelcomed.AnimationFolder
     {
         private AnimationType _currentAnimationType = AnimationType.Idle;
         private Dictionary<AnimationType, AnimationBunch> _animations = new Dictionary<AnimationType, AnimationBunch>();
-
+        private bool _isPlaying = true;
         public AnimationController(string animationName)
         {
-            if (animationName == null) return;
-
+            if (animationName is null)
+            {
+                _isPlaying = false;
+                return;
+            }
             //placeholder for hallway constructor 
-            if(animationName == "Hallway")
+            if(animationName is "Hallway")
             {
                 Dictionary<AnimationType, AnimationData> hallwayData = new Dictionary<AnimationType, AnimationData>();
                 var specific = new SpecificAnimationData()
@@ -67,10 +70,13 @@ namespace Heroes_UnWelcomed.AnimationFolder
         }
         private void UpdateBunch(float delta)
         {
+            if (!_isPlaying) return;
             _animations[_currentAnimationType]?.Update(delta);
+            
         }
         public void Draw(SpriteBatch s, Vector2 position, bool isPreview = false)
         {
+            if (!_isPlaying) return;
             _animations[_currentAnimationType]?.Draw(s, position, isPreview);
         }
         protected virtual void SetCurrentAnimation(AnimationType type)

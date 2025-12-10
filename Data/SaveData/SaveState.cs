@@ -11,4 +11,5 @@ public class EncounterSaveData
     public Dictionary<string, bool> Puzzle { get; set; } = new();
     public Dictionary<string, bool> Trap { get; set; } = new();
     public Dictionary<string, bool> LockedDoor { get; set; } = new();
+    public Dictionary<string, bool> SpawnIn { get; set; } = new();
 }

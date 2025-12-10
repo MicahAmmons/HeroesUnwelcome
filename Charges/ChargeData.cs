@@ -1,4 +1,5 @@
 using Microsoft.Xna.Framework;
+using SharpDX.MediaFoundation;
 using System;
 using System.Collections.Generic;
 
@@ -38,11 +39,15 @@ namespace Heroes_UnWelcomed.Charges
     }
     public class ExitChargeData : ChargeData
     {
-
+        
     }
     public class  DoorChargeData : ChargeData
     {
         
+    }
+    public class SpawnInChargeData : ChargeData
+    {
+
     }
 }
 

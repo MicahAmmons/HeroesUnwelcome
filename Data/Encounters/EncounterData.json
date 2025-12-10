@@ -10,5 +10,10 @@
     "Category": "Combat",
     "AttackPower": 3,
     "EncounterOrder": [ "Hallway", "LockedDoor", "Combat", "Exit" ]
+  },
+  "SpawnIn": {
+    "EncounterName": "SpawnIn",
+    "Category": "SpawnIn",
+    "EncounterOrder": ["SpawnIn"]
   }
 }

@@ -58,11 +58,11 @@ namespace Heroes_UnWelcomed.UI
         }
         internal static void ResetSpecificEncounter()
         {
-            _encUIController.ResetCurrentlySelectedSpecificEnc();
+            _encUIController?.ResetCurrentlySelectedSpecificEnc();
         }
         internal static void ResetEncounterCategory()
         {
-            _encUIController.UpdateSelectedEncounterCategory(EncounterType.None);
+            _encUIController?.UpdateSelectedEncounterCategory(EncounterType.None);
         }
     }
 

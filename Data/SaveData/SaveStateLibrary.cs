@@ -34,7 +34,8 @@ namespace Heroes_UnWelcomed.Data.SaveData
              encounter.Combat,
              encounter.Puzzle,
              encounter.Trap,
-             encounter.LockedDoor
+             encounter.LockedDoor,
+             encounter.SpawnIn
             })
             {
                 if (dict != null && dict.TryGetValue(name, out bool unlocked))
@@ -76,7 +77,8 @@ namespace Heroes_UnWelcomed.Data.SaveData
     (encounter.Combat, EncounterType.Combat),
     (encounter.Puzzle, EncounterType.Puzzle),
     (encounter.Trap, EncounterType.Trap),
-    (encounter.LockedDoor, EncounterType.LockedDoor)
+    (encounter.LockedDoor, EncounterType.LockedDoor),
+    (encounter.SpawnIn, EncounterType.SpawnIn),
             };
 
             foreach (var (dict, name) in dicts)

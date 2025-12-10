@@ -17,8 +17,6 @@ namespace Heroes_UnWelcomed.AnimationFolder
         }
         public void MoveEntity()
         {
-            if (MovePath.Count > 0)
-                HandlePathProgression();
             if (DestinationPoints.Count > 0)
             {   List<Vector2> destPoints = DestinationPoints.ToList(); 
                 DestinationPoints.Clear();
@@ -27,20 +25,12 @@ namespace Heroes_UnWelcomed.AnimationFolder
 
 
         }
-
-
-
         private void CreateMovePath(List<Vector2> destPoints)
         {
             foreach (var dest in  destPoints)
             {
 
             }
-        }
-
-        private void HandlePathProgression()
-        {
-            throw new NotImplementedException();
         }
     }
 }

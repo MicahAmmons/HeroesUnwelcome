@@ -16,6 +16,7 @@ namespace Heroes_UnWelcomed.Assets
         }
         public static void LoadAllTextures()
         {
+            // Static, one-off textures
             AssetManager.LoadTexture("TurtleAttack", "Heroes/Turtle/Turtle_Attack_SS");
             AssetManager.LoadTexture("TurtleAttackVE", "Heroes/Turtle/Turtle_Attack_VE_SS");
             AssetManager.LoadTexture("TurtleWalk", "Heroes/Turtle/Turtle_Walk_SS");
@@ -27,6 +28,7 @@ namespace Heroes_UnWelcomed.Assets
 
             AssetManager.LoadTexture("CombatCategoryIcon", "Encounter/CategoryIcons/CombatIcon");
             AssetManager.LoadTexture("TrapCategoryIcon", "Encounter/CategoryIcons/TrapIcon");
+            AssetManager.LoadTexture("SpawnInIcon", "Encounter/CategoryIcons/SpawnInIcon");
 
             AssetManager.LoadTexture("GoblinIcon", "Encounter/Goblin/GoblinIcon");
             AssetManager.LoadTexture("VampireIcon", "Encounter/Vampire/VampireIcon");
@@ -34,103 +36,47 @@ namespace Heroes_UnWelcomed.Assets
         }
         public static void LoadCellAnimations()
         {
-            List<string> allKeys = new List<string>();
-            for (int i = 1; ; i++)
-            {
-                string key = $"EmptyCell{i}";
-                string path = $"Cells/EmptyCellAnimation/EmptyCell{i}";
-                if (!AssetManager.TryLoadRawTexture(key, path))
-                {
-                    break;
-                }
-                allKeys.Add(key);
-            }
-            AnimationLibrary.AddAnimationFrame("EmptyCell", AnimationType.Idle, allKeys, DrawPosition.Cell);
+            LoadSequentialAnimation(
+                ownerKey: "EmptyCell",
+                animType: AnimationType.Idle,
+                drawPos: DrawPosition.Cell,
+                keyPrefix: "EmptyCell",
+                pathPrefix: "Cells/EmptyCellAnimation/");
         }
+
         public static void LoadShaders()
         {
-           // AssetManager.LoadEffect("ScrollWrap", "Shaders/ScrollWrap");
-
         }
+
         public static void LoadHeroTextures()
         {
-            LoadWalkTextures("Hero", AnimationType.Walk, DrawPosition.Hero);
+            LoadHeroAnimation(AnimationType.Walk, DrawPosition.Hero);
+            LoadHeroAnimation(AnimationType.Idle, DrawPosition.Hero);
         }
+
         public static void LoadCombatEncounters()
         {
-            var list = EncounterLibrary.ReturnAllEncounterNames();
-            foreach (var encounter in list)
+            var encounterNames = EncounterLibrary.ReturnAllEncounterNames();
+
+            foreach (var encounter in encounterNames)
             {
-
-                LoadAttackTextures(encounter, DrawPosition.Combatant);
-                LoadBlockTextures(encounter, DrawPosition.Combatant);
-                LoadDeathTextures(encounter, DrawPosition.Combatant);
-                LoadIdleTextures(encounter, DrawPosition.Combatant);
-                LoadPrepareTextures(encounter, DrawPosition.Combatant);
+                LoadEncounterAnimation(encounter, AnimationType.Attack, DrawPosition.Combatant);
+                LoadEncounterAnimation(encounter, AnimationType.Block, DrawPosition.Combatant);
+                LoadEncounterAnimation(encounter, AnimationType.Death, DrawPosition.Combatant);
+                LoadEncounterAnimation(encounter, AnimationType.Idle, DrawPosition.Combatant);
+                LoadEncounterAnimation(encounter, AnimationType.Prepare, DrawPosition.Combatant);
             }
-
         }
+
         public static void LoadHallwayEncounter()
         {
-            var list = new List<string>();
-            for (int i = 1; ; i++)
-            {
-                string key = $"Hallway{i}";
-                string path = $"Encounter/Hallway/{key}";
-                if (!AssetManager.TryLoadRawTexture(key, path))
-                {
-                    break;
-                }
-                list.Add(key);
-            }
-            AnimationLibrary.AddAnimationFrame("Hallway", AnimationType.Idle, list, DrawPosition.Hallway);
+            LoadSequentialAnimation(
+                ownerKey: "Hallway",
+                animType: AnimationType.Idle,
+                drawPos: DrawPosition.Hallway,
+                keyPrefix: "Hallway",
+                pathPrefix: "Encounter/Hallway/");
         }
-        private static void LoadHeroAnimationTextures(string hero, AnimationType animName, DrawPosition drawPos)
-        {
-            List<string> allKeys = new List<string>();
-            for (int i = 1; ; i++)
-            {
-                string key = $"{animName}{i}";
-                string path = $"Heroes/{animName}Animation/{key}";
-                if (!AssetManager.TryLoadRawTexture(key, path))
-                {
-                    break;
-                }
-                allKeys.Add(key);
-            }
-            AnimationLibrary.AddAnimationFrame(hero, animName, allKeys, drawPos);
-        }
-        private static void LoadAnimationTextures(string encounter, AnimationType animName, DrawPosition drawPos )
-        {
-            List<string> allKeys = new List<string>();
-            for (int i = 1; ; i++)
-            {
-                string key = $"{encounter}{animName}{i}";
-                string path = $"Encounter/{encounter}/{key}";
-                if (!AssetManager.TryLoadRawTexture(key, path))
-                {
-                    break;
-                }
-                allKeys.Add(key);
-            }
-            AnimationLibrary.AddAnimationFrame(encounter, animName, allKeys, drawPos);
-        }
-        private static void LoadAttackTextures(string encounter, DrawPosition drawPos)
-            => LoadAnimationTextures(encounter, AnimationType.Attack, drawPos);
-        private static void LoadWalkTextures(string hero, AnimationType animName, DrawPosition drawPos) 
-            => LoadHeroAnimationTextures(hero, AnimationType.Walk, drawPos);
-        private static void LoadBlockTextures(string encounter, DrawPosition drawPos)
-            => LoadAnimationTextures(encounter, AnimationType.Block, drawPos);
-
-        private static void LoadDeathTextures(string encounter, DrawPosition drawPos)
-            => LoadAnimationTextures(encounter, AnimationType.Death, drawPos);
-
-        private static void LoadIdleTextures(string encounter, DrawPosition drawPos)
-            => LoadAnimationTextures(encounter, AnimationType.Idle, drawPos);
-
-        private static void LoadPrepareTextures(string encounter, DrawPosition drawPos)
-            => LoadAnimationTextures(encounter, AnimationType.Prepare, drawPos);
-
 
         public static void LoadSpeedControlTextures()
         {
@@ -138,6 +84,57 @@ namespace Heroes_UnWelcomed.Assets
             AssetManager.LoadTexture("Play", "SpeedControl/Play");
             AssetManager.LoadTexture("2xSpeed", "SpeedControl/2xSpeed");
             AssetManager.LoadTexture("3xSpeed", "SpeedControl/3xSpeed");
+        }
+
+        private static void LoadSequentialAnimation(
+            string ownerKey,
+            AnimationType animType,
+            DrawPosition drawPos,
+            string keyPrefix,
+            string pathPrefix)
+        {
+            var keys = new List<string>();
+
+            for (int i = 1; ; i++)
+            {
+                string key = $"{keyPrefix}{i}";
+                string path = $"{pathPrefix}{key}";
+
+                if (!AssetManager.TryLoadRawTexture(key, path))
+                    break;
+
+                keys.Add(key);
+            }
+
+            if (keys.Count > 0)
+            {
+                AnimationLibrary.AddAnimationFrame(ownerKey, animType, keys, drawPos);
+            }
+        }
+        private static void LoadEncounterAnimation(string encounter, AnimationType animType, DrawPosition drawPos)
+        {
+            string keyPrefix = $"{encounter}{animType}";
+            string pathPrefix = $"Encounter/{encounter}/";
+
+            LoadSequentialAnimation(
+                ownerKey: encounter,
+                animType: animType,
+                drawPos: drawPos,
+                keyPrefix: keyPrefix,
+                pathPrefix: pathPrefix);
+        }
+        private static void LoadHeroAnimation(AnimationType animType, DrawPosition drawPos)
+        {
+            string animName = animType.ToString(); 
+            string keyPrefix = animName;
+            string pathPrefix = $"Heroes/{animName}Animation/";
+
+            LoadSequentialAnimation(
+                ownerKey: "Hero",
+                animType: animType,
+                drawPos: drawPos,
+                keyPrefix: keyPrefix,
+                pathPrefix: pathPrefix);
         }
     }
 }

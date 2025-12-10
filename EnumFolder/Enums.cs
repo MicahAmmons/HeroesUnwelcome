@@ -41,6 +41,7 @@ public enum ChargeType
 public enum EncounterType
 {
     None,
+    SpawnIn,
     Combat,
     Trap,
     Puzzle,
