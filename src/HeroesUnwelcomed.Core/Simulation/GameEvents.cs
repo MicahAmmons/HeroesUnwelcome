@@ -26,10 +26,13 @@ public sealed record PartyWaiting(double Beat, int PartyId, int RoomId, int Bloc
 
 public sealed record PartyArrived(double Beat, int PartyId, int RoomId) : GameEvent(Beat);
 
-/// <summary>The party gathers to decide who goes first.</summary>
-public sealed record PartyHuddleStarted(double Beat, int PartyId, int RoomId) : GameEvent(Beat);
+/// <summary>
+/// A party began one step of the encounter choreography. Every participant acts
+/// for exactly <paramref name="Duration"/> beats from <see cref="GameEvent.Beat"/>.
+/// </summary>
+public sealed record PartyStepStarted(double Beat, int PartyId, int RoomId, PartyPhase Step, double Duration) : GameEvent(Beat);
 
-/// <summary>The huddle's decision: <paramref name="HeroIds"/> in attempt order.</summary>
+/// <summary>The decision made under the banner: <paramref name="HeroIds"/> in attempt order.</summary>
 public sealed record PartyReordered(double Beat, int PartyId, int RoomId, IReadOnlyList<int> HeroIds) : GameEvent(Beat);
 
 /// <summary>Every member died; the party is over.</summary>
@@ -37,6 +40,7 @@ public sealed record PartyWiped(double Beat, int PartyId, int RoomId) : GameEven
 
 // ---- Attempts ------------------------------------------------------------
 
+/// <summary>A hero heads in to take on the room (start of Entrance, or of a Step Up after a death).</summary>
 public sealed record AttemptStarted(double Beat, int PartyId, int HeroId, int RoomId) : GameEvent(Beat);
 
 /// <summary>A hero beat the room; the whole party may pass.</summary>

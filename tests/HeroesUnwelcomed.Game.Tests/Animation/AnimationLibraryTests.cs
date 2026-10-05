@@ -73,6 +73,20 @@ public class AnimationLibraryTests
         Assert.Contains(library.Entities, e => e.Name == "Hero");
     }
 
+    [Fact]
+    public void ShippedAnimations_FitTheirChoreographySteps()
+    {
+        // Guards the real data: every clip must fit inside the step it plays in.
+        string data = Path.Combine(RepoRoot(), "data");
+        var library = AnimationLibrary.Parse(File.ReadAllText(Path.Combine(data, AnimationLibrary.FilePath)));
+        var tuning = HeroesUnwelcomed.Core.Definitions.GameDefinitions.Parse(
+            File.ReadAllText(Path.Combine(data, "game", "rooms.json")),
+            File.ReadAllText(Path.Combine(data, "game", "tuning.json")),
+            File.ReadAllText(Path.Combine(data, "game", "heroes.json"))).Tuning;
+
+        Assert.Empty(HeroesUnwelcomed.Game.Play.ChoreographyCheck.Problems(library, tuning));
+    }
+
     private static string RepoRoot()
     {
         var dir = new DirectoryInfo(AppContext.BaseDirectory);

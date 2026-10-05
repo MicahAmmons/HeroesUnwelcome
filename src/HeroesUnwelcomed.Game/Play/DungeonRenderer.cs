@@ -3,6 +3,7 @@ using HeroesUnwelcomed.Core.Dungeons;
 using HeroesUnwelcomed.Core.Simulation;
 using HeroesUnwelcomed.Game.Animation;
 using HeroesUnwelcomed.Game.Rendering;
+using HeroesUnwelcomed.Game.Sound;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -27,7 +28,8 @@ public sealed class DungeonRenderer(Primitives draw)
     private static readonly Color ExitPortalColor = new(185, 120, 255);
     private static readonly Color DoorColor = new(150, 110, 70);
 
-    public void Draw(SpriteBatch batch, Run run, IReadOnlyDictionary<int, AnimationPlayer> monsters, GridPoint selected, bool showSelection, float zoom)
+    public void Draw(SpriteBatch batch, Run run, RoomLayout layout, IReadOnlyDictionary<int, ScriptedAnimator> encounters,
+        double gameBeat, BeatTime time, GridPoint selected, bool showSelection, float zoom)
     {
         Dungeon dungeon = run.Dungeon;
         int line = (int)Math.Max(2, 2 / zoom); // outlines stay ~2 px wide at any zoom
@@ -37,11 +39,11 @@ public sealed class DungeonRenderer(Primitives draw)
         for (int i = 0; i < dungeon.Rooms.Count; i++)
         {
             Room room = dungeon.Rooms[i];
-            DrawRoom(batch, run, room, i, line, zoom);
-            if (monsters.TryGetValue(room.Id, out AnimationPlayer? monster))
+            DrawRoom(batch, run, layout, room, i, line, zoom);
+            if (encounters.TryGetValue(room.Id, out ScriptedAnimator? encounter))
             {
-                Vector2 feet = WorldLayout.ToWorld(room.Position, room.Facing, WorldLayout.MonsterU);
-                PlaceholderSprite.Draw(batch, draw, feet, monster.Entity, monster.DisplayClip, monster.Frame, scale: WorldLayout.SpriteScale);
+                var (clip, frame) = encounter.FrameAt(gameBeat, time);
+                PlaceholderSprite.Draw(batch, draw, layout.Encounter(room), encounter.Entity, clip, frame, scale: WorldLayout.SpriteScale);
             }
         }
 
@@ -74,7 +76,7 @@ public sealed class DungeonRenderer(Primitives draw)
         }
     }
 
-    private void DrawRoom(SpriteBatch batch, Run run, Room room, int order, int line, float zoom)
+    private void DrawRoom(SpriteBatch batch, Run run, RoomLayout layout, Room room, int order, int line, float zoom)
     {
         Dungeon dungeon = run.Dungeon;
         Rectangle cell = WorldLayout.CellRect(room.Position);
@@ -90,14 +92,14 @@ public sealed class DungeonRenderer(Primitives draw)
         {
             if (dungeon.ConnectionAfter(order - 1) == ConnectionKind.Hallway)
             {
-                Vector2 door = WorldLayout.ToWorld(room.Position, room.Facing, WorldLayout.DoorU);
+                Vector2 door = layout.Door(room);
                 var frame = new Rectangle((int)door.X - 60, floorY - 380, 120, 380);
                 draw.FillRect(batch, frame, DoorColor * 0.35f);
                 draw.OutlineRect(batch, frame, DoorColor, 8);
             }
             else
             {
-                Vector2 portal = WorldLayout.ToWorld(room.Position, room.Facing, WorldLayout.EntryPortalU);
+                Vector2 portal = layout.EntryPortal(room);
                 draw.Ring(batch, new Rectangle((int)portal.X - 110, floorY - 420, 220, 420), EntryPortalColor);
             }
         }
@@ -105,17 +107,17 @@ public sealed class DungeonRenderer(Primitives draw)
         // How heroes leave: an exit portal if the next room isn't straight ahead.
         if (order < dungeon.Rooms.Count - 1 && dungeon.ConnectionAfter(order) == ConnectionKind.Portal)
         {
-            Vector2 portal = WorldLayout.ToWorld(room.Position, room.Facing, WorldLayout.ExitPortalU);
+            Vector2 portal = layout.ExitPortal(room);
             draw.Ring(batch, new Rectangle((int)portal.X - 100, floorY - 400, 200, 400), ExitPortalColor);
         }
 
         if (order == 0)
         {
-            DrawEntrance(batch, run, room, floorY);
+            DrawEntrance(batch, run, layout.Encounter(room), floorY);
         }
         else if (dungeon.IsTreasure(order))
         {
-            Vector2 chest = WorldLayout.ToWorld(room.Position, room.Facing, WorldLayout.MonsterU + 170);
+            Vector2 chest = layout.At(room, layout.For(room.Kind.Id).Encounter, behind: -260);
             var box = new Rectangle((int)chest.X - 90, floorY - 110, 180, 110);
             draw.FillRect(batch, box, new Color(200, 160, 40) * 0.6f);
             draw.OutlineRect(batch, box, new Color(240, 200, 70), 6);
@@ -126,9 +128,8 @@ public sealed class DungeonRenderer(Primitives draw)
         draw.OutlineRect(batch, cell, new Color(55, 50, 75), line);
     }
 
-    private void DrawEntrance(SpriteBatch batch, Run run, Room room, int floorY)
+    private void DrawEntrance(SpriteBatch batch, Run run, Vector2 center, int floorY)
     {
-        Vector2 center = WorldLayout.ToWorld(room.Position, room.Facing, WorldLayout.MonsterU);
         var gate = new Rectangle((int)center.X - 170, floorY - 520, 340, 520);
         draw.FillRect(batch, gate, new Color(40, 36, 30));
         draw.OutlineRect(batch, gate, new Color(160, 140, 110), 10);

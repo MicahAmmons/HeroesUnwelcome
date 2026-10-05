@@ -18,15 +18,15 @@ namespace HeroesUnwelcomed.Game.Play;
 /// <remarks>
 /// <para>
 /// <b>Each frame:</b> read input (camera, selection, menus, door, send
-/// party) → advance the <see cref="Run"/> to the current game beat → update
-/// where every hero should stand → animate → draw.
+/// party) → advance the <see cref="Run"/> to the current game beat → draw.
 /// </para>
 /// <para>
-/// <b>Events in, pictures out.</b> The scene listens to the run's events and
-/// turns them into visuals: a departure becomes a walk (or portal jump) timed
-/// to arrive exactly when the simulation says; a death becomes the Death
-/// animation plus Fear on the dead hero's teammates. The simulation never
-/// knows any of this is happening.
+/// <b>Events in, pictures out.</b> The run's events go to the
+/// <see cref="Choreographer"/>, which turns every choreography step into exact
+/// "path + clip from beat A to beat B" instructions for each hero and
+/// encounter. Positions and frames are then calculated from the game beat
+/// while drawing, so nothing accumulates and nothing drifts. The simulation
+/// never knows any of this is happening.
 /// </para>
 /// <para>
 /// <b>Scenario parameters:</b> <c>setup</c> (data file for the starting run,
@@ -46,12 +46,14 @@ public sealed class PlayScene : IScene
     private readonly DungeonRenderer _renderer;
     private readonly PlayHud _hud;
     private readonly Dictionary<int, HeroView> _heroViews = [];
-    private readonly Dictionary<int, AnimationPlayer> _monsters = [];
+    private readonly Dictionary<int, ScriptedAnimator> _encounters = [];
     private readonly GameDefinitions _definitions;
     private readonly RunSetup _setup;
     private AnimationLibrary _animations;
+    private RoomLayout _layout;
     private Run _run = null!;
     private BuildController _build = null!;
+    private Choreographer _choreographer = null!;
     private double _startSimBeat;
     private double _gameBeat;
     private double _seconds;
@@ -64,6 +66,7 @@ public sealed class PlayScene : IScene
         _renderer = new DungeonRenderer(services.Draw);
         _hud = new PlayHud(services);
         _animations = AnimationLibrary.Load(services.Data);
+        _layout = RoomLayout.Load(services.Data);
         _definitions = GameDataLoader.LoadDefinitions(services.Data);
         _setup = GameDataLoader.LoadSetup(services.Data, parameters.GetValueOrDefault("setup") ?? GameDataLoader.DefaultSetup);
         services.Data.FileChanged += OnDataFileChanged;
@@ -73,6 +76,9 @@ public sealed class PlayScene : IScene
     /// <summary>The current run (read by the dev tools' inspector).</summary>
     public Run Run => _run;
 
+    /// <summary>Animations too long for their choreography step (shown in the dev tools).</summary>
+    public IReadOnlyList<string> ChoreographyProblems => ChoreographyCheck.Problems(_animations, _definitions.Tuning);
+
     public void StartRun()
     {
         if (_run is not null)
@@ -81,11 +87,12 @@ public sealed class PlayScene : IScene
         }
 
         _run = Run.Create(_definitions, _setup);
+        _heroViews.Clear();
+        _encounters.Clear();
+        _choreographer = new Choreographer(_run, _layout, ViewFor, EncounterFor);
         _run.EventRaised += OnRunEvent;
         _build = new BuildController(_run);
         _build.Message += message => _hud.Toast(message, _seconds);
-        _heroViews.Clear();
-        _monsters.Clear();
         _startSimBeat = _services.Audio.Time.SimBeat;
         _gameBeat = 0;
         _cameraPlaced = false;
@@ -113,10 +120,7 @@ public sealed class PlayScene : IScene
         _gameBeat = Math.Max(_gameBeat, time.SimBeat - _startSimBeat);
         _run.AdvanceTo(_gameBeat);
 
-        SyncMonsters();
-        UpdateHeroTargets();
-        foreach (HeroView view in _heroViews.Values) view.Update(time, _gameBeat);
-        foreach (AnimationPlayer monster in _monsters.Values) monster.Update(time);
+        SyncEncounters();
     }
 
     public void Draw(SpriteBatch batch)
@@ -124,8 +128,10 @@ public sealed class PlayScene : IScene
         Viewport viewport = _services.GraphicsDevice.Viewport;
 
         batch.Begin(transformMatrix: _camera.Transform(viewport), samplerState: SamplerState.LinearClamp);
-        _renderer.Draw(batch, _run, _monsters, _build.Selected, showSelection: !_run.IsOver, _camera.Zoom);
-        DrawHeroes(batch);
+        BeatTime time = _services.Audio.Time;
+        _renderer.Draw(batch, _run, _layout, _encounters, _gameBeat, time, _build.Selected, showSelection: !_run.IsOver, _camera.Zoom);
+        DrawHeroes(batch, time);
+        DrawBanners(batch);
         batch.End();
 
         batch.Begin(transformMatrix: _services.Ui.Transform, samplerState: SamplerState.LinearClamp);
@@ -250,115 +256,66 @@ public sealed class PlayScene : IScene
 
     private void OnRunEvent(GameEvent gameEvent)
     {
-        switch (gameEvent)
+        _choreographer.Handle(gameEvent);
+
+        if (gameEvent is RunEnded ended)
         {
-            case PartySpawned spawned:
-                for (int i = 0; i < spawned.HeroIds.Count; i++)
-                {
-                    HeroView view = ViewFor(spawned.HeroIds[i]);
-                    view.Appear(WorldLayout.QueueSlot(_run.Dungeon.Entrance.Position, _run.Dungeon.Entrance.Facing, i));
-                }
-                break;
-
-            case PartyDeparted departed:
-                StartTravel(departed);
-                break;
-
-            case PartyArrived arrived:
-                PlayMonster(arrived.RoomId, "Idle"); // the room resets for every party
-                break;
-
-            case PartyHuddleStarted huddle:
-                foreach (int heroId in MembersOf(huddle.PartyId)) ViewFor(heroId).PlayOneShot("Huddle");
-                break;
-
-            case AttemptStarted attempt:
-                ViewFor(attempt.HeroId).PlayOneShot("Attack");
-                PlayMonster(attempt.RoomId, "Prepare");
-                break;
-
-            case RoomCleared cleared:
-                ViewFor(cleared.HeroId).PlayOneShot("Celebrate");
-                PlayMonster(cleared.RoomId, "Death", "Disarmed");
-                break;
-
-            case HeroDied died:
-                ViewFor(died.HeroId).Die(died.Beat);
-                foreach (int heroId in MembersOf(died.PartyId)) ViewFor(heroId).PlayOneShot("Fear");
-                PlayMonster(died.RoomId, "Attack", "Trigger");
-                break;
-
-            case RunEnded ended:
-                _hud.Toast($"{_run.Heroes.ById(ended.WinningHeroId).Name} reached the treasure!", _seconds);
-                break;
+            _hud.Toast($"{_run.Heroes.ById(ended.WinningHeroId).Name} reached the treasure!", _seconds);
         }
     }
 
-    private void StartTravel(PartyDeparted departed)
+    private void DrawHeroes(SpriteBatch batch, BeatTime time)
     {
-        Room from = _run.Dungeon.RoomById(departed.FromRoomId)!;
-        Room to = _run.Dungeon.RoomById(departed.ToRoomId)!;
-        var members = MembersOf(departed.PartyId);
-
-        for (int i = 0; i < members.Count; i++)
+        foreach (HeroView view in _heroViews.Values.Where(v => v.Visible))
         {
-            HeroView view = ViewFor(members[i]);
-            Vector2 end = WorldLayout.QueueSlot(to.Position, to.Facing, i);
-            var path = new MovementPath(view.Position);
+            Vector2 feet = view.PositionAt(_gameBeat);
+            var (clip, frame) = view.FrameAt(_gameBeat, time);
+            PlaceholderSprite.Draw(batch, _services.Draw, feet, view.Animator.Entity, clip, frame, scale: WorldLayout.SpriteScale);
 
-            if (departed.Connection == ConnectionKind.Hallway)
-            {
-                // Out the far side, along the hallway, through the next room's door, into the queue.
-                path.WalkTo(WorldLayout.ToWorld(from.Position, from.Facing, WorldLayout.CellWidth))
-                    .WalkTo(WorldLayout.ToWorld(to.Position, to.Facing, WorldLayout.DoorU))
-                    .WalkTo(end);
-            }
-            else
-            {
-                // Into this room's exit portal, out of the next room's entry portal.
-                path.WalkTo(WorldLayout.ToWorld(from.Position, from.Facing, WorldLayout.ExitPortalU))
-                    .JumpTo(WorldLayout.ToWorld(to.Position, to.Facing, WorldLayout.EntryPortalU))
-                    .WalkTo(end);
-            }
-
-            view.FollowPath(path, departed.Beat, departed.ArriveBeat);
-        }
-    }
-
-    // Where each hero in a room should stand right now.
-    private void UpdateHeroTargets()
-    {
-        foreach (Party party in _run.ActiveParties)
-        {
-            if (party.Phase == PartyPhase.Traveling) continue;
-
-            Room room = _run.Dungeon.Rooms[party.RoomIndex];
-            float spacing = party.Phase == PartyPhase.Huddling ? WorldLayout.HuddleSpacing : WorldLayout.SlotSpacing;
-
-            for (int i = 0; i < party.Members.Count; i++)
-            {
-                HeroView view = ViewFor(party.Members[i].Id);
-                bool fighting = party.Phase == PartyPhase.Attempting && i == 0;
-                view.Target = fighting
-                    ? WorldLayout.ToWorld(room.Position, room.Facing, WorldLayout.FightSpotU)
-                    : WorldLayout.QueueSlot(room.Position, room.Facing, i, spacing);
-            }
-        }
-    }
-
-    private void DrawHeroes(SpriteBatch batch)
-    {
-        // The fallen are drawn first (behind the living), and without name tags, to keep fights readable.
-        foreach (HeroView view in _heroViews.Values.Where(v => v.Visible).OrderByDescending(v => v.IsDead).ThenBy(v => v.Position.Y).ThenBy(v => v.Position.X))
-        {
-            AnimationPlayer anim = view.Animation;
-            PlaceholderSprite.Draw(batch, _services.Draw, view.Position, anim.Entity, anim.DisplayClip, anim.Frame, view.Opacity, WorldLayout.SpriteScale);
-
-            if (view.IsDead) continue;
-            int top = (int)(view.Position.Y - anim.Entity.Size.Y * WorldLayout.SpriteScale);
-            var nameArea = new Rectangle((int)view.Position.X - 250, top - 120, 500, 70);
+            int top = (int)(feet.Y - view.Animator.Entity.Size.Y * WorldLayout.SpriteScale);
+            var nameArea = new Rectangle((int)feet.X - 250, top - 120, 500, 70);
             float nameScale = DungeonRenderer.ScreenSteadyScale(0.75f, _camera.Zoom, 1.6f);
-            _services.Draw.TextCentered(batch, view.Name, nameArea, Color.White * view.Opacity, nameScale);
+            _services.Draw.TextCentered(batch, view.Name, nameArea, Color.White, nameScale);
+        }
+    }
+
+    // The reorder banner: drops from the ceiling over the whole line, holds, then rolls back up.
+    private void DrawBanners(SpriteBatch batch)
+    {
+        foreach (PartyView party in _choreographer.Parties)
+        {
+            if (party.Banner is not { } banner || party.Line.Count == 0) continue;
+
+            float progress = (float)Math.Clamp((_gameBeat - banner.StartBeat) / Math.Max(1e-6, banner.Duration), 0, 1);
+            float drop = banner.Step switch
+            {
+                PartyPhase.BannerDown => progress,
+                PartyPhase.BannerUp => 1 - progress,
+                _ => 1,
+            };
+            if (drop <= 0) continue;
+
+            Room room = _run.Dungeon.RoomById(party.RoomId)!;
+            Vector2 front = _layout.LineSlot(room, 0);
+            Vector2 back = _layout.LineSlot(room, party.Line.Count - 1);
+            float halfHero = _animations.Entity("Hero").Size.X * WorldLayout.SpriteScale / 2f + 50;
+            Rectangle cell = WorldLayout.CellRect(room.Position);
+            int left = (int)(Math.Min(front.X, back.X) - halfHero);
+            int right = (int)(Math.Max(front.X, back.X) + halfHero);
+            int top = cell.Y + 40;
+            int fullHeight = (int)(front.Y + 30 - top);
+            var rect = new Rectangle(left, top, right - left, (int)(fullHeight * drop));
+
+            string clip = banner.Step switch
+            {
+                PartyPhase.BannerDown => "Unfurl",
+                PartyPhase.BannerUp => "Furl",
+                _ => "Covered",
+            };
+            _services.Draw.FillRect(batch, rect, new Color(110, 20, 30));
+            _services.Draw.OutlineRect(batch, rect, new Color(230, 190, 80), 10);
+            float labelScale = DungeonRenderer.ScreenSteadyScale(0.8f, _camera.Zoom, 3f);
+            _services.Draw.TextCentered(batch, $"Banner - {clip}", rect, new Color(240, 210, 120), labelScale);
         }
     }
 
@@ -374,27 +331,22 @@ public sealed class PlayScene : IScene
         return view;
     }
 
-    private List<int> MembersOf(int partyId) =>
-        _run.AllParties.FirstOrDefault(p => p.Id == partyId)?.Members.Select(h => h.Id).ToList() ?? [];
+    private ScriptedAnimator? EncounterFor(int roomId)
+    {
+        SyncEncounters();
+        return _encounters.GetValueOrDefault(roomId);
+    }
 
-    // Every room with an animated entity (monster or trap) gets a player; new rooms appear when built.
-    private void SyncMonsters()
+    // Every room with an animated entity (monster or trap) gets an animator; new rooms appear when built.
+    private void SyncEncounters()
     {
         foreach (Room room in _run.Dungeon.Rooms)
         {
-            if (!_monsters.ContainsKey(room.Id) && _animations.TryEntity(room.Kind.Id) is { } entity)
+            if (!_encounters.ContainsKey(room.Id) && _animations.TryEntity(room.Kind.Id) is { } entity)
             {
-                _monsters[room.Id] = new AnimationPlayer(entity);
+                _encounters[room.Id] = new ScriptedAnimator(entity);
             }
         }
-    }
-
-    /// <summary>Plays the first of <paramref name="clips"/> the room's entity has.</summary>
-    private void PlayMonster(int roomId, params string[] clips)
-    {
-        if (!_monsters.TryGetValue(roomId, out AnimationPlayer? monster)) return;
-        string? clip = clips.FirstOrDefault(monster.Entity.HasClip);
-        if (clip is not null) monster.Play(clip);
     }
 
     private void OnDataFileChanged(string path)
@@ -404,16 +356,28 @@ public sealed class PlayScene : IScene
             try
             {
                 _animations = AnimationLibrary.Load(_services.Data);
-                foreach (HeroView view in _heroViews.Values) view.Animation.Rebind(_animations.Entity("Hero"));
-                foreach (var (roomId, monster) in _monsters)
+                foreach (HeroView view in _heroViews.Values) view.Animator.Rebind(_animations.Entity("Hero"));
+                foreach (ScriptedAnimator encounter in _encounters.Values)
                 {
-                    if (_animations.TryEntity(monster.Entity.Name) is { } entity) monster.Rebind(entity);
+                    if (_animations.TryEntity(encounter.Entity.Name) is { } entity) encounter.Rebind(entity);
                 }
                 _hud.Toast("Animations reloaded.", _seconds);
             }
             catch (Exception ex) when (ex is InvalidDataException or System.Text.Json.JsonException or IOException)
             {
                 _hud.Toast($"Couldn't reload animations: {ex.Message}", _seconds);
+            }
+        }
+        else if (path == RoomLayout.FilePath)
+        {
+            try
+            {
+                _layout = RoomLayout.Load(_services.Data);
+                _hud.Toast("Room layout reloaded. Restart the scene to rebuild positions.", _seconds);
+            }
+            catch (Exception ex) when (ex is InvalidDataException or System.Text.Json.JsonException or IOException)
+            {
+                _hud.Toast($"Couldn't reload the layout: {ex.Message}", _seconds);
             }
         }
         else if (path.StartsWith("game/", StringComparison.Ordinal))

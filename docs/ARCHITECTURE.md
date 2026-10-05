@@ -74,7 +74,8 @@ Developer tools live in `src/HeroesUnwelcomed.Game/DevTools/` and are compiled *
 - **M1: Beat clock and audio prototype** ✅. Custom mixer that doubles as the master clock, generated placeholder stems per speed level (calm pause track included), speed changes on the beat, stem mute/unmute on the beat, animation system (music/sim clocks, one-shots, rate curves, pause shows idle), animation gallery, live JSON reload.
 - **M2: Core game logic, no graphics** ✅. Data-driven room kinds/tuning/heroes/run setup (`data/game/`), dungeon grid + order + calculated connections + flipping, hero pool and codex, parties (travel → huddle → reorder → attempt → die/clear → wait/queue), souls ledger, door lock cycle, commands with refusal reasons, event log + replay, metrics, both ordering rules, SimRunner with bot DM and HTML report.
 - **M3: First playable** ✅. Play scene (now the game's default start): world layout, camera (pan/zoom/fit/follow selection), dungeon renderer with calculated doors and portals, hero views that walk timed paths and glide to queue/fight spots, event-driven animations (huddle, attack, celebrate, death + teammates' fear, monster reactions), HUD (souls, door, pool, "who goes first here" rankings, prompts, toasts, run-over screen), build controller with build/upgrade/flip menus usable by controller, keyboard and mouse, door toggle and send-party actions, dev-panel run inspector, play scenarios.
-- **M4:** Multiple parties, room queues, waiting idles.
+- **M3.5: Choreography** ✅. Beat-scripted encounter flow (see below), party moves as one formation, banner reorder, room anchor points as data, the full animation vocabulary, choreography length check, no-overlap tests.
+- **M4:** Multiple parties polish (most of it already works: queueing, waiting, auto spawning).
 - **M5:** Music augments by influence, positional sound, Fear animation.
 - **M6:** Specialization into classes, balance pass.
 - **Later:** save mid-run, hero pool screen, costs, music brief for the composer, real art, Steam integration, Deck Verified, mobile port.
@@ -87,10 +88,32 @@ Developer tools live in `src/HeroesUnwelcomed.Game/DevTools/` and are compiled *
 - **Events** (`GameEvent` records) are the only output. Visuals, audio and metrics subscribe to `Run.EventRaised`; `RunMetrics` is calculated purely from `Run.Events`.
 - **Data:** `data/game/rooms.json`, `tuning.json`, `heroes.json`, `run-setup.json`. Core parses JSON text but never touches files; callers load the text.
 
+## Encounter choreography (M3.5)
+
+Every encounter is a fixed script. Each step has a length in beats (`data/game/tuning.json`), and the whole party and the encounter act in lockstep:
+
+| Step | Front hero | Rest of the line | Encounter |
+|---|---|---|---|
+| Walk | Walk (Portal Entrance / Exit near portals) | Walk, same pace, fixed spacing | Idle |
+| Arrive pause | stops at the border | Idle | Idle |
+| Banner down / hold / up | covered; the order swaps the instant it's fully down | covered | Idle |
+| Entrance | EncounterEntrance to the Hero Spot | Idle | HeroEnter |
+| Ready | Ready (face-off) | Idle | Ready |
+| Action | Fight / Disarm / Puzzle / Magic (by category) | Idle | Interact |
+| Result | Victory / Death | VictoryReact / DeathReact | Defeat / Victory |
+| Recover | (fallen hero removed) | Idle | Idle / stays defeated |
+| Step up (loss) | new front walks on to the Hero Spot → Ready | line moves up one space | HeroEnter |
+| Catch up (win) | victor keeps celebrating | walk up behind the victor → Walk on | Defeat |
+
+- **Core** (`Run`) owns the timing: each step is a `PartyPhase`, announced with a `PartyStepStarted(beat, step, duration)` event. The dice roll at the end of Action. `debugGapBeats` adds stillness after every step for checking timing by eye.
+- **`Choreographer`** turns each step into exact instructions per participant: a stretch of route from beat A to beat B, and a clip from beat A. **The party is one object**: when travelling, one route runs from the back of the line through every member to the leader and on; everyone moves the same distance, so spacing and pace are identical. Positions come from anchors plus line index, so heroes never share a place. A test plays whole runs and checks no two heroes ever overlap.
+- **`ScriptedAnimator`** calculates frames from a clip's start beat (no running timers): one-shots hold their last frame until the next step. **`ChoreographyCheck`** lists clips longer than their step (shown in the dev panel; a test keeps the shipped data clean).
+- **Anchors** (`data/game/layout.json`): as fractions of the cell width along travel. Line front 0.44 (just before the border/door at 0.5), Hero Spot ⅓ into the encounter half, encounter ⅔ in, portals, spacing. Room kinds can override any of them.
+
 ## How the playable game works (M3)
 
-- **`PlayScene`** advances the `Run` to the current game beat each frame, then turns the run's **events** into visuals. A `PartyDeparted` becomes a `MovementPath` (hallway: out the far side and through the next door; portal: into the exit portal, out of the next room's entry portal) timed to arrive exactly at the simulation's arrival beat. Huddle, attack, death and so on become animations on `HeroView`s and room monsters.
-- **`WorldLayout`**: one grid cell = 1920×1080 world units, split into a travel half and a room half; positions inside a cell are measured "along the way through", so left-facing rooms are just mirrored.
+- **`PlayScene`** advances the `Run` to the current game beat each frame, passes events to the `Choreographer`, and draws positions and frames calculated from the game beat (so pause freezes everything exactly).
+- **`WorldLayout`**: one grid cell = 1920×1080 world units, split into a travel half and an encounter half; positions inside a cell are measured "along the way through", so left-facing rooms are just mirrored.
 - **`BuildController`** takes intentions (move, point at, confirm, cancel), not buttons, so keyboard, gamepad, mouse and later touch drive identical logic. Every change goes through a Core command, and refusals show Core's reason.
 - **Readability:** characters draw 1.6× their data size; room labels and names keep a steady on-screen size whatever the zoom.
 - **Scenario parameters** for the play scene: `setup` (run-setup file), `startLocked`, `focusRoom`, `zoom`.
@@ -102,6 +125,8 @@ Developer tools live in `src/HeroesUnwelcomed.Game/DevTools/` and are compiled *
 |---|---|---|---|
 | ladder | 98% | 3,344 | 66% |
 | reputation | 100% | 3,545 | 81% |
+
+After the M3.5 choreography (slower, more theatrical encounters): reputation 100% won, median 4,839 beats, best-pick 82%; ladder median 5,163 beats, best-pick 68%.
 
 The numeric reputation rule picks the truly best hero noticeably more often; the ladder adapts more slowly (one place per result). Both are kept; the choice is open. Balance numbers are placeholders.
 

@@ -15,10 +15,11 @@ namespace HeroesUnwelcomed.Game.Scenes;
 /// </summary>
 public sealed class AnimationGalleryScene : IScene
 {
-    private const float ClipButtonWidth = 210;
-    private const float ClipButtonHeight = 64;
-    private const float ClipButtonGap = 14;
-    private const float SpriteScale = 0.75f;
+    private const float ClipButtonWidth = 220;
+    private const float ClipButtonHeight = 56;
+    private const float ClipButtonGap = 10;
+    private const float ClipButtonsBottomMargin = 130;
+    private const float SpriteScale = 0.6f;
     private const int MaxPerRow = 4;
 
     private readonly GameServices _services;
@@ -210,10 +211,11 @@ public sealed class AnimationGalleryScene : IScene
             bool playing = SelectedPlayer.Clip.Name == SelectedClips[i].Name;
             draw.FillRect(batch, button, playing ? new Color(60, 90, 60) : new Color(35, 35, 50));
             draw.OutlineRect(batch, button, selected ? Color.Gold : new Color(80, 80, 100), selected ? 4 : 2);
-            draw.TextCentered(batch, SelectedClips[i].Name, button, Color.White, 0.6f);
+            draw.TextCentered(batch, SelectedClips[i].Name, button, Color.White, 0.5f);
         }
 
-        Rectangle label = _services.Ui.Place(Anchor.Bottom, new Vector2(0, 188), new Vector2(900, 40));
+        float buttonsHeight = ClipButtonRows * (ClipButtonHeight + ClipButtonGap);
+        Rectangle label = _services.Ui.Place(Anchor.Bottom, new Vector2(0, ClipButtonsBottomMargin + buttonsHeight + 4), new Vector2(900, 40));
         draw.TextCentered(batch, $"{SelectedPlayer.Entity.Name} animations", label, new Color(180, 180, 200), 0.6f);
     }
 
@@ -232,7 +234,7 @@ public sealed class AnimationGalleryScene : IScene
     // Two rows when there are more than four entities: floors at ~44% and ~74% of the canvas height.
     private float FloorY(int row) => RowCount == 1
         ? _services.Ui.Size.Y / 2f + 170
-        : _services.Ui.Size.Y * (row == 0 ? 0.435f : 0.74f);
+        : _services.Ui.Size.Y * (row == 0 ? 0.40f : 0.665f);
 
     private Vector2 FeetPosition(int index)
     {
@@ -251,12 +253,23 @@ public sealed class AnimationGalleryScene : IScene
         return new Rectangle((int)(feet.X - width / 2f), (int)(feet.Y - height), width, height);
     }
 
+    // Clip buttons wrap onto as many rows as needed, centred, building up from the bottom.
+    private int ClipButtonsPerRow =>
+        Math.Max(1, (int)((_services.Ui.Size.X - 80 + ClipButtonGap) / (ClipButtonWidth + ClipButtonGap)));
+
+    private int ClipButtonRows => (SelectedClips.Count + ClipButtonsPerRow - 1) / ClipButtonsPerRow;
+
     private Rectangle ClipButton(int index)
     {
-        int count = SelectedClips.Count;
-        float rowWidth = count * ClipButtonWidth + (count - 1) * ClipButtonGap;
-        Rectangle row = _services.Ui.Place(Anchor.Bottom, new Vector2(0, 120), new Vector2(rowWidth, ClipButtonHeight));
-        return new Rectangle((int)(row.X + index * (ClipButtonWidth + ClipButtonGap)), row.Y, (int)ClipButtonWidth, (int)ClipButtonHeight);
+        int perRow = ClipButtonsPerRow;
+        int row = index / perRow;
+        int inThisRow = Math.Min(perRow, SelectedClips.Count - row * perRow);
+        int rowsBelow = ClipButtonRows - 1 - row;
+
+        float rowWidth = inThisRow * ClipButtonWidth + (inThisRow - 1) * ClipButtonGap;
+        float x = (_services.Ui.Size.X - rowWidth) / 2f + (index % perRow) * (ClipButtonWidth + ClipButtonGap);
+        float y = _services.Ui.Size.Y - ClipButtonsBottomMargin - ClipButtonHeight - rowsBelow * (ClipButtonHeight + ClipButtonGap);
+        return new Rectangle((int)x, (int)y, (int)ClipButtonWidth, (int)ClipButtonHeight);
     }
 
     private void SelectEntity(int index)

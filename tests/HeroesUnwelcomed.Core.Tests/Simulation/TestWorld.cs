@@ -32,9 +32,22 @@ internal static class TestWorld
     {
         HallwayBeats = 4,
         PortalBeats = 3,
-        HuddleBeats = 2,
-        AttemptBeats = 2,
         RespawnBeats = 10,
+        // Every choreography step lasts 1 beat, so timelines are easy to read in tests:
+        // arrive 4 → pause 4–5 → banner down 5–6 (reorder at 6) → hold 6–7 → up 7–8 →
+        // entrance 8–9 → ready 9–10 → action 10–11 (result rolled at 11) → result 11–12 →
+        // recover 12–13 → catch up 13–14 (depart at 14) or step up 13–14 → ready 14–15 → ...
+        ArrivePauseBeats = 1,
+        BannerDownBeats = 1,
+        BannerHoldBeats = 1,
+        BannerUpBeats = 1,
+        EntranceBeats = 1,
+        ReadyBeats = 1,
+        ActionBeats = 1,
+        ResultBeats = 1,
+        RecoverBeats = 1,
+        StepUpBeats = 1,
+        CatchUpBeats = 1,
         SpawnGapRooms = 2,
     };
 

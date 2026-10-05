@@ -30,15 +30,8 @@ public static class WorldLayout
     /// <summary>Height of the floor line, measured from the top of the cell.</summary>
     public const float FloorY = CellHeight * 0.8f;
 
-    // Landmarks, as distance travelled through the cell (0 = entry side).
-    public const float EntryPortalU = 180f;
-    public const float DoorU = CellWidth / 2f;
-    public const float FrontSlotU = 1220f;
-    public const float FightSpotU = 1330f;
-    public const float MonsterU = 1660f;
-    public const float ExitPortalU = 1800f;
-    public const float SlotSpacing = 255f;
-    public const float HuddleSpacing = 120f;
+    // Anchor points (line, hero spot, encounter, door, portals) are data:
+    // see RoomLayout and data/game/layout.json.
 
     /// <summary>
     /// Characters are drawn this much bigger than their size in the animation
@@ -55,10 +48,6 @@ public static class WorldLayout
         float localX = facing == Facing.Right ? u : CellWidth - u;
         return new Vector2(cell.X * CellWidth + localX, cell.Y * CellHeight + y);
     }
-
-    /// <summary>Where the hero in queue position <paramref name="index"/> stands (0 = front).</summary>
-    public static Vector2 QueueSlot(GridPoint cell, Facing facing, int index, float spacing = SlotSpacing) =>
-        ToWorld(cell, facing, FrontSlotU - index * spacing);
 
     /// <summary>The rectangle covering the room half of a cell.</summary>
     public static Rectangle RoomHalf(GridPoint cell, Facing facing)

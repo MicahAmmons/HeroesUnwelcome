@@ -186,25 +186,68 @@ public sealed class Run
         }
     }
 
+    // Moves a party on to its next choreography step once the current one is over.
     private void Step(Party party)
     {
-        bool phaseOver = Beat >= party.PhaseEndsAt - Epsilon;
+        if (party.Phase == PartyPhase.Waiting)
+        {
+            Depart(party); // try again every tick
+            return;
+        }
+
+        if (Beat < party.PhaseEndsAt - Epsilon)
+        {
+            return;
+        }
 
         switch (party.Phase)
         {
-            case PartyPhase.Waiting:
-                Depart(party);
-                break;
-            case PartyPhase.Traveling when phaseOver:
-                Arrive(party);
-                break;
-            case PartyPhase.Huddling when phaseOver:
-                Reorder(party);
-                break;
-            case PartyPhase.Attempting when phaseOver:
-                Resolve(party);
-                break;
+            case PartyPhase.Traveling: Arrive(party); break;
+            case PartyPhase.ArrivePause: Begin(party, PartyPhase.BannerDown); break;
+            case PartyPhase.BannerDown: Reorder(party); Begin(party, PartyPhase.BannerHold); break;
+            case PartyPhase.BannerHold: Begin(party, PartyPhase.BannerUp); break;
+            case PartyPhase.BannerUp: StartAttempt(party, PartyPhase.Entrance); break;
+            case PartyPhase.Entrance: Begin(party, PartyPhase.Ready); break;
+            case PartyPhase.StepUp: Begin(party, PartyPhase.Ready); break;
+            case PartyPhase.Ready: Begin(party, PartyPhase.Action); break;
+            case PartyPhase.Action: Resolve(party); break;
+            case PartyPhase.Result: Begin(party, PartyPhase.Recover); break;
+            case PartyPhase.Recover: AfterRecover(party); break;
+            case PartyPhase.CatchUp: Depart(party); break;
         }
+    }
+
+    /// <summary>
+    /// Starts a choreography step: sets its end beat from the tuning and tells
+    /// the world (visuals animate exactly this long). The optional debug gap
+    /// adds stillness after the step without changing the step itself.
+    /// </summary>
+    private void Begin(Party party, PartyPhase step)
+    {
+        double duration = StepBeats(step);
+        party.Phase = step;
+        party.PhaseEndsAt = Beat + duration + Definitions.Tuning.DebugGapBeats;
+        Raise(new PartyStepStarted(Beat, party.Id, Dungeon.Rooms[party.RoomIndex].Id, step, duration));
+    }
+
+    private double StepBeats(PartyPhase step)
+    {
+        Tuning t = Definitions.Tuning;
+        return step switch
+        {
+            PartyPhase.ArrivePause => t.ArrivePauseBeats,
+            PartyPhase.BannerDown => t.BannerDownBeats,
+            PartyPhase.BannerHold => t.BannerHoldBeats,
+            PartyPhase.BannerUp => t.BannerUpBeats,
+            PartyPhase.Entrance => t.EntranceBeats,
+            PartyPhase.Ready => t.ReadyBeats,
+            PartyPhase.Action => t.ActionBeats,
+            PartyPhase.Result => t.ResultBeats,
+            PartyPhase.Recover => t.RecoverBeats,
+            PartyPhase.StepUp => t.StepUpBeats,
+            PartyPhase.CatchUp => t.CatchUpBeats,
+            _ => 0,
+        };
     }
 
     // ---- A party's life ---------------------------------------------------
@@ -271,28 +314,25 @@ public sealed class Run
             Depart(party);
             return;
         }
-
-        party.Phase = PartyPhase.Huddling;
-        party.PhaseEndsAt = Beat + Definitions.Tuning.HuddleBeats;
-        Raise(new PartyHuddleStarted(Beat, party.Id, room.Id));
+        Begin(party, PartyPhase.ArrivePause);
     }
 
+    // Happens the instant the banner is fully down: the order swaps unseen.
     private void Reorder(Party party)
     {
         Room room = Dungeon.Rooms[party.RoomIndex];
         party.Members = Rules.Ordering.Order(party.Members, room.Kind, Codex, Definitions).ToList();
         Raise(new PartyReordered(Beat, party.Id, room.Id, party.Members.Select(h => h.Id).ToList()));
-        StartAttempt(party);
     }
 
-    private void StartAttempt(Party party)
+    // The front hero heads in: Entrance after the banner, or Step Up after a teammate died.
+    private void StartAttempt(Party party, PartyPhase movement)
     {
-        Room room = Dungeon.Rooms[party.RoomIndex];
-        party.Phase = PartyPhase.Attempting;
-        party.PhaseEndsAt = Beat + Definitions.Tuning.AttemptBeats;
-        Raise(new AttemptStarted(Beat, party.Id, party.Members[0].Id, room.Id));
+        Raise(new AttemptStarted(Beat, party.Id, party.Members[0].Id, Dungeon.Rooms[party.RoomIndex].Id));
+        Begin(party, movement);
     }
 
+    // End of the Action step: roll the dice, then show the result.
     private void Resolve(Party party)
     {
         Room room = Dungeon.Rooms[party.RoomIndex];
@@ -302,26 +342,20 @@ public sealed class Run
         Codex.RecordAttempt(hero.Id, room.Kind.Id, result.Success);
         Rules.Growth.Apply(hero, room, result.Success);
         Rules.Ordering.Record(hero, room.Kind, result.Success, Codex);
+        party.LastAttemptSucceeded = result.Success;
 
         if (result.Success)
         {
             hero.RoomsCleared++;
             var cleared = new RoomCleared(Beat, party.Id, hero.Id, room.Id, room.Kind.Id, result.Chance);
             Raise(cleared);
+            Begin(party, PartyPhase.Result);
 
             if (Rules.RunEnd.EndsRun(this, cleared))
             {
                 FinishParty(party);
                 Outcome = new RunEnded(Beat, hero.Id, party.Id);
                 Raise(Outcome);
-            }
-            else if (Dungeon.IsTreasure(party.RoomIndex))
-            {
-                FinishParty(party); // reached the end without ending the run (only with other end rules)
-            }
-            else
-            {
-                Depart(party);
             }
             return;
         }
@@ -336,16 +370,35 @@ public sealed class Run
         {
             ChangeSouls(room.Kind.Souls, $"{hero.Name} died at {room.Kind.Id}", room.Id);
         }
+        Begin(party, PartyPhase.Result);
+    }
+
+    // After the result and a beat of stillness: catch up to the victor, step up for the next try, or end.
+    private void AfterRecover(Party party)
+    {
+        Room room = Dungeon.Rooms[party.RoomIndex];
+
+        if (party.LastAttemptSucceeded)
+        {
+            if (Dungeon.IsTreasure(party.RoomIndex))
+            {
+                FinishParty(party); // reached the end without ending the run (only with other end rules)
+            }
+            else
+            {
+                Begin(party, PartyPhase.CatchUp);
+            }
+            return;
+        }
 
         if (party.Members.Count == 0)
         {
             party.Phase = PartyPhase.Finished;
             Raise(new PartyWiped(Beat, party.Id, room.Id));
+            return;
         }
-        else
-        {
-            StartAttempt(party); // the next hero steps up; no new huddle
-        }
+
+        StartAttempt(party, PartyPhase.StepUp);
     }
 
     // Survivors of a party that finished without being wiped go back to the pool.

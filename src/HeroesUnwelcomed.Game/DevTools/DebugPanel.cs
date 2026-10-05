@@ -118,6 +118,13 @@ public sealed class DebugPanel
         if (ImGui.Button("New run")) play.StartRun();
         if (_lastCommandResult is { } result) ImGui.TextWrapped(result);
 
+        var problems = play.ChoreographyProblems;
+        if (problems.Count > 0)
+        {
+            ImGui.SeparatorText("Choreography check");
+            foreach (string problem in problems) ImGui.TextColored(new System.Numerics.Vector4(1f, 0.7f, 0.3f, 1f), problem);
+        }
+
         ImGui.SeparatorText("Parties");
         foreach (Party party in run.ActiveParties)
         {

@@ -47,15 +47,6 @@ public class WorldAndCameraTests
     }
 
     [Fact]
-    public void Layout_QueueStandsBehindTheFrontInTravelDirection()
-    {
-        var cell = new GridPoint(0, 0);
-
-        Assert.True(WorldLayout.QueueSlot(cell, Facing.Right, 1).X < WorldLayout.QueueSlot(cell, Facing.Right, 0).X);
-        Assert.True(WorldLayout.QueueSlot(cell, Facing.Left, 1).X > WorldLayout.QueueSlot(cell, Facing.Left, 0).X);
-    }
-
-    [Fact]
     public void Camera_ScreenAndWorldConversionsAreInverses()
     {
         var camera = new Camera2D { Position = new Vector2(3000, 1200) };

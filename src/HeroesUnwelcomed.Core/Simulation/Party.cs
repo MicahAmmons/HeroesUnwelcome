@@ -2,20 +2,29 @@ using HeroesUnwelcomed.Core.Heroes;
 
 namespace HeroesUnwelcomed.Core.Simulation;
 
-/// <summary>What a party is doing right now.</summary>
+/// <summary>
+/// What a party is doing right now: one step of the encounter choreography.
+/// Every step has a fixed length (see <see cref="Definitions.Tuning"/>).
+/// </summary>
 public enum PartyPhase
 {
-    /// <summary>Moving to the room at <see cref="Party.RoomIndex"/> (hallway or portal).</summary>
+    /// <summary>Walking (or portalling) to the room at <see cref="Party.RoomIndex"/>.</summary>
     Traveling,
 
     /// <summary>Done here, but the next room is occupied. Idles until it frees up.</summary>
     Waiting,
 
-    /// <summary>Gathered at the room, deciding the order.</summary>
-    Huddling,
-
-    /// <summary>One hero is attempting the room.</summary>
-    Attempting,
+    ArrivePause,
+    BannerDown,
+    BannerHold,
+    BannerUp,
+    Entrance,
+    Ready,
+    Action,
+    Result,
+    Recover,
+    StepUp,
+    CatchUp,
 
     /// <summary>Wiped out, or reached the end.</summary>
     Finished,
@@ -46,9 +55,15 @@ public sealed class Party
     /// <summary>Game beat when the current phase ends (unused while Waiting/Finished).</summary>
     public double PhaseEndsAt { get; internal set; }
 
-    public Hero? Attempter => Phase == PartyPhase.Attempting ? Members.FirstOrDefault() : null;
+    /// <summary>The hero currently taking on the room (front of the line), during the encounter steps.</summary>
+    public Hero? Attempter => Phase is PartyPhase.Entrance or PartyPhase.Ready or PartyPhase.Action or PartyPhase.StepUp
+        ? Members.FirstOrDefault()
+        : null;
 
     public bool IsActive => Phase != PartyPhase.Finished;
+
+    /// <summary>Whether the last attempt succeeded (decides between step-up and catch-up).</summary>
+    public bool LastAttemptSucceeded { get; internal set; }
 
     // Set while waiting, so the "waiting" event is only reported once.
     internal bool ReportedWaiting { get; set; }

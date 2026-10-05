@@ -7,59 +7,77 @@ namespace HeroesUnwelcomed.Core.Tests.Simulation;
 public class RunFlowTests
 {
     [Fact]
-    public void Party_WalksHuddlesAndAttempts_OnSchedule()
+    public void Party_StepsThroughTheChoreography_OnSchedule()
     {
         var (run, _) = TestWorld.ScriptedRun();
 
         Assert.True(run.Execute(new SendNextParty()).Accepted);
-        run.AdvanceTo(4);  // hallway = 4 beats
-        Assert.Single(run.Of<PartyArrived>());
-        Assert.Single(run.Of<PartyHuddleStarted>());
+        run.AdvanceTo(14);
 
-        run.AdvanceTo(6);  // huddle = 2 beats
-        Assert.Single(run.Of<PartyReordered>());
-        Assert.Single(run.Of<AttemptStarted>());
+        Assert.Equal(4, run.Of<PartyArrived>().Single().Beat);          // hallway = 4 beats
+        Assert.Equal(6, run.Of<PartyReordered>().Single().Beat);        // the moment the banner is fully down
+        Assert.Equal(8, run.Of<AttemptStarted>().Single().Beat);        // front hero heads in after the banner lifts
+        Assert.Equal(11, run.Of<RoomCleared>().Single().Beat);          // rolled at the end of Action
+        Assert.Equal(14, run.Of<PartyDeparted>().Last().Beat);          // after result, recover, catch up
 
-        run.AdvanceTo(8);  // attempt = 2 beats → scripted default: success
-        RoomCleared cleared = Assert.Single(run.Of<RoomCleared>());
-        Assert.Equal(8, cleared.Beat);
-        Assert.Equal(2, run.Of<PartyDeparted>().Count()); // entrance → room 1, room 1 → room 2
+        var steps = run.Of<PartyStepStarted>().Select(s => s.Step).ToList();
+        Assert.Equal(
+        [
+            PartyPhase.ArrivePause, PartyPhase.BannerDown, PartyPhase.BannerHold, PartyPhase.BannerUp,
+            PartyPhase.Entrance, PartyPhase.Ready, PartyPhase.Action, PartyPhase.Result, PartyPhase.Recover,
+            PartyPhase.CatchUp,
+        ], steps);
     }
 
     [Fact]
-    public void Failure_KillsAttempter_PaysSouls_AndNextHeroTriesWithoutAHuddle()
+    public void Failure_KillsFrontHero_PaysSouls_ThenTheLineStepsUp()
     {
         var (run, dice) = TestWorld.ScriptedRun();
         dice.Then(false, true);
 
         run.Execute(new SendNextParty());
-        run.AdvanceTo(10);
+        run.AdvanceTo(16);
 
         HeroDied death = Assert.Single(run.Of<HeroDied>());
-        Assert.Equal(8, death.Beat);
-        Assert.Equal(3, run.Souls.Balance);                   // goblin pays 3
-        Assert.Single(run.Of<PartyHuddleStarted>());          // still only one huddle
-        Assert.Equal(2, run.Of<AttemptStarted>().Count());    // second hero stepped up at once
-        Assert.Single(run.Of<RoomCleared>());
+        Assert.Equal(11, death.Beat);
+        Assert.Equal(3, run.Souls.Balance);                                  // goblin pays 3
+        Assert.Single(run.Of<PartyReordered>());                             // no second banner for the same room
+        Assert.Equal([8.0, 13.0], run.Of<AttemptStarted>().Select(a => a.Beat)); // next hero heads in after recovering
+        Assert.Contains(run.Of<PartyStepStarted>(), s => s.Step == PartyPhase.StepUp && s.Beat == 13);
+        Assert.Equal(16, run.Of<RoomCleared>().Single().Beat);              // step up 13, ready 14, action 15, roll 16
         Assert.Equal(HeroState.Dead, run.Heroes.ById(death.HeroId).State);
     }
 
     [Fact]
-    public void Wipe_EndsParty_AndHeroesRespawnLater()
+    public void Wipe_EndsPartyAfterTheLastResult_AndHeroesRespawnLater()
     {
         var (run, dice) = TestWorld.ScriptedRun();
         dice.Default = false;
 
         run.Execute(new SendNextParty());
-        run.AdvanceTo(10);
+        run.AdvanceTo(18);
 
-        Assert.Single(run.Of<PartyWiped>());
+        Assert.Equal([11.0, 16.0], run.Of<HeroDied>().Select(d => d.Beat));
+        Assert.Equal(18, Assert.Single(run.Of<PartyWiped>()).Beat);          // after the last death's result + recover
         Assert.Empty(run.ActiveParties);
-        Assert.Equal(2, run.Heroes.All.Count(h => h.State == HeroState.Dead));
 
-        run.AdvanceTo(20); // deaths at 8 and 10, respawn 10 beats later
+        run.AdvanceTo(26); // respawn 10 beats after each death
         Assert.Equal(2, run.Of<HeroRespawned>().Count());
         Assert.All(run.Heroes.All, h => Assert.Equal(HeroState.Waiting, h.State));
+    }
+
+    [Fact]
+    public void DebugGap_AddsStillnessAfterEachStep_WithoutChangingStepLengths()
+    {
+        var defs = TestWorld.Definitions(TestWorld.Tuning with { DebugGapBeats = 1 });
+        var run = Run.Create(defs, TestWorld.Setup());
+
+        run.Execute(new SendNextParty());
+        run.AdvanceTo(20);
+
+        var steps = run.Of<PartyStepStarted>().ToList();
+        Assert.All(steps, s => Assert.Equal(1, s.Duration));
+        Assert.Equal([4.0, 6.0, 8.0], steps.Take(3).Select(s => s.Beat)); // each step starts 2 beats after the last
     }
 
     [Fact]
@@ -89,10 +107,10 @@ public class RunFlowTests
         Assert.Equal((2, 1), (waiting.PartyId, waiting.BlockedByPartyId));
         Assert.False(run.Execute(new SendNextParty()).Accepted); // party 2 is still at the entrance
 
-        // Party 1: arrive 4, huddle to 6, attempt to 8, clears and moves on. Party 2 follows that same tick.
-        run.AdvanceTo(8);
+        // Party 1 clears room 1 and leaves it at beat 14 (see the timeline in TestWorld). Party 2 follows that same tick.
+        run.AdvanceTo(14);
         PartyDeparted follow = run.Of<PartyDeparted>().Single(d => d.PartyId == 2);
-        Assert.Equal(8, follow.Beat);
+        Assert.Equal(14, follow.Beat);
     }
 
     [Fact]

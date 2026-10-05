@@ -65,9 +65,46 @@ public sealed record Tuning
     // How long things take, in game beats.
     public double HallwayBeats { get; init; } = 4;
     public double PortalBeats { get; init; } = 3;
-    public double HuddleBeats { get; init; } = 4;
-    public double AttemptBeats { get; init; } = 4;
     public double RespawnBeats { get; init; } = 32;
+
+    // The encounter choreography: every step has a fixed length, in game beats.
+    // The whole party (and the encounter) acts in lockstep through these.
+
+    /// <summary>The line stops at the border; a short beat before the banner.</summary>
+    public double ArrivePauseBeats { get; init; } = 1;
+
+    /// <summary>The banner unfurls over the line. The order swaps the instant it's fully down.</summary>
+    public double BannerDownBeats { get; init; } = 1;
+
+    /// <summary>The banner stays down.</summary>
+    public double BannerHoldBeats { get; init; } = 2;
+
+    /// <summary>The banner furls back up.</summary>
+    public double BannerUpBeats { get; init; } = 1;
+
+    /// <summary>The front hero crosses from the border to the room's hero spot.</summary>
+    public double EntranceBeats { get; init; } = 2;
+
+    /// <summary>Face-off: the hero readies (sword raised), the encounter postures.</summary>
+    public double ReadyBeats { get; init; } = 1;
+
+    /// <summary>The attempt itself (fight, disarm...). The outcome is rolled at its end.</summary>
+    public double ActionBeats { get; init; } = 2;
+
+    /// <summary>Victory or death, with the party's reaction, for exactly this long.</summary>
+    public double ResultBeats { get; init; } = 2;
+
+    /// <summary>A beat of stillness after the result (a dead hero is gone by now).</summary>
+    public double RecoverBeats { get; init; } = 1;
+
+    /// <summary>After a death: the line moves up one space; the new front hero walks on to the hero spot.</summary>
+    public double StepUpBeats { get; init; } = 2;
+
+    /// <summary>After a win: the line walks up behind the victor before moving on together.</summary>
+    public double CatchUpBeats { get; init; } = 2;
+
+    /// <summary>Debugging aid: extra stillness after every step, to check everything starts and ends together. 0 in normal play.</summary>
+    public double DebugGapBeats { get; init; }
 
     /// <summary>
     /// How sharply skill − difficulty turns into a success chance. Smaller =

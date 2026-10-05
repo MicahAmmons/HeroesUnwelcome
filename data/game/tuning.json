@@ -3,9 +3,28 @@
   // Durations are in game beats (at 1x speed, 100 bpm: 1 beat = 0.6 s).
   "hallwayBeats": 4,
   "portalBeats": 3,
-  "huddleBeats": 4,
-  "attemptBeats": 4,
   "respawnBeats": 32,
+
+  // The encounter choreography. Each step has a fixed length, and the party
+  // and the encounter act in lockstep through them:
+  //   arrive pause -> banner down (order swaps when fully covered) -> banner hold -> banner up ->
+  //   entrance (front hero to the hero spot) -> ready (face-off) -> action (dice rolled at its end) ->
+  //   result (victory/death + reactions) -> recover ->
+  //   step up (after a death; then ready again)  or  catch up (after a win; then walk on)
+  "arrivePauseBeats": 1,
+  "bannerDownBeats": 1,
+  "bannerHoldBeats": 2,
+  "bannerUpBeats": 1,
+  "entranceBeats": 2,
+  "readyBeats": 1,
+  "actionBeats": 2,
+  "resultBeats": 2,
+  "recoverBeats": 1,
+  "stepUpBeats": 2,
+  "catchUpBeats": 2,
+
+  // Debugging: extra stillness after every step (0 = off). Try 2 to check timing by eye.
+  "debugGapBeats": 0,
 
   // Success chance = 1 / (1 + e^(-(skill - difficulty) / steepness)).
   // Equal skill and difficulty = 50%. Smaller steepness = less luck.

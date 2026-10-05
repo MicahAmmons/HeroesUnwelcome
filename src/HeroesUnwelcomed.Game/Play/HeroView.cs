@@ -5,153 +5,97 @@ using Microsoft.Xna.Framework;
 namespace HeroesUnwelcomed.Game.Play;
 
 /// <summary>
-/// How one hero looks on screen: where they stand, which animation is
-/// playing, and whether they're fading out after death.
+/// One hero on screen. It holds no logic of its own: its party tells it, for
+/// each choreography step, where to move (a stretch of a route, start beat,
+/// end beat) and which clip to play (from a start beat).
 /// </summary>
 /// <remarks>
-/// <para>
-/// The view never decides anything. The simulation says where the hero
-/// *should* be (a queue slot, the fight spot, or a route to the next room)
-/// and this class moves the picture there smoothly.
-/// </para>
-/// <para>
-/// <b>Moving between rooms</b> follows a <see cref="MovementPath"/> timed by the
-/// game beat, so travel takes exactly as long as the simulation says.
-/// <b>Within a room</b> (e.g. after the huddle reorders the queue) the hero
-/// glides toward the target. The glide also runs on game beats, so it freezes
-/// while paused and speeds up at 3x like everything else.
-/// </para>
-/// <para>
-/// <b>Animations:</b> event-driven one-shots (Attack, Fear, Huddle,
-/// Celebrate, Death) play to completion. Otherwise the hero walks while moving
-/// and idles while still.
-/// </para>
+/// Position is calculated, never accumulated: "how far along my route should I
+/// be at this beat". So heroes given the same timing move in perfect lockstep,
+/// and pausing (game beat stops) freezes them exactly in place.
 /// </remarks>
 public sealed class HeroView
 {
-    private const string Idle = "Idle";
-    private const string Walk = "Walk";
-    private const string Death = "Death";
-    private const double FadeAfterBeats = 3;
-    private const double FadeOverBeats = 2;
+    private const float PortalClipDistance = 160f; // world units either side of a portal jump
 
     private MovementPath? _path;
-    private double _pathStart;
-    private double _pathEnd;
-    private double? _diedAtBeat;
+    private float _fromDistance;
+    private float _toDistance;
+    private double _moveStart;
+    private double _moveEnd;
+    private Vector2 _standing;
 
     public HeroView(int heroId, string name, EntityDefinition entity)
     {
         HeroId = heroId;
         Name = name;
-        Animation = new AnimationPlayer(entity);
+        Animator = new ScriptedAnimator(entity);
     }
 
     public int HeroId { get; }
     public string Name { get; }
-    public AnimationPlayer Animation { get; }
-    public Vector2 Position { get; private set; }
-    public Vector2 Target { get; set; }
-    public bool Visible { get; private set; }
-    public float Opacity { get; private set; } = 1f;
-    public bool IsMoving { get; private set; }
-    public bool IsDead => _diedAtBeat is not null;
+    public ScriptedAnimator Animator { get; }
+    public bool Visible { get; set; }
 
-    /// <summary>Puts the hero in the world (a new party just entered).</summary>
-    public void Appear(Vector2 position)
+    /// <summary>Where the hero stands once any current movement finishes.</summary>
+    public Vector2 RestingPosition => _path is null ? _standing : _path.AtDistance(_toDistance);
+
+    /// <summary>Stand still at <paramref name="position"/> (cancels any movement).</summary>
+    public void PlaceAt(Vector2 position)
     {
-        Position = Target = position;
-        Visible = true;
-        Opacity = 1f;
-        _diedAtBeat = null;
         _path = null;
-        Animation.Play(Idle);
+        _standing = position;
     }
 
-    public void FollowPath(MovementPath path, double startBeat, double endBeat)
+    /// <summary>Move along <paramref name="path"/> from one distance to another between two beats.</summary>
+    public void Move(MovementPath path, float fromDistance, float toDistance, double startBeat, double endBeat)
     {
         _path = path;
-        _pathStart = startBeat;
-        _pathEnd = endBeat;
-        Target = path.End;
+        _fromDistance = fromDistance;
+        _toDistance = toDistance;
+        _moveStart = startBeat;
+        _moveEnd = endBeat;
     }
 
-    /// <summary>Plays an action animation (if the hero has it), unless they're dead.</summary>
-    public void PlayOneShot(string clip)
+    /// <summary>Walk in a straight line from where the hero stands to <paramref name="to"/>.</summary>
+    public void MoveTo(Vector2 to, double startBeat, double endBeat)
     {
-        if (!IsDead && Animation.Entity.HasClip(clip))
-        {
-            Animation.Play(clip);
-        }
+        var path = new MovementPath(RestingPosition).WalkTo(to);
+        Move(path, 0, path.WalkedLength, startBeat, endBeat);
     }
 
-    public void Die(double beat)
+    public Vector2 PositionAt(double gameBeat)
     {
-        _diedAtBeat = beat;
-        _path = null;
-        Target = Position;
-        Animation.Play(Death);
+        if (_path is null) return _standing;
+        return _path.AtDistance(DistanceAt(gameBeat));
     }
 
-    /// <param name="gameBeat">Continuous game beat since the run started (smoother than the simulation's 1/8-beat ticks).</param>
-    public void Update(BeatTime time, double gameBeat)
+    /// <summary>What to draw now. Near a portal jump, Portal Entrance / Portal Exit replace Walk.</summary>
+    public (ClipDefinition Clip, int Frame) FrameAt(double gameBeat, BeatTime time)
     {
-        if (!Visible)
+        if (_path is not null && !time.Paused && gameBeat < _moveEnd)
         {
-            return;
-        }
-
-        if (_path is not null)
-        {
-            float t = (float)((gameBeat - _pathStart) / Math.Max(1e-6, _pathEnd - _pathStart));
-            Position = _path.At(t);
-            if (t >= 1f)
+            float distance = DistanceAt(gameBeat);
+            foreach (float jump in _path.JumpDistances)
             {
-                _path = null;
+                float before = jump - distance;
+                if (before > 0 && before < PortalClipDistance)
+                {
+                    return Animator.FrameAtProgress("PortalEntrance", 1f - before / PortalClipDistance);
+                }
+                float after = distance - jump;
+                if (after >= 0 && after < PortalClipDistance)
+                {
+                    return Animator.FrameAtProgress("PortalExit", after / PortalClipDistance);
+                }
             }
         }
-        else
-        {
-            // Glide toward the target: cover ~90% of the gap per game beat.
-            float amount = 1f - MathF.Pow(0.1f, (float)time.SimDelta);
-            Position = Vector2.Distance(Position, Target) > 2500
-                ? Target // too far to glide (e.g. a scene jump): snap
-                : Vector2.Lerp(Position, Target, amount);
-        }
-
-        IsMoving = _path is not null || Vector2.Distance(Position, Target) > 6f;
-        ChooseAnimation();
-        Animation.Update(time);
-
-        if (_diedAtBeat is { } died)
-        {
-            double fade = (gameBeat - died - FadeAfterBeats) / FadeOverBeats;
-            Opacity = (float)Math.Clamp(1 - fade, 0, 1);
-            if (Opacity <= 0)
-            {
-                Visible = false;
-            }
-        }
+        return Animator.FrameAt(gameBeat, time);
     }
 
-    private void ChooseAnimation()
+    private float DistanceAt(double gameBeat)
     {
-        if (IsDead)
-        {
-            return; // Death holds its last frame
-        }
-
-        ClipDefinition current = Animation.Clip;
-        bool inOneShot = !current.Loop;
-        if (inOneShot)
-        {
-            return; // let it finish; its "then" brings it back to Idle
-        }
-
-        string wanted = IsMoving ? Walk : Idle;
-        if (current.Name != wanted)
-        {
-            Animation.Play(wanted);
-        }
+        double t = Math.Clamp((gameBeat - _moveStart) / Math.Max(1e-6, _moveEnd - _moveStart), 0, 1);
+        return MathHelper.Lerp(_fromDistance, _toDistance, (float)t);
     }
 }

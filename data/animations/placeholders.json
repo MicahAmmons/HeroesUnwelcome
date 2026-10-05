@@ -3,76 +3,95 @@
   //
   //   frames         how many frames (the label moves top → bottom across them)
   //   beatsPerFrame  beats each frame lasts (1 = one frame per beat, 0.5 = two per beat)
-  //   loop           true = repeats; false = plays once
-  //   clock          "music" keeps moving while paused (idles); "sim" freezes while paused (actions)
-  //   then           clip to switch to when a one-shot finishes (leave out to hold the last frame)
-  //   rate           optional speed curve: [beatsSinceStart, playbackSpeed] points
+  //   loop           true = repeats; false = plays once, then holds its last frame
+  //   clock          "music" keeps moving while paused (idles); "sim" freezes while paused (everything else)
+  //
+  // Choreography rule: each step in data/game/tuning.json has a fixed length. A clip
+  // shorter than its step holds its last frame; a longer one gets cut off (the dev
+  // panel's Run inspector lists any that are too long).
+  //
+  // Heroes:     Idle, Walk, EncounterEntrance, Ready, Fight / Disarm / Puzzle / Magic,
+  //             Victory, VictoryReact, Death, DeathReact, PortalEntrance, PortalExit
+  // Encounters: Idle, HeroEnter, Ready, Interact, Victory (a hero died), Defeat (a hero won)
   "entities": {
     "Hero": {
       "color": "#4A86E8",
       "size": [140, 260],
       "clips": {
-        "Idle":      { "frames": 3, "beatsPerFrame": 1,   "loop": true,  "clock": "music" },
-        "Walk":      { "frames": 3, "beatsPerFrame": 0.5, "loop": true,  "clock": "sim" },
-        "Huddle":    { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "sim", "then": "Idle" },
-        "Attack":    { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
-        "Celebrate": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
-        "Death":     { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "sim" },
-        // Fear: frozen in shock for 2 beats, then creeps back up to full speed before returning to Idle.
-        "Fear":      { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "music", "then": "Idle",
-                       "rate": [[0, 0], [2, 0], [2.01, 0.25], [5, 1]] }
+        "Idle": { "frames": 3, "beatsPerFrame": 1, "loop": true, "clock": "music" },
+        "Walk": { "frames": 3, "beatsPerFrame": 0.5, "loop": true, "clock": "sim" },
+        "EncounterEntrance": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Ready": { "frames": 3, "beatsPerFrame": 0.33, "loop": false, "clock": "sim" },
+        "Fight": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Disarm": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Puzzle": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Magic": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Victory": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "VictoryReact": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Death": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "DeathReact": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "PortalEntrance": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "PortalExit": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
       }
     },
     "Goblin": {
       "color": "#6AA84F",
       "size": [180, 200],
       "clips": {
-        "Idle":    { "frames": 3, "beatsPerFrame": 1,   "loop": true,  "clock": "music" },
-        "Prepare": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
-        "Attack":  { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
-        "Block":   { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
-        "Death":   { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "sim" }
-      }
-    },
-    "Vampire": {
-      "color": "#CC4125",
-      "size": [200, 300],
-      "clips": {
-        "Idle":    { "frames": 3, "beatsPerFrame": 2,   "loop": true,  "clock": "music" },
-        "Prepare": { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "sim", "then": "Idle" },
-        "Attack":  { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
-        "Block":   { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
-        "Death":   { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "sim" }
+        "Idle": { "frames": 3, "beatsPerFrame": 1, "loop": true, "clock": "music" },
+        "HeroEnter": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Ready": { "frames": 3, "beatsPerFrame": 0.33, "loop": false, "clock": "sim" },
+        "Interact": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Victory": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Defeat": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
       }
     },
     "Orc": {
       "color": "#38761D",
       "size": [220, 260],
       "clips": {
-        "Idle":    { "frames": 3, "beatsPerFrame": 1,   "loop": true,  "clock": "music" },
-        "Prepare": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
-        "Attack":  { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
-        "Death":   { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "sim" }
+        "Idle": { "frames": 3, "beatsPerFrame": 1, "loop": true, "clock": "music" },
+        "HeroEnter": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Ready": { "frames": 3, "beatsPerFrame": 0.33, "loop": false, "clock": "sim" },
+        "Interact": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Victory": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Defeat": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
+      }
+    },
+    "Vampire": {
+      "color": "#CC4125",
+      "size": [200, 300],
+      "clips": {
+        "Idle": { "frames": 3, "beatsPerFrame": 2, "loop": true, "clock": "music" },
+        "HeroEnter": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Ready": { "frames": 3, "beatsPerFrame": 0.33, "loop": false, "clock": "sim" },
+        "Interact": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Victory": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Defeat": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
       }
     },
     "SpikeTrap": {
       "color": "#E69138",
       "size": [260, 110],
       "clips": {
-        "Idle":     { "frames": 3, "beatsPerFrame": 1,    "loop": true,  "clock": "music" },
-        "Trigger":  { "frames": 3, "beatsPerFrame": 0.25, "loop": false, "clock": "sim", "then": "Reset" },
-        "Reset":    { "frames": 3, "beatsPerFrame": 1,    "loop": false, "clock": "sim", "then": "Idle" },
-        "Disarmed": { "frames": 3, "beatsPerFrame": 1,    "loop": false, "clock": "sim" }
+        "Idle": { "frames": 3, "beatsPerFrame": 1, "loop": true, "clock": "music" },
+        "HeroEnter": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Ready": { "frames": 3, "beatsPerFrame": 0.33, "loop": false, "clock": "sim" },
+        "Interact": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Victory": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Defeat": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
       }
     },
     "PitFall": {
       "color": "#B45F06",
       "size": [300, 90],
       "clips": {
-        "Idle":     { "frames": 3, "beatsPerFrame": 2,    "loop": true,  "clock": "music" },
-        "Trigger":  { "frames": 3, "beatsPerFrame": 0.25, "loop": false, "clock": "sim", "then": "Reset" },
-        "Reset":    { "frames": 3, "beatsPerFrame": 1,    "loop": false, "clock": "sim", "then": "Idle" },
-        "Disarmed": { "frames": 3, "beatsPerFrame": 1,    "loop": false, "clock": "sim" }
+        "Idle": { "frames": 3, "beatsPerFrame": 2, "loop": true, "clock": "music" },
+        "HeroEnter": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Ready": { "frames": 3, "beatsPerFrame": 0.33, "loop": false, "clock": "sim" },
+        "Interact": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Victory": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Defeat": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
       }
     },
     // The treasure room's guardian: the player's avatar.
@@ -80,11 +99,12 @@
       "color": "#8E7CC3",
       "size": [240, 360],
       "clips": {
-        "Idle":    { "frames": 3, "beatsPerFrame": 2,   "loop": true,  "clock": "music" },
-        "Prepare": { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "sim", "then": "Idle" },
-        "Attack":  { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
-        "Block":   { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
-        "Death":   { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "sim" }
+        "Idle": { "frames": 3, "beatsPerFrame": 2, "loop": true, "clock": "music" },
+        "HeroEnter": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Ready": { "frames": 3, "beatsPerFrame": 0.33, "loop": false, "clock": "sim" },
+        "Interact": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Victory": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Defeat": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
       }
     }
   }
