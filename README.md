@@ -14,6 +14,7 @@ A 2D reverse-dungeon auto-battler built in C# with MonoGame. Desktop and Steam D
 
 | Launch profile | What it opens |
 |---|---|
+| Animation Gallery | Every placeholder entity animating to the music; play clips, change speed, pause |
 | Sandbox | Input playground: one selection driven by keyboard, gamepad and mouse |
 | UI Layout (1080p) | UI scaling check at 1920x1080 |
 | UI Layout (Steam Deck 1280x800) | The same check at the Deck's resolution |
@@ -36,7 +37,8 @@ A 2D reverse-dungeon auto-battler built in C# with MonoGame. Desktop and Steam D
 
 ## Developer tools (Debug builds only)
 
-- **Dev Tools panel (F1):** FPS, scenario switcher, window-size presets (including Steam Deck), fullscreen, screenshots and a live input readout.
+- **Dev Tools panel (F1):** FPS, scenario switcher, audio & beat readout (speed buttons, metronome, volume, per-stem mutes, a "fear cut" test, visual delay), window-size presets (including Steam Deck), fullscreen, screenshots, live input readout.
+- **Live data reload:** in Debug builds the game reads JSON straight from the repo's `data/` folder. Save `data/animations/placeholders.json` while the Animation Gallery runs and the changes appear instantly (errors are shown on screen and the old data is kept).
 - **Scenarios:** JSON files in `data/scenarios/`. Each one launches straight into a prepared situation. Add a file and it shows up in the panel.
 - **Command-line options** (set in `src/HeroesUnwelcomed.Desktop/Properties/launchSettings.json`):
 

@@ -1,4 +1,8 @@
+using HeroesUnwelcomed.Audio.Mixing;
+using HeroesUnwelcomed.Audio.Music;
+using HeroesUnwelcomed.Audio.Timing;
 using HeroesUnwelcomed.Game.Input;
+using HeroesUnwelcomed.Game.Sound;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
 using NumVector2 = System.Numerics.Vector2;
@@ -32,14 +36,16 @@ public sealed class DebugPanel
     public void Layout(GameTime gameTime)
     {
         ImGui.SetNextWindowPos(new NumVector2(16, 16), ImGuiCond.FirstUseEver);
-        ImGui.SetNextWindowSize(new NumVector2(460, 640), ImGuiCond.FirstUseEver);
+        ImGui.SetNextWindowSize(new NumVector2(480, 760), ImGuiCond.FirstUseEver);
 
         if (ImGui.Begin("Dev Tools  (F1 / Back to hide)"))
         {
             DrawStats(gameTime);
             DrawScenarios();
+            DrawAudio();
             DrawDisplay();
             DrawInput();
+            DrawData();
         }
         ImGui.End();
     }
@@ -82,6 +88,112 @@ public sealed class DebugPanel
         if (ImGui.Button("Restart scene"))
         {
             _host.Restart();
+        }
+    }
+
+    private void DrawAudio()
+    {
+        if (!ImGui.CollapsingHeader("Audio & beat", ImGuiTreeNodeFlags.DefaultOpen))
+        {
+            return;
+        }
+
+        AudioEngine audio = _game.SharedServices.Audio;
+        BeatTime time = audio.Time;
+        AudioOutput output = audio.Output;
+
+        ImGui.Text($"Bar {time.Bar + 1} beat {time.BeatInBar + 1}   music {time.MusicBeat:0.00}   game {time.SimBeat:0.00}");
+        ImGui.Text($"Playing: {audio.Mixer.CurrentVersion.Name} @ {audio.Mixer.CurrentVersion.Bpm:0} bpm   pending changes: {audio.Mixer.PendingChanges}");
+        ImGui.Text(output.HasDevice
+            ? $"Device OK   queued {output.QueuedBuffers}/{AudioOutput.TargetQueuedBuffers}   buffer {AudioOutput.BufferedSeconds * 1000:0} ms   underruns {output.Underruns}"
+            : $"NO AUDIO DEVICE (silent clock): {output.FailureReason}");
+
+        // Speed buttons (same as P / [ ] / Start / LB / RB).
+        foreach (SpeedLevel level in audio.Levels)
+        {
+            bool current = level == audio.CurrentLevel;
+            if (current) ImGui.PushStyleColor(ImGuiCol.Button, new System.Numerics.Vector4(0.2f, 0.55f, 0.3f, 1f));
+            if (ImGui.Button(level.Name)) audio.SetSpeed(level);
+            if (current) ImGui.PopStyleColor();
+            ImGui.SameLine();
+        }
+        ImGui.NewLine();
+
+        bool metronome = audio.MetronomeOn;
+        if (ImGui.Checkbox("Metronome", ref metronome))
+        {
+            audio.SetMetronome(metronome);
+        }
+
+        float volume = audio.Mixer.MasterGain;
+        if (ImGui.SliderFloat("Master volume", ref volume, 0f, 1f))
+        {
+            audio.Mixer.MasterGain = volume;
+        }
+
+        float latency = audio.OutputLatencyMs;
+        if (ImGui.SliderFloat("Visual delay (ms)", ref latency, 0f, 200f))
+        {
+            audio.OutputLatencyMs = latency;
+        }
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("If animations look ahead of the sound, raise this until they line up.");
+        }
+
+        ImGui.SeparatorText("Stems (mute/unmute on the next beat)");
+        foreach (StemChannel channel in audio.Mixer.Channels)
+        {
+            if (channel.Name == AudioEngine.MetronomeStem)
+            {
+                continue;
+            }
+            bool on = channel.TargetGain > 0f;
+            if (ImGui.Checkbox(channel.Name, ref on))
+            {
+                audio.ScheduleStemGain(channel.Name, on ? 1f : 0f, When.NextBeat);
+            }
+            ImGui.SameLine();
+            ImGui.ProgressBar(channel.Gain, new NumVector2(-1, 0), "");
+        }
+
+        // Preview of the planned "hero died" music reaction (M5): cut everything
+        // but the hats on the next beat, then bring it all back on a bar line.
+        if (ImGui.Button("Test: fear cut"))
+        {
+            string[] cut = ["drums", "bass", "lead", "pad"];
+            double cutBeat = 0;
+            foreach (string stem in cut)
+            {
+                cutBeat = audio.ScheduleStemGain(stem, 0f, When.NextBeat);
+            }
+            double returnBeat = Quantize.NextMultiple(cutBeat + 4, time.BeatsPerBar);
+            foreach (string stem in cut)
+            {
+                audio.Mixer.ScheduleStemGain(stem, 1f, returnBeat, rampBeats: 0.25);
+            }
+        }
+        if (ImGui.IsItemHovered())
+        {
+            ImGui.SetTooltip("Cuts drums, bass, lead and pad on the next beat (hats keep time),\nthen brings them back on the bar line at least one bar later.");
+        }
+    }
+
+    private void DrawData()
+    {
+        if (!ImGui.CollapsingHeader("Data files"))
+        {
+            return;
+        }
+
+        ImGui.TextWrapped($"Reading from: {_game.SharedServices.Data.Root}");
+        if (_host.Watcher.LastReloaded is { } path)
+        {
+            ImGui.Text($"Last change: {path} at {_host.Watcher.LastReloadedAt:HH:mm:ss}");
+        }
+        else
+        {
+            ImGui.TextDisabled("Save a JSON file in data/ and it reloads live.");
         }
     }
 

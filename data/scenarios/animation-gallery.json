@@ -1,0 +1,5 @@
+{
+  // Every placeholder entity side by side, animating to the music.
+  "description": "Animation gallery. Every entity animating to the beat. Pick an entity and clip to play it; change speed and pause to see how each clock behaves. Edit data/animations/placeholders.json while it runs.",
+  "scene": "animation-gallery"
+}

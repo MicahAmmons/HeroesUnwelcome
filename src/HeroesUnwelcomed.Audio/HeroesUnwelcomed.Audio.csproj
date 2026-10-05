@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    The music system: tempo/beat clock maths, the mixer, music tracks and the
+    placeholder synthesizer. Plain C# with NO MonoGame reference, so all of it
+    can be tested sample-by-sample without a sound card. The Game project's
+    AudioOutput is the only piece that talks to real speakers.
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\HeroesUnwelcomed.Core\HeroesUnwelcomed.Core.csproj" />
+  </ItemGroup>
+</Project>

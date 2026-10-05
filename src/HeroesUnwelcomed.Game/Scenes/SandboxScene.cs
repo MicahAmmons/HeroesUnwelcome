@@ -17,13 +17,9 @@ public sealed class SandboxScene : IScene
     private static readonly Vector2 SlotSize = new(220, 124);
     private const int SlotGap = 16;
 
-    private static readonly string[] SpeedLabels = ["1x", "2x", "3x"];
-
     private readonly GameServices _services;
     private readonly bool[,] _filled = new bool[Columns, Rows];
     private Point _selected = new(0, 0);
-    private bool _paused;
-    private int _speedIndex;
 
     public SandboxScene(GameServices services)
     {
@@ -55,10 +51,6 @@ public sealed class SandboxScene : IScene
         {
             _filled[_selected.X, _selected.Y] = !_filled[_selected.X, _selected.Y];
         }
-
-        if (input.WasPressed(GameAction.Pause)) _paused = !_paused;
-        if (input.WasPressed(GameAction.SpeedUp)) _speedIndex = Math.Min(_speedIndex + 1, SpeedLabels.Length - 1);
-        if (input.WasPressed(GameAction.SpeedDown)) _speedIndex = Math.Max(_speedIndex - 1, 0);
     }
 
     public void Draw(SpriteBatch batch)
@@ -92,9 +84,11 @@ public sealed class SandboxScene : IScene
         Rectangle title = ui.Place(Anchor.Top, new Vector2(0, 40), new Vector2(900, 60));
         draw.TextCentered(batch, "Sandbox - input playground", title, Color.White);
 
-        string status = _paused ? "PAUSED" : $"Speed {SpeedLabels[_speedIndex]}";
+        // Pause and speed are global (handled by HeroesGame); this just shows the current setting.
+        bool paused = _services.Audio.IsPaused;
+        string status = paused ? "PAUSED" : $"Speed {_services.Audio.CurrentLevel.Name}";
         Rectangle statusRect = ui.Place(Anchor.TopRight, new Vector2(40, 40), new Vector2(300, 60));
-        draw.FillRect(batch, statusRect, _paused ? new Color(140, 30, 30) : new Color(30, 90, 50));
+        draw.FillRect(batch, statusRect, paused ? new Color(140, 30, 30) : new Color(30, 90, 50));
         draw.TextCentered(batch, status, statusRect, Color.White);
 
         DrawInputReadout(batch);

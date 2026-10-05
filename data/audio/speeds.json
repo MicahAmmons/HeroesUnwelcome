@@ -1,0 +1,14 @@
+{
+  // Game speeds, in order. Exactly one level must have simRate 0 (pause).
+  //   bpm      music tempo at this speed
+  //   simRate  game beats per music beat (0 = frozen; 2 = two game beats per music beat)
+  //   style    placeholder music arrangement: calm, normal or driving
+  // Effective game speed = bpm x simRate: 100, 200, 300 → exactly 1x, 2x, 3x.
+  // Changes here apply on the next launch (music is generated at startup).
+  "levels": [
+    { "name": "Paused", "bpm": 70,  "simRate": 0, "style": "calm" },
+    { "name": "1x",     "bpm": 100, "simRate": 1, "style": "normal" },
+    { "name": "2x",     "bpm": 100, "simRate": 2, "style": "driving" },
+    { "name": "3x",     "bpm": 150, "simRate": 2, "style": "driving" }
+  ]
+}

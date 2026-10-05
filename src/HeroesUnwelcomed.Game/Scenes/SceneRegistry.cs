@@ -12,6 +12,7 @@ public static class SceneRegistry
     {
         ["sandbox"] = services => new SandboxScene(services),
         ["ui-layout"] = services => new UiLayoutScene(services),
+        ["animation-gallery"] = services => new AnimationGalleryScene(services),
     };
 
     public static IEnumerable<string> Names => Factories.Keys;

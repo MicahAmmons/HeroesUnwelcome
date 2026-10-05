@@ -1,0 +1,58 @@
+{
+  // Placeholder animations. Edit and save while the game runs: changes apply instantly.
+  //
+  //   frames         how many frames (the label moves top → bottom across them)
+  //   beatsPerFrame  beats each frame lasts (1 = one frame per beat, 0.5 = two per beat)
+  //   loop           true = repeats; false = plays once
+  //   clock          "music" keeps moving while paused (idles); "sim" freezes while paused (actions)
+  //   then           clip to switch to when a one-shot finishes (leave out to hold the last frame)
+  //   rate           optional speed curve: [beatsSinceStart, playbackSpeed] points
+  "entities": {
+    "Hero": {
+      "color": "#4A86E8",
+      "size": [180, 260],
+      "clips": {
+        "Idle":      { "frames": 3, "beatsPerFrame": 1,   "loop": true,  "clock": "music" },
+        "Walk":      { "frames": 3, "beatsPerFrame": 0.5, "loop": true,  "clock": "sim" },
+        "Huddle":    { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "sim", "then": "Idle" },
+        "Attack":    { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
+        "Celebrate": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
+        "Death":     { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "sim" },
+        // Fear: frozen in shock for 2 beats, then creeps back up to full speed before returning to Idle.
+        "Fear":      { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "music", "then": "Idle",
+                       "rate": [[0, 0], [2, 0], [2.01, 0.25], [5, 1]] }
+      }
+    },
+    "Goblin": {
+      "color": "#6AA84F",
+      "size": [180, 200],
+      "clips": {
+        "Idle":    { "frames": 3, "beatsPerFrame": 1,   "loop": true,  "clock": "music" },
+        "Prepare": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
+        "Attack":  { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
+        "Block":   { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
+        "Death":   { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "sim" }
+      }
+    },
+    "Vampire": {
+      "color": "#CC4125",
+      "size": [200, 300],
+      "clips": {
+        "Idle":    { "frames": 3, "beatsPerFrame": 2,   "loop": true,  "clock": "music" },
+        "Prepare": { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "sim", "then": "Idle" },
+        "Attack":  { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
+        "Block":   { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
+        "Death":   { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "sim" }
+      }
+    },
+    "Trap": {
+      "color": "#E69138",
+      "size": [260, 120],
+      "clips": {
+        "Idle":    { "frames": 3, "beatsPerFrame": 1,    "loop": true,  "clock": "music" },
+        "Trigger": { "frames": 3, "beatsPerFrame": 0.25, "loop": false, "clock": "sim", "then": "Reset" },
+        "Reset":   { "frames": 3, "beatsPerFrame": 1,    "loop": false, "clock": "sim", "then": "Idle" }
+      }
+    }
+  }
+}

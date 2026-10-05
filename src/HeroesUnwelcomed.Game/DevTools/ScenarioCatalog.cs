@@ -1,4 +1,5 @@
 using System.Text.Json;
+using HeroesUnwelcomed.Game.Data;
 using HeroesUnwelcomed.Game.Scenes;
 
 namespace HeroesUnwelcomed.Game.DevTools;
@@ -14,38 +15,35 @@ namespace HeroesUnwelcomed.Game.DevTools;
 /// </remarks>
 public sealed record Scenario(string Name, string Description, string Scene);
 
-/// <summary>Loads every scenario file from the Data/scenarios folder next to the game.</summary>
+/// <summary>Loads every scenario file from the data/scenarios folder.</summary>
 public sealed class ScenarioCatalog
 {
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true,
-        ReadCommentHandling = JsonCommentHandling.Skip,
-        AllowTrailingCommas = true,
-    };
+    public const string FolderName = "scenarios";
 
-    private ScenarioCatalog(IReadOnlyList<Scenario> scenarios)
+    private ScenarioCatalog(string folder, IReadOnlyList<Scenario> scenarios)
     {
+        Folder = folder;
         All = scenarios;
     }
 
     public IReadOnlyList<Scenario> All { get; }
 
-    public static string Folder => Path.Combine(AppContext.BaseDirectory, "Data", "scenarios");
+    public string Folder { get; }
 
-    public static ScenarioCatalog Load()
+    public static ScenarioCatalog Load(DataSource data)
     {
-        if (!Directory.Exists(Folder))
+        string folder = data.PathOf(FolderName);
+        if (!Directory.Exists(folder))
         {
-            return new ScenarioCatalog([]);
+            return new ScenarioCatalog(folder, []);
         }
 
-        var scenarios = Directory.GetFiles(Folder, "*.json")
+        var scenarios = Directory.GetFiles(folder, "*.json")
             .Order(StringComparer.OrdinalIgnoreCase)
             .Select(LoadFile)
             .ToList();
 
-        return new ScenarioCatalog(scenarios);
+        return new ScenarioCatalog(folder, scenarios);
     }
 
     public Scenario Get(string name)
@@ -58,7 +56,7 @@ public sealed class ScenarioCatalog
     private static Scenario LoadFile(string path)
     {
         string name = Path.GetFileNameWithoutExtension(path);
-        ScenarioFile file = JsonSerializer.Deserialize<ScenarioFile>(File.ReadAllText(path), JsonOptions)
+        ScenarioFile file = JsonSerializer.Deserialize<ScenarioFile>(File.ReadAllText(path), DataSource.JsonOptions)
             ?? throw new InvalidDataException($"Scenario file '{path}' is empty.");
         return new Scenario(name, file.Description, file.Scene);
     }

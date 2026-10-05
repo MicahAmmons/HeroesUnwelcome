@@ -1,7 +1,9 @@
+using HeroesUnwelcomed.Game.Data;
 using HeroesUnwelcomed.Game.Display;
 using HeroesUnwelcomed.Game.Input;
 using HeroesUnwelcomed.Game.Rendering;
 using HeroesUnwelcomed.Game.Scenes;
+using HeroesUnwelcomed.Game.Sound;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -13,8 +15,9 @@ namespace HeroesUnwelcomed.Game;
 /// Game-specific behaviour lives in scenes, not here.
 /// </summary>
 /// <remarks>
-/// <b>Frame order:</b> read input, update the UI canvas, handle global keys,
-/// update dev tools, update the scene. Then draw the scene, then the dev tools
+/// <b>Frame order:</b> read input, refill the audio and read the beat clock,
+/// update the UI canvas, handle global keys (fullscreen, pause, speed), update
+/// dev tools, update the scene. Then draw the scene, then the dev tools
 /// on top. Screenshots are captured between those two draws, so they show
 /// exactly what a player would see.
 /// </remarks>
@@ -24,9 +27,11 @@ public sealed class HeroesGame : Microsoft.Xna.Framework.Game
     private readonly LaunchOptions _options;
     private readonly InputService _input = new(InputBindings.CreateDefaults());
     private readonly UiCanvas _ui = new();
+    private readonly DataSource _data = DataSource.CreateDefault();
 
     private SpriteBatch _spriteBatch = null!;
     private GameServices _services = null!;
+    private AudioEngine _audio = null!;
     private IScene? _scene;
 
     // The windowed size to return to when leaving fullscreen.
@@ -57,8 +62,8 @@ public sealed class HeroesGame : Microsoft.Xna.Framework.Game
 
         // MonoGame defaults to a fixed 60 updates per second. We use variable
         // timing instead: one update per displayed frame, so 120/144 Hz screens
-        // are smooth. Gameplay timing will come from the music's beat clock (M1),
-        // not from counting frames, so the frame rate can't affect the game.
+        // are smooth. Gameplay timing comes from the music's beat clock
+        // (AudioEngine), not from counting frames, so frame rate can't affect the game.
         IsFixedTimeStep = false;
 
         Window.Title = "Heroes Unwelcomed";
@@ -70,12 +75,15 @@ public sealed class HeroesGame : Microsoft.Xna.Framework.Game
     public bool IsFullscreen => _graphics.IsFullScreen;
     public InputService Input => _input;
     public UiCanvas Ui => _ui;
+    // Named to avoid clashing with MonoGame's own Game.Services container.
+    public GameServices SharedServices => _services;
 
     protected override void LoadContent()
     {
         _spriteBatch = new SpriteBatch(GraphicsDevice);
         var font = Content.Load<SpriteFont>("Fonts/Ui");
-        _services = new GameServices(GraphicsDevice, Content, _input, _ui, new Primitives(GraphicsDevice, font));
+        _audio = AudioEngine.CreateWithPlaceholderMusic(_data);
+        _services = new GameServices(GraphicsDevice, Content, _input, _ui, new Primitives(GraphicsDevice, font), _audio, _data);
 
         if (_options.StartFullscreen)
         {
@@ -100,12 +108,10 @@ public sealed class HeroesGame : Microsoft.Xna.Framework.Game
         (keyboardBlocked, mouseBlocked) = _devTools.InputCapture;
 #endif
         _input.Update(deltaSeconds, IsActive, keyboardBlocked, mouseBlocked);
+        _audio.Update(gameTime.ElapsedGameTime.TotalSeconds);
         _ui.Update(GraphicsDevice.Viewport);
 
-        if (_input.WasPressed(GameAction.ToggleFullscreen))
-        {
-            SetFullscreen(!IsFullscreen);
-        }
+        HandleGlobalActions();
 
 #if DEBUG
         _devTools.Update(gameTime);
@@ -125,6 +131,15 @@ public sealed class HeroesGame : Microsoft.Xna.Framework.Game
 #endif
 
         base.Draw(gameTime);
+    }
+
+    // Controls that work the same in every scene.
+    private void HandleGlobalActions()
+    {
+        if (_input.WasPressed(GameAction.ToggleFullscreen)) SetFullscreen(!IsFullscreen);
+        if (_input.WasPressed(GameAction.Pause)) _audio.TogglePause();
+        if (_input.WasPressed(GameAction.SpeedUp)) _audio.SpeedUp();
+        if (_input.WasPressed(GameAction.SpeedDown)) _audio.SpeedDown();
     }
 
     /// <summary>Replaces the active scene with a fresh instance of the named one.</summary>
@@ -200,6 +215,7 @@ public sealed class HeroesGame : Microsoft.Xna.Framework.Game
         _scene?.Dispose();
         _services.Draw.Dispose();
         _spriteBatch.Dispose();
+        _audio.Dispose();
 #if DEBUG
         _devTools.Dispose();
 #endif

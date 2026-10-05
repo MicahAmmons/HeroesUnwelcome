@@ -1,5 +1,9 @@
 {
   "profiles": {
+    "Animation Gallery": {
+      "commandName": "Project",
+      "commandLineArgs": "--scenario animation-gallery"
+    },
     "Sandbox": {
       "commandName": "Project",
       "commandLineArgs": "--scenario sandbox"

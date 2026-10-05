@@ -5,6 +5,7 @@
   -->
   <ItemGroup>
     <ProjectReference Include="..\HeroesUnwelcomed.Core\HeroesUnwelcomed.Core.csproj" />
+    <ProjectReference Include="..\HeroesUnwelcomed.Audio\HeroesUnwelcomed.Audio.csproj" />
   </ItemGroup>
 
   <ItemGroup>

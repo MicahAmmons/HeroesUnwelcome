@@ -23,11 +23,14 @@ public sealed class DevToolsHost : IDisposable
     private readonly ImGuiRenderer _imgui;
     private readonly DebugPanel _panel;
     private readonly bool _screenshotIncludesPanel;
+    private readonly DataWatcher _watcher;
 
     public DevToolsHost(HeroesGame game, LaunchOptions options)
     {
         _game = game;
-        Scenarios = ScenarioCatalog.Load();
+        Scenarios = ScenarioCatalog.Load(game.SharedServices.Data);
+        _watcher = new DataWatcher(game.SharedServices.Data);
+        game.SharedServices.Data.FileChanged += OnDataFileChanged;
         Screenshots = new ScreenshotCapture(options);
         _imgui = new ImGuiRenderer(game, PanelScale);
         _panel = new DebugPanel(this, game);
@@ -44,7 +47,8 @@ public sealed class DevToolsHost : IDisposable
         PanelVisible = options.ScreenshotFrames.Count == 0 || _screenshotIncludesPanel;
     }
 
-    public ScenarioCatalog Scenarios { get; }
+    public ScenarioCatalog Scenarios { get; private set; }
+    public DataWatcher Watcher => _watcher;
     public ScreenshotCapture Screenshots { get; }
     public Scenario? CurrentScenario { get; private set; }
     public bool PanelVisible { get; set; }
@@ -58,6 +62,8 @@ public sealed class DevToolsHost : IDisposable
 
     public void Update(GameTime gameTime)
     {
+        _watcher.Update();
+
         InputService input = _game.Input;
 
         if (input.WasPressed(GameAction.ToggleDebugPanel))
@@ -110,5 +116,28 @@ public sealed class DevToolsHost : IDisposable
     /// <summary>Starts the current scene over from scratch.</summary>
     public void Restart() => _game.SwitchScene(_game.CurrentSceneName);
 
-    public void Dispose() => _imgui.Dispose();
+    /// <summary>Re-reads the scenarios folder (picks up newly added files).</summary>
+    public void RefreshScenarios()
+    {
+        Scenarios = ScenarioCatalog.Load(_game.SharedServices.Data);
+        if (CurrentScenario is { } current)
+        {
+            CurrentScenario = Scenarios.All.FirstOrDefault(s => s.Name == current.Name);
+        }
+    }
+
+    private void OnDataFileChanged(string path)
+    {
+        if (path.StartsWith(ScenarioCatalog.FolderName + "/", StringComparison.Ordinal))
+        {
+            RefreshScenarios();
+        }
+    }
+
+    public void Dispose()
+    {
+        _game.SharedServices.Data.FileChanged -= OnDataFileChanged;
+        _watcher.Dispose();
+        _imgui.Dispose();
+    }
 }

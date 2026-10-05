@@ -53,11 +53,14 @@ Undecided design questions are isolated behind replaceable rules, so changing on
 | Project | Purpose |
 |---|---|
 | `src/HeroesUnwelcomed.Core` | Game logic: no MonoGame. |
+| `src/HeroesUnwelcomed.Audio` | Music system: tempo map/beat clock, mixer, music tracks, placeholder synth. No MonoGame, so it's testable sample by sample. |
 | `src/HeroesUnwelcomed.Game` | Visuals, audio, input, UI, dev tools. Shared by all platforms. |
 | `src/HeroesUnwelcomed.Desktop` | Windows/macOS/Linux/Deck launcher. |
 | `tests/HeroesUnwelcomed.Core.Tests` | xUnit tests for Core. |
+| `tests/HeroesUnwelcomed.Audio.Tests` | Sample-accurate tests for the music system. |
+| `tests/HeroesUnwelcomed.Game.Tests` | Tests for Game logic that needs no window (animation timing, data parsing). |
 | `tools/HeroesUnwelcomed.SimRunner` *(M2)* | Runs thousands of runs without graphics and outputs balance charts. |
-| `data/` | JSON: scenarios now; rooms, tuning, costs later. Copied next to the exe as `Data/`. |
+| `data/` | JSON: scenarios, speed levels, animations; rooms, tuning and costs later. Copied next to the exe as `Data/`. Debug builds read the repo's `data/` directly and live-reload it. |
 
 Versions are pinned: .NET SDK in `global.json`, NuGet packages in `Directory.Packages.props`, MonoGame content tools in `.config/dotnet-tools.json` (keep these in sync with the MonoGame packages). Shared build settings are in `Directory.Build.props`.
 
@@ -66,7 +69,7 @@ Developer tools live in `src/HeroesUnwelcomed.Game/DevTools/` and are compiled *
 ## Milestones
 
 - **M0: Foundation** ✅. Solution, pinned versions, window that works at any resolution, input actions layer, UI canvas, ImGui dev panel, scenarios + launch profiles, automated screenshots, deterministic random generator + tests.
-- **M1: Beat clock and audio prototype.** Custom mixer (also the master clock), generated placeholder stems at 3 tempos plus a calm pause track, speed changes on bar lines, stem mute/unmute on the beat, animation gallery with beat-synced placeholder animations.
+- **M1: Beat clock and audio prototype** ✅. Custom mixer that doubles as the master clock, generated placeholder stems per speed level (calm pause track included), speed changes on the beat, stem mute/unmute on the beat, animation system (music/sim clocks, one-shots, rate curves, pause shows idle), animation gallery, live JSON reload.
 - **M2: Core game logic, no graphics.** Grid, build-order rule, connection calculation, flipping, one party: walk → huddle → reorder → attempt; death → souls → respawn; skill/reputation growth; run end; door lock cycle; commands, events, metrics; tests; first SimRunner chart.
 - **M3: First playable.** Draw Core's state: rooms, hallways/doors/portals, heroes, huddle reorder. Camera. Placing/upgrading rooms with controller and mouse. Debug hero inspector.
 - **M4:** Multiple parties, room queues, waiting idles.
@@ -74,6 +77,17 @@ Developer tools live in `src/HeroesUnwelcomed.Game/DevTools/` and are compiled *
 - **M6:** Specialization into classes, balance pass.
 - **Later:** save mid-run, hero pool screen, costs, music brief for the composer, real art, Steam integration, Deck Verified, mobile port.
 
+## How time works (M1)
+
+- **Audio frames are the master clock.** `AudioOutput` feeds 1024-frame buffers (48 kHz stereo, ~4 queued ≈ 85 ms) to MonoGame's `DynamicSoundEffectInstance`. Frames played = submitted − still queued.
+- **`TempoMap`** (Audio project) converts frames ↔ beats using segments, each with its own tempo and *sim rate*. The *music beat* always moves; the *sim (game) beat* = music beats × sim rate, and stops when paused.
+- **`AudioEngine`** smooths the "audible frame" estimate into a steady per-frame `BeatTime` (music beat, game beat, deltas, paused). Everything animates from this.
+- **Speed levels** (`data/audio/speeds.json`): Paused 70 bpm × 0, 1x 100 bpm × 1, 2x 100 bpm × 2, 3x 150 bpm × 2. Effective game speed = bpm × sim rate, so they're exactly 1x/2x/3x and game beats always land on musical beats or half-beats. Changing speed: the sim rate changes immediately (pause feels instant); the music version switches on the next beat.
+- **Stems** are muted/unmuted on a scheduled beat with a ≥5 ms ramp (no clicks). Muted stems keep their place, so they come back in time.
+- **Animations** count beats, never seconds. Looping *music-clock* clips (idles) take their frame from the global beat, so they're always in unison. *Sim-clock* clips (actions) freeze while paused and show Idle instead, then resume exactly. One-shots can chain (`then`) and use playback-rate curves (Fear).
+- **Known limitation:** audio is refilled from the game loop, so a stall longer than ~85 ms (e.g. dragging the window on Windows) briefly stutters the sound. A dedicated audio thread can fix this if needed. The first fill queues ~250 ms to cover slow startup frames.
+
 ## Known placeholders
 
 - `Fonts/Ui.spritefont` uses Windows' Arial. It's fine for development, but it needs replacing with a properly licensed font before release.
+- Music is generated by `PlaceholderMusic` (about 0.7 s at startup, ~45 MB of samples). Real music will be the composer's stems per speed level, loaded/streamed from files. The mixer won't change.

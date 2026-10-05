@@ -38,4 +38,15 @@
   <ItemGroup>
     <Content Include="..\..\data\**\*.json" LinkBase="Data" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
+  <!--
+    Debug builds remember where the repo's data folder is, so the game reads
+    (and live-reloads) the files you edit instead of the copies next to the exe.
+  -->
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>SourceDataDirectory</_Parameter1>
+      <_Parameter2>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\..\data'))</_Parameter2>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>

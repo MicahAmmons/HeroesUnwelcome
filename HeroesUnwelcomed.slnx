@@ -1,10 +1,13 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/HeroesUnwelcomed.Audio/HeroesUnwelcomed.Audio.csproj" />
     <Project Path="src/HeroesUnwelcomed.Core/HeroesUnwelcomed.Core.csproj" />
     <Project Path="src/HeroesUnwelcomed.Desktop/HeroesUnwelcomed.Desktop.csproj" />
     <Project Path="src/HeroesUnwelcomed.Game/HeroesUnwelcomed.Game.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/HeroesUnwelcomed.Audio.Tests/HeroesUnwelcomed.Audio.Tests.csproj" />
     <Project Path="tests/HeroesUnwelcomed.Core.Tests/HeroesUnwelcomed.Core.Tests.csproj" />
+    <Project Path="tests/HeroesUnwelcomed.Game.Tests/HeroesUnwelcomed.Game.Tests.csproj" />
   </Folder>
 </Solution>

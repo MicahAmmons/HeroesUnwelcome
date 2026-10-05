@@ -24,7 +24,8 @@ Add `--screenshot-devtools` to include the ImGui panel. Check visual changes at 
 
 ## Rules of the codebase
 
-- `HeroesUnwelcomed.Core` must never reference MonoGame.
+- `HeroesUnwelcomed.Core` and `HeroesUnwelcomed.Audio` must never reference MonoGame.
+- Anything that moves is timed in beats from `AudioEngine.Time` (`BeatTime`), never in seconds or frames. Actions use the sim (game) beat; ambient loops use the music beat.
 - No static managers for game state; pass dependencies in (see `GameServices`).
 - Game code reads input only through `InputService` / `GameAction`. No hover-only interactions; everything must work with a gamepad.
 - UI is laid out in UI units on `UiCanvas` and anchored with `UiCanvas.Place`.

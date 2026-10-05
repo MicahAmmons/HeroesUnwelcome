@@ -1,6 +1,8 @@
+using HeroesUnwelcomed.Game.Data;
 using HeroesUnwelcomed.Game.Display;
 using HeroesUnwelcomed.Game.Input;
 using HeroesUnwelcomed.Game.Rendering;
+using HeroesUnwelcomed.Game.Sound;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -20,4 +22,6 @@ public sealed record GameServices(
     ContentManager Content,
     InputService Input,
     UiCanvas Ui,
-    Primitives Draw);
+    Primitives Draw,
+    AudioEngine Audio,
+    DataSource Data);
