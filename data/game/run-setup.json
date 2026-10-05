@@ -17,8 +17,8 @@
   "partySize": 4,
   "startingSouls": 20,
 
-  // "ladder" (win = up a place, lose = down a place) or "reputation" (numeric score).
-  "orderingRule": "ladder",
-  // "manual" (only when sent) or "auto" (pool + gap rule).
-  "spawnRule": "manual"
+  // "reputation" (numeric score; chosen after the M2 simulations) or "ladder" (win = up a place, lose = down a place).
+  "orderingRule": "reputation",
+  // "auto" (pool + gap rule) or "manual" (only when the player sends a party).
+  "spawnRule": "auto"
 }

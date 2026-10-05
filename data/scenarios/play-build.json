@@ -1,0 +1,6 @@
+{
+  // Straight into build mode with plenty of souls.
+  "description": "Build mode with 300 souls and the door already locked. Try building, upgrading and flipping rooms, then open the door (L / Y).",
+  "scene": "play",
+  "parameters": { "setup": "game/setups/rich.json", "startLocked": "true" }
+}

@@ -119,8 +119,8 @@ public sealed record RunSetup
     public int PartySize { get; init; } = 4;
     public int StartingSouls { get; init; }
 
-    /// <summary>"ladder" or "reputation". See the ordering rules.</summary>
-    public string OrderingRule { get; init; } = "ladder";
+    /// <summary>"reputation" (the chosen default) or "ladder". See the ordering rules.</summary>
+    public string OrderingRule { get; init; } = "reputation";
 
     /// <summary>"manual" (only when told to) or "auto" (pool + gap rule).</summary>
     public string SpawnRule { get; init; } = "manual";

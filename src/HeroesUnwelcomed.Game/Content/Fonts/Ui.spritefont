@@ -16,6 +16,26 @@
         <Start>&#32;</Start>
         <End>&#126;</End>
       </CharacterRegion>
+      <!-- Latin-1: accented letters, ·, ×, °, etc. -->
+      <CharacterRegion>
+        <Start>&#160;</Start>
+        <End>&#255;</End>
+      </CharacterRegion>
+      <!-- Bullet -->
+      <CharacterRegion>
+        <Start>&#8226;</Start>
+        <End>&#8226;</End>
+      </CharacterRegion>
+      <!-- Ellipsis -->
+      <CharacterRegion>
+        <Start>&#8230;</Start>
+        <End>&#8230;</End>
+      </CharacterRegion>
+      <!-- Arrows ← ↑ → ↓ -->
+      <CharacterRegion>
+        <Start>&#8592;</Start>
+        <End>&#8595;</End>
+      </CharacterRegion>
     </CharacterRegions>
   </Asset>
 </XnaContent>

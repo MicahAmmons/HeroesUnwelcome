@@ -38,7 +38,6 @@ public sealed class DevToolsHost : IDisposable
         if (options.Scenario is { } name)
         {
             CurrentScenario = Scenarios.Get(name);
-            StartingScene = CurrentScenario.Scene;
         }
 
         // Show the panel by default in normal debug runs, but not in automated
@@ -52,9 +51,6 @@ public sealed class DevToolsHost : IDisposable
     public ScreenshotCapture Screenshots { get; }
     public Scenario? CurrentScenario { get; private set; }
     public bool PanelVisible { get; set; }
-
-    /// <summary>The scene the launch scenario asked for, if any.</summary>
-    public string? StartingScene { get; }
 
     /// <summary>Whether the panel is currently using the keyboard/mouse (so the game should ignore them).</summary>
     public (bool Keyboard, bool Mouse) InputCapture =>
@@ -110,11 +106,11 @@ public sealed class DevToolsHost : IDisposable
     public void LoadScenario(Scenario scenario)
     {
         CurrentScenario = scenario;
-        _game.SwitchScene(scenario.Scene);
+        _game.SwitchScene(scenario.Scene, scenario.Parameters);
     }
 
     /// <summary>Starts the current scene over from scratch.</summary>
-    public void Restart() => _game.SwitchScene(_game.CurrentSceneName);
+    public void Restart() => _game.RestartScene();
 
     /// <summary>Re-reads the scenarios folder (picks up newly added files).</summary>
     public void RefreshScenarios()

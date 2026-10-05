@@ -20,7 +20,7 @@ Run a scenario and capture screenshots for visual checks (Debug build):
 src/HeroesUnwelcomed.Desktop/bin/Debug/net10.0/HeroesUnwelcomed.exe --scenario ui-layout --window 1280x800 --screenshot-frames 30 --screenshot-dir <scratch dir> --exit-after-screenshots
 ```
 
-Add `--screenshot-devtools` to include the ImGui panel. Check visual changes at both 1920x1080 and Steam Deck 1280x800.
+Add `--screenshot-devtools` to include the ImGui panel. The play scene needs real time to pass (about 160 frames per second here), so use frames in the thousands to see heroes act; scenarios `play`, `play-build`, `play-crowded`, `play-closeup` cover the main situations. Check visual changes at both 1920x1080 and Steam Deck 1280x800.
 
 ## Rules of the codebase
 
@@ -29,6 +29,7 @@ Add `--screenshot-devtools` to include the ImGui panel. Check visual changes at 
 - Game logic lives in `Core` (`Run`): change state only through `GameCommand`s, report changes only through `GameEvent`s, keep it deterministic (fixed ticks, seeded forks, no wall-clock time, stable iteration order). Every tunable number belongs in `data/game/*.json`.
 - After changing game logic or balance data, run the SimRunner (`dotnet run --project tools/HeroesUnwelcomed.SimRunner -- --runs 200`) and compare.
 - No static managers for game state; pass dependencies in (see `GameServices`).
+- Visuals react to `Run` events; they never change simulation state. Player actions go through `BuildController`-style intent methods, then Core commands.
 - Game code reads input only through `InputService` / `GameAction`. No hover-only interactions; everything must work with a gamepad.
 - UI is laid out in UI units on `UiCanvas` and anchored with `UiCanvas.Place`.
 - Randomness that affects gameplay comes from `DeterministicRandom`, with one `Fork` per purpose. Never use `System.Random` or `string.GetHashCode()` for gameplay.

@@ -1,0 +1,6 @@
+{
+  // Many small parties at once, a portal and left-facing rooms.
+  "description": "Crowded dungeon: 12 heroes in parties of 3, six rooms including a portal jump and a left-facing row. Watch parties queue behind each other.",
+  "scene": "play",
+  "parameters": { "setup": "game/setups/crowded.json" }
+}

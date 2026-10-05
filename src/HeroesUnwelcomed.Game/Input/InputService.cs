@@ -38,6 +38,7 @@ public sealed class InputService
 {
     private const float StickDeadzone = 0.2f;
     private const float WheelNotch = 120f; // one click of a mouse wheel
+    private const float TriggerClicksPerSecond = 3f;
 
     private readonly InputBindings _bindings;
     private readonly HashSet<GameAction> _down = [];
@@ -59,7 +60,10 @@ public sealed class InputService
     /// <summary>Camera pan direction, each axis -1..1 (right stick or WASD).</summary>
     public Vector2 Pan { get; private set; }
 
-    /// <summary>Zoom amount this frame: positive = in. Triggers give a steady rate, the wheel gives steps.</summary>
+    /// <summary>
+    /// Zoom this frame, in "wheel clicks": positive = in. One wheel click = 1;
+    /// a fully held trigger gives 3 clicks per second.
+    /// </summary>
     public float Zoom { get; private set; }
 
     /// <summary>Mouse position in window pixels.</summary>
@@ -150,7 +154,7 @@ public sealed class InputService
 
         // Triggers: hold for a steady zoom (scaled by frame time so it's
         // framerate-independent). Wheel: discrete steps.
-        float triggers = (_gamepad.Triggers.Right - _gamepad.Triggers.Left) * deltaSeconds;
+        float triggers = (_gamepad.Triggers.Right - _gamepad.Triggers.Left) * deltaSeconds * TriggerClicksPerSecond;
         float wheel = (_mouse.ScrollWheelValue - _previousMouse.ScrollWheelValue) / WheelNotch;
         Zoom = triggers + wheel;
     }

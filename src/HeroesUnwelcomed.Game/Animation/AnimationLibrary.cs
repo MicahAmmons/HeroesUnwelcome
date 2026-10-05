@@ -92,6 +92,8 @@ public sealed class AnimationLibrary
         Entities.FirstOrDefault(e => e.Name == name)
         ?? throw new ArgumentException($"No entity named '{name}' in {FilePath}.");
 
+    public EntityDefinition? TryEntity(string name) => Entities.FirstOrDefault(e => e.Name == name);
+
     public static AnimationLibrary Load(DataSource data) => Parse(data.ReadText(FilePath));
 
     public static AnimationLibrary Parse(string json)

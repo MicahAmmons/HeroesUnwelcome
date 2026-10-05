@@ -47,6 +47,8 @@ public sealed class InputBindings
         .Bind(GameAction.Pause, new KeyBinding(Keys.P), new GamepadBinding(Buttons.Start))
         .Bind(GameAction.SpeedUp, new KeyBinding(Keys.OemCloseBrackets), new KeyBinding(Keys.OemPlus), new GamepadBinding(Buttons.RightShoulder))
         .Bind(GameAction.SpeedDown, new KeyBinding(Keys.OemOpenBrackets), new KeyBinding(Keys.OemMinus), new GamepadBinding(Buttons.LeftShoulder))
+        .Bind(GameAction.ToggleDoor, new KeyBinding(Keys.L), new GamepadBinding(Buttons.Y))
+        .Bind(GameAction.SendParty, new KeyBinding(Keys.N), new GamepadBinding(Buttons.X))
         .Bind(GameAction.ToggleFullscreen, new KeyBinding(Keys.F11), new KeyBinding(Keys.Enter, RequiresAlt: true))
         .Bind(GameAction.Screenshot, new KeyBinding(Keys.F12))
         .Bind(GameAction.ToggleDebugPanel, new KeyBinding(Keys.F1), new KeyBinding(Keys.OemTilde), new GamepadBinding(Buttons.Back));

@@ -73,7 +73,7 @@ Developer tools live in `src/HeroesUnwelcomed.Game/DevTools/` and are compiled *
 - **M0: Foundation** ✅. Solution, pinned versions, window that works at any resolution, input actions layer, UI canvas, ImGui dev panel, scenarios + launch profiles, automated screenshots, deterministic random generator + tests.
 - **M1: Beat clock and audio prototype** ✅. Custom mixer that doubles as the master clock, generated placeholder stems per speed level (calm pause track included), speed changes on the beat, stem mute/unmute on the beat, animation system (music/sim clocks, one-shots, rate curves, pause shows idle), animation gallery, live JSON reload.
 - **M2: Core game logic, no graphics** ✅. Data-driven room kinds/tuning/heroes/run setup (`data/game/`), dungeon grid + order + calculated connections + flipping, hero pool and codex, parties (travel → huddle → reorder → attempt → die/clear → wait/queue), souls ledger, door lock cycle, commands with refusal reasons, event log + replay, metrics, both ordering rules, SimRunner with bot DM and HTML report.
-- **M3: First playable.** Draw Core's state: rooms, hallways/doors/portals, heroes, huddle reorder. Camera. Placing/upgrading rooms with controller and mouse. Debug hero inspector.
+- **M3: First playable** ✅. Play scene (now the game's default start): world layout, camera (pan/zoom/fit/follow selection), dungeon renderer with calculated doors and portals, hero views that walk timed paths and glide to queue/fight spots, event-driven animations (huddle, attack, celebrate, death + teammates' fear, monster reactions), HUD (souls, door, pool, "who goes first here" rankings, prompts, toasts, run-over screen), build controller with build/upgrade/flip menus usable by controller, keyboard and mouse, door toggle and send-party actions, dev-panel run inspector, play scenarios.
 - **M4:** Multiple parties, room queues, waiting idles.
 - **M5:** Music augments by influence, positional sound, Fear animation.
 - **M6:** Specialization into classes, balance pass.
@@ -86,6 +86,15 @@ Developer tools live in `src/HeroesUnwelcomed.Game/DevTools/` and are compiled *
 - **Determinism:** one seed → forked random streams (`heroes`, `challenge`, `party-selection`). The same seed plus the recorded commands at their beats reproduces a run exactly (tested).
 - **Events** (`GameEvent` records) are the only output. Visuals, audio and metrics subscribe to `Run.EventRaised`; `RunMetrics` is calculated purely from `Run.Events`.
 - **Data:** `data/game/rooms.json`, `tuning.json`, `heroes.json`, `run-setup.json`. Core parses JSON text but never touches files; callers load the text.
+
+## How the playable game works (M3)
+
+- **`PlayScene`** advances the `Run` to the current game beat each frame, then turns the run's **events** into visuals. A `PartyDeparted` becomes a `MovementPath` (hallway: out the far side and through the next door; portal: into the exit portal, out of the next room's entry portal) timed to arrive exactly at the simulation's arrival beat. Huddle, attack, death and so on become animations on `HeroView`s and room monsters.
+- **`WorldLayout`**: one grid cell = 1920×1080 world units, split into a travel half and a room half; positions inside a cell are measured "along the way through", so left-facing rooms are just mirrored.
+- **`BuildController`** takes intentions (move, point at, confirm, cancel), not buttons, so keyboard, gamepad, mouse and later touch drive identical logic. Every change goes through a Core command, and refusals show Core's reason.
+- **Readability:** characters draw 1.6× their data size; room labels and names keep a steady on-screen size whatever the zoom.
+- **Scenario parameters** for the play scene: `setup` (run-setup file), `startLocked`, `focusRoom`, `zoom`.
+- **Chosen huddle rule: reputation** (after the M2 simulations). Ladder remains available via `orderingRule`.
 
 ### First SimRunner findings (200 runs per rule, default data, bot DM)
 

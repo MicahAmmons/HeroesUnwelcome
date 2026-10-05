@@ -13,7 +13,7 @@ namespace HeroesUnwelcomed.Game.DevTools;
 /// will also describe the dungeon layout, hero pool, seed and starting state:
 /// "two parties queued at a trap room", "a hero one win from specializing"...
 /// </remarks>
-public sealed record Scenario(string Name, string Description, string Scene);
+public sealed record Scenario(string Name, string Description, string Scene, IReadOnlyDictionary<string, string> Parameters);
 
 /// <summary>Loads every scenario file from the data/scenarios folder.</summary>
 public sealed class ScenarioCatalog
@@ -58,7 +58,7 @@ public sealed class ScenarioCatalog
         string name = Path.GetFileNameWithoutExtension(path);
         ScenarioFile file = JsonSerializer.Deserialize<ScenarioFile>(File.ReadAllText(path), DataSource.JsonOptions)
             ?? throw new InvalidDataException($"Scenario file '{path}' is empty.");
-        return new Scenario(name, file.Description, file.Scene);
+        return new Scenario(name, file.Description, file.Scene, file.Parameters);
     }
 
     // The shape of the JSON on disk.
@@ -66,5 +66,6 @@ public sealed class ScenarioCatalog
     {
         public string Description { get; set; } = "";
         public string Scene { get; set; } = SceneRegistry.DefaultScene;
+        public Dictionary<string, string> Parameters { get; set; } = [];
     }
 }

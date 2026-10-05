@@ -18,6 +18,8 @@ public sealed class AnimationGalleryScene : IScene
     private const float ClipButtonWidth = 210;
     private const float ClipButtonHeight = 64;
     private const float ClipButtonGap = 14;
+    private const float SpriteScale = 0.75f;
+    private const int MaxPerRow = 4;
 
     private readonly GameServices _services;
     private readonly List<AnimationPlayer> _players = [];
@@ -111,15 +113,18 @@ public sealed class AnimationGalleryScene : IScene
         DrawHeader(batch, time);
         DrawBeatIndicator(batch, time);
 
-        // Floor line the characters stand on.
-        float floorY = FloorY();
-        draw.FillRect(batch, new Rectangle(0, (int)floorY, (int)ui.Size.X, 3), new Color(60, 60, 80));
+        // Floor lines the characters stand on (one per row).
+        for (int row = 0; row < RowCount; row++)
+        {
+            draw.FillRect(batch, new Rectangle(0, (int)FloorY(row), (int)ui.Size.X, 3), new Color(60, 60, 80));
+        }
 
         for (int i = 0; i < _players.Count; i++)
         {
             AnimationPlayer player = _players[i];
             Vector2 feet = FeetPosition(i);
-            PlaceholderSprite.Draw(batch, draw, feet, player.Entity, player.DisplayClip, player.Frame);
+            float floorY = feet.Y;
+            PlaceholderSprite.Draw(batch, draw, feet, player.Entity, player.DisplayClip, player.Frame, scale: SpriteScale);
 
             string status = player.DisplayClip != player.Clip
                 ? $"{player.Clip.Name} (paused: showing Idle)"
@@ -208,7 +213,7 @@ public sealed class AnimationGalleryScene : IScene
             draw.TextCentered(batch, SelectedClips[i].Name, button, Color.White, 0.6f);
         }
 
-        Rectangle label = _services.Ui.Place(Anchor.Bottom, new Vector2(0, 220), new Vector2(900, 40));
+        Rectangle label = _services.Ui.Place(Anchor.Bottom, new Vector2(0, 188), new Vector2(900, 40));
         draw.TextCentered(batch, $"{SelectedPlayer.Entity.Name} animations", label, new Color(180, 180, 200), 0.6f);
     }
 
@@ -222,16 +227,28 @@ public sealed class AnimationGalleryScene : IScene
         _services.Draw.TextCentered(batch, help, area, new Color(160, 160, 185), 0.6f);
     }
 
-    private float FloorY() => _services.Ui.Size.Y / 2f + 170;
+    private int RowCount => (_players.Count + MaxPerRow - 1) / MaxPerRow;
 
-    private Vector2 FeetPosition(int index) =>
-        new(_services.Ui.Size.X * (index + 1) / (_players.Count + 1), FloorY());
+    // Two rows when there are more than four entities: floors at ~44% and ~74% of the canvas height.
+    private float FloorY(int row) => RowCount == 1
+        ? _services.Ui.Size.Y / 2f + 170
+        : _services.Ui.Size.Y * (row == 0 ? 0.435f : 0.74f);
+
+    private Vector2 FeetPosition(int index)
+    {
+        int row = index / MaxPerRow;
+        int inRow = Math.Min(MaxPerRow, _players.Count - row * MaxPerRow);
+        int column = index % MaxPerRow;
+        return new Vector2(_services.Ui.Size.X * (column + 1) / (inRow + 1), FloorY(row));
+    }
 
     private Rectangle EntityBox(int index)
     {
         Vector2 feet = FeetPosition(index);
         Point size = _players[index].Entity.Size;
-        return new Rectangle((int)(feet.X - size.X / 2f), (int)(feet.Y - size.Y), size.X, size.Y);
+        int width = (int)(size.X * SpriteScale);
+        int height = (int)(size.Y * SpriteScale);
+        return new Rectangle((int)(feet.X - width / 2f), (int)(feet.Y - height), width, height);
     }
 
     private Rectangle ClipButton(int index)

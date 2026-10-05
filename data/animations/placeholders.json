@@ -10,7 +10,7 @@
   "entities": {
     "Hero": {
       "color": "#4A86E8",
-      "size": [180, 260],
+      "size": [140, 260],
       "clips": {
         "Idle":      { "frames": 3, "beatsPerFrame": 1,   "loop": true,  "clock": "music" },
         "Walk":      { "frames": 3, "beatsPerFrame": 0.5, "loop": true,  "clock": "sim" },
@@ -45,13 +45,46 @@
         "Death":   { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "sim" }
       }
     },
-    "Trap": {
-      "color": "#E69138",
-      "size": [260, 120],
+    "Orc": {
+      "color": "#38761D",
+      "size": [220, 260],
       "clips": {
-        "Idle":    { "frames": 3, "beatsPerFrame": 1,    "loop": true,  "clock": "music" },
-        "Trigger": { "frames": 3, "beatsPerFrame": 0.25, "loop": false, "clock": "sim", "then": "Reset" },
-        "Reset":   { "frames": 3, "beatsPerFrame": 1,    "loop": false, "clock": "sim", "then": "Idle" }
+        "Idle":    { "frames": 3, "beatsPerFrame": 1,   "loop": true,  "clock": "music" },
+        "Prepare": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
+        "Attack":  { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
+        "Death":   { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "sim" }
+      }
+    },
+    "SpikeTrap": {
+      "color": "#E69138",
+      "size": [260, 110],
+      "clips": {
+        "Idle":     { "frames": 3, "beatsPerFrame": 1,    "loop": true,  "clock": "music" },
+        "Trigger":  { "frames": 3, "beatsPerFrame": 0.25, "loop": false, "clock": "sim", "then": "Reset" },
+        "Reset":    { "frames": 3, "beatsPerFrame": 1,    "loop": false, "clock": "sim", "then": "Idle" },
+        "Disarmed": { "frames": 3, "beatsPerFrame": 1,    "loop": false, "clock": "sim" }
+      }
+    },
+    "PitFall": {
+      "color": "#B45F06",
+      "size": [300, 90],
+      "clips": {
+        "Idle":     { "frames": 3, "beatsPerFrame": 2,    "loop": true,  "clock": "music" },
+        "Trigger":  { "frames": 3, "beatsPerFrame": 0.25, "loop": false, "clock": "sim", "then": "Reset" },
+        "Reset":    { "frames": 3, "beatsPerFrame": 1,    "loop": false, "clock": "sim", "then": "Idle" },
+        "Disarmed": { "frames": 3, "beatsPerFrame": 1,    "loop": false, "clock": "sim" }
+      }
+    },
+    // The treasure room's guardian: the player's avatar.
+    "LichLord": {
+      "color": "#8E7CC3",
+      "size": [240, 360],
+      "clips": {
+        "Idle":    { "frames": 3, "beatsPerFrame": 2,   "loop": true,  "clock": "music" },
+        "Prepare": { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "sim", "then": "Idle" },
+        "Attack":  { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
+        "Block":   { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim", "then": "Idle" },
+        "Death":   { "frames": 3, "beatsPerFrame": 1,   "loop": false, "clock": "sim" }
       }
     }
   }

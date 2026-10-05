@@ -1,0 +1,18 @@
+{
+  // Like run-setup.json but with plenty of souls, for trying out building and upgrading.
+  "seed": 12345,
+  "gridWidth": 8,
+  "gridHeight": 5,
+  "rooms": [
+    { "kind": "Entrance", "position": [0, 2] },
+    { "kind": "Goblin",   "position": [1, 2] },
+    { "kind": "Goblin",   "position": [2, 2] },
+    { "kind": "Goblin",   "position": [3, 2] },
+    { "kind": "LichLord", "position": [4, 2] }
+  ],
+  "heroPoolSize": 5,
+  "partySize": 4,
+  "startingSouls": 300,
+  "orderingRule": "reputation",
+  "spawnRule": "auto"
+}

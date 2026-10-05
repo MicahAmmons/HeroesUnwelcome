@@ -23,6 +23,8 @@ public enum GameAction
     Pause,
     SpeedUp,
     SpeedDown,
+    ToggleDoor,
+    SendParty,
 
     // System
     ToggleFullscreen,

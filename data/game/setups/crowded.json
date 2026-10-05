@@ -1,0 +1,20 @@
+{
+  // A longer dungeon and a big hero pool in small parties, so several parties queue at once.
+  "seed": 777,
+  "gridWidth": 8,
+  "gridHeight": 5,
+  "rooms": [
+    { "kind": "Entrance",  "position": [0, 1] },
+    { "kind": "Goblin",    "position": [1, 1] },
+    { "kind": "SpikeTrap", "position": [2, 1] },
+    { "kind": "Orc",       "position": [3, 1] },
+    { "kind": "PitFall",   "position": [5, 3], "facing": "Left" },
+    { "kind": "Goblin",    "position": [4, 3], "facing": "Left" },
+    { "kind": "LichLord",  "position": [3, 3], "facing": "Left" }
+  ],
+  "heroPoolSize": 12,
+  "partySize": 3,
+  "startingSouls": 50,
+  "orderingRule": "reputation",
+  "spawnRule": "auto"
+}

@@ -1,0 +1,5 @@
+{
+  // The game as it starts normally.
+  "description": "The game. Default run: 3 goblin rooms and the Lich Lord. Heroes enter automatically. L / Y locks the door so you can build.",
+  "scene": "play"
+}

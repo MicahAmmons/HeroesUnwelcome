@@ -1,5 +1,17 @@
 {
   "profiles": {
+    "Play": {
+      "commandName": "Project",
+      "commandLineArgs": "--scenario play"
+    },
+    "Play: build mode": {
+      "commandName": "Project",
+      "commandLineArgs": "--scenario play-build"
+    },
+    "Play: crowded": {
+      "commandName": "Project",
+      "commandLineArgs": "--scenario play-crowded"
+    },
     "Animation Gallery": {
       "commandName": "Project",
       "commandLineArgs": "--scenario animation-gallery"

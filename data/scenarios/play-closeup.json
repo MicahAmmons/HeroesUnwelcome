@@ -1,0 +1,6 @@
+{
+  // Zoomed in on the first goblin room, to watch a fight up close.
+  "description": "Close-up on room #1: watch the huddle, the reorder and each attempt at full size.",
+  "scene": "play",
+  "parameters": { "focusRoom": "1", "zoom": "0.75" }
+}

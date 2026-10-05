@@ -9,12 +9,18 @@ namespace HeroesUnwelcomed.Game.Rendering;
 /// </summary>
 public sealed class Primitives : IDisposable
 {
+    private const int RingTextureSize = 128;
+
     private readonly Texture2D _pixel;
+    private readonly Texture2D _ring;
+    private readonly Texture2D _disc;
 
     public Primitives(GraphicsDevice graphicsDevice, SpriteFont font)
     {
         _pixel = new Texture2D(graphicsDevice, 1, 1);
         _pixel.SetData([Color.White]);
+        _ring = CreateCircle(graphicsDevice, thickness: 0.14f);
+        _disc = CreateCircle(graphicsDevice, thickness: 1f);
         Font = font;
     }
 
@@ -42,5 +48,41 @@ public sealed class Primitives : IDisposable
         Text(batch, text, new Vector2(MathF.Round(position.X), MathF.Round(position.Y)), color, scale);
     }
 
-    public void Dispose() => _pixel.Dispose();
+    /// <summary>An outlined ellipse (e.g. a portal) filling <paramref name="rect"/>.</summary>
+    public void Ring(SpriteBatch batch, Rectangle rect, Color color) => batch.Draw(_ring, rect, color);
+
+    /// <summary>A filled ellipse filling <paramref name="rect"/>.</summary>
+    public void Disc(SpriteBatch batch, Rectangle rect, Color color) => batch.Draw(_disc, rect, color);
+
+    // Draws a white circle into a texture once, with soft (anti-aliased) edges:
+    // each pixel's opacity comes from how far it is from the circle's edge.
+    private static Texture2D CreateCircle(GraphicsDevice device, float thickness)
+    {
+        const int size = RingTextureSize;
+        var pixels = new Color[size * size];
+        float radius = size / 2f - 1f;
+        float inner = radius * (1f - thickness);
+
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                float distance = Vector2.Distance(new Vector2(x + 0.5f, y + 0.5f), new Vector2(size / 2f));
+                float outerEdge = Math.Clamp(radius - distance + 0.5f, 0f, 1f);
+                float innerEdge = thickness >= 1f ? 1f : Math.Clamp(distance - inner + 0.5f, 0f, 1f);
+                pixels[y * size + x] = Color.White * (outerEdge * innerEdge); // premultiplied, like SpriteBatch expects
+            }
+        }
+
+        var texture = new Texture2D(device, size, size);
+        texture.SetData(pixels);
+        return texture;
+    }
+
+    public void Dispose()
+    {
+        _pixel.Dispose();
+        _ring.Dispose();
+        _disc.Dispose();
+    }
 }

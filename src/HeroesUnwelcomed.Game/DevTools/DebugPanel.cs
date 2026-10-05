@@ -1,7 +1,11 @@
 using HeroesUnwelcomed.Audio.Mixing;
 using HeroesUnwelcomed.Audio.Music;
 using HeroesUnwelcomed.Audio.Timing;
+using HeroesUnwelcomed.Core.Definitions;
+using HeroesUnwelcomed.Core.Heroes;
+using HeroesUnwelcomed.Core.Simulation;
 using HeroesUnwelcomed.Game.Input;
+using HeroesUnwelcomed.Game.Play;
 using HeroesUnwelcomed.Game.Sound;
 using ImGuiNET;
 using Microsoft.Xna.Framework;
@@ -42,6 +46,7 @@ public sealed class DebugPanel
         {
             DrawStats(gameTime);
             DrawScenarios();
+            DrawRun();
             DrawAudio();
             DrawDisplay();
             DrawInput();
@@ -90,6 +95,61 @@ public sealed class DebugPanel
             _host.Restart();
         }
     }
+
+    // Live view of the simulation: heroes, parties, door, souls.
+    private void DrawRun()
+    {
+        if (_game.CurrentScene is not PlayScene play || !ImGui.CollapsingHeader("Run inspector", ImGuiTreeNodeFlags.DefaultOpen))
+        {
+            return;
+        }
+
+        Run run = play.Run;
+        ImGui.Text($"Beat {run.Beat:0.0}   door {run.Door}   souls {run.Souls.Balance}   rule {run.Rules.Ordering.Name}");
+        if (run.IsOver) ImGui.TextColored(new System.Numerics.Vector4(1f, 0.4f, 0.4f, 1f), "Run over: heroes won");
+
+        if (ImGui.Button("Send party")) Report(run.Execute(new SendNextParty()));
+        ImGui.SameLine();
+        if (ImGui.Button(run.Door == DoorState.Open ? "Lock door" : "Unlock door"))
+        {
+            Report(run.Execute(run.Door == DoorState.Open ? new LockDoor() : new UnlockDoor()));
+        }
+        ImGui.SameLine();
+        if (ImGui.Button("New run")) play.StartRun();
+        if (_lastCommandResult is { } result) ImGui.TextWrapped(result);
+
+        ImGui.SeparatorText("Parties");
+        foreach (Party party in run.ActiveParties)
+        {
+            string room = run.Dungeon.Rooms[party.RoomIndex].Kind.Id;
+            ImGui.Text($"#{party.Id} {party.Phase} → {room}: {string.Join(", ", party.Members.Select(h => h.Name))}");
+        }
+
+        ImGui.SeparatorText("Heroes");
+        if (ImGui.BeginTable("heroes", 6, ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInnerH | ImGuiTableFlags.SizingStretchProp))
+        {
+            foreach (string column in new[] { "Name", "State", "Combat", "Trap", "Boss", "Deaths" })
+            {
+                ImGui.TableSetupColumn(column);
+            }
+            ImGui.TableHeadersRow();
+            foreach (Hero hero in run.Heroes.All)
+            {
+                ImGui.TableNextRow();
+                ImGui.TableNextColumn(); ImGui.Text(hero.Name);
+                ImGui.TableNextColumn(); ImGui.Text(hero.State == HeroState.Dead ? $"Dead ({hero.RespawnAtBeat - run.Beat:0})" : hero.State.ToString());
+                ImGui.TableNextColumn(); ImGui.Text($"{hero.Skill(RoomCategory.Combat):0.00}");
+                ImGui.TableNextColumn(); ImGui.Text($"{hero.Skill(RoomCategory.Trap):0.00}");
+                ImGui.TableNextColumn(); ImGui.Text($"{hero.Skill(RoomCategory.Boss):0.00}");
+                ImGui.TableNextColumn(); ImGui.Text(hero.Deaths.ToString());
+            }
+            ImGui.EndTable();
+        }
+    }
+
+    private string? _lastCommandResult;
+
+    private void Report(CommandResult result) => _lastCommandResult = result.ToString();
 
     private void DrawAudio()
     {

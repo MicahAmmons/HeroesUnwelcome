@@ -14,6 +14,9 @@ A 2D reverse-dungeon auto-battler built in C# with MonoGame. Desktop and Steam D
 
 | Launch profile | What it opens |
 |---|---|
+| Play | The game: 3 goblin rooms and the Lich Lord; heroes enter automatically |
+| Play: build mode | Door already locked, 300 souls: try building, upgrading, flipping |
+| Play: crowded | 12 heroes in parties of 3, a portal and a left-facing row: parties queue |
 | Animation Gallery | Every placeholder entity animating to the music; play clips, change speed, pause |
 | Sandbox | Input playground: one selection driven by keyboard, gamepad and mouse |
 | UI Layout (1080p) | UI scaling check at 1920x1080 |
@@ -25,8 +28,10 @@ A 2D reverse-dungeon auto-battler built in C# with MonoGame. Desktop and Steam D
 | Action | Keyboard / mouse | Gamepad |
 |---|---|---|
 | Move selection | Arrow keys / hover | D-pad / left stick |
-| Confirm | Enter, Space / click | A |
-| Cancel | Esc, Backspace | B |
+| Confirm / open menu | Enter, Space / click | A |
+| Cancel / close menu | Esc, Backspace | B |
+| Lock / open the dungeon door | L | Y |
+| Send the next party | N | X |
 | Pause | P | Start |
 | Speed down / up | `[` `]` (or `-` `+`) | LB / RB |
 | Pan camera | W A S D / right-drag | Right stick |
@@ -37,7 +42,7 @@ A 2D reverse-dungeon auto-battler built in C# with MonoGame. Desktop and Steam D
 
 ## Developer tools (Debug builds only)
 
-- **Dev Tools panel (F1):** FPS, scenario switcher, audio & beat readout (speed buttons, metronome, volume, per-stem mutes, a "fear cut" test, visual delay), window-size presets (including Steam Deck), fullscreen, screenshots, live input readout.
+- **Dev Tools panel (F1):** FPS, scenario switcher, run inspector (heroes' skills and states, parties, send party, door, new run), audio & beat readout (speed buttons, metronome, volume, per-stem mutes, a "fear cut" test, visual delay), window-size presets (including Steam Deck), fullscreen, screenshots, live input readout.
 - **Live data reload:** in Debug builds the game reads JSON straight from the repo's `data/` folder. Save `data/animations/placeholders.json` while the Animation Gallery runs and the changes appear instantly (errors are shown on screen and the old data is kept).
 - **Scenarios:** JSON files in `data/scenarios/`. Each one launches straight into a prepared situation. Add a file and it shows up in the panel.
 - **Command-line options** (set in `src/HeroesUnwelcomed.Desktop/Properties/launchSettings.json`):

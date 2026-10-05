@@ -33,6 +33,7 @@ public sealed class HeroesGame : Microsoft.Xna.Framework.Game
     private GameServices _services = null!;
     private AudioEngine _audio = null!;
     private IScene? _scene;
+    private IReadOnlyDictionary<string, string>? _sceneParameters;
 
     // The windowed size to return to when leaving fullscreen.
     private Point _windowedSize;
@@ -72,6 +73,7 @@ public sealed class HeroesGame : Microsoft.Xna.Framework.Game
     }
 
     public string CurrentSceneName { get; private set; } = "";
+    public IScene? CurrentScene => _scene;
     public bool IsFullscreen => _graphics.IsFullScreen;
     public InputService Input => _input;
     public UiCanvas Ui => _ui;
@@ -91,11 +93,13 @@ public sealed class HeroesGame : Microsoft.Xna.Framework.Game
         }
 
         string startScene = SceneRegistry.DefaultScene;
+        IReadOnlyDictionary<string, string>? parameters = null;
 #if DEBUG
         _devTools = new DevTools.DevToolsHost(this, _options);
-        startScene = _devTools.StartingScene ?? startScene;
+        startScene = _devTools.CurrentScenario?.Scene ?? startScene;
+        parameters = _devTools.CurrentScenario?.Parameters;
 #endif
-        SwitchScene(startScene);
+        SwitchScene(startScene, parameters);
     }
 
     protected override void Update(GameTime gameTime)
@@ -143,13 +147,16 @@ public sealed class HeroesGame : Microsoft.Xna.Framework.Game
     }
 
     /// <summary>Replaces the active scene with a fresh instance of the named one.</summary>
-    public void SwitchScene(string name)
+    public void SwitchScene(string name, IReadOnlyDictionary<string, string>? parameters = null)
     {
-        IScene next = SceneRegistry.Create(name, _services);
         _scene?.Dispose();
-        _scene = next;
+        _scene = SceneRegistry.Create(name, _services, parameters);
+        _sceneParameters = parameters;
         CurrentSceneName = name;
     }
+
+    /// <summary>Starts the current scene again from scratch, with the same parameters.</summary>
+    public void RestartScene() => SwitchScene(CurrentSceneName, _sceneParameters);
 
     /// <summary>Resizes the window (leaving fullscreen if needed).</summary>
     public void SetWindowSize(int width, int height)
