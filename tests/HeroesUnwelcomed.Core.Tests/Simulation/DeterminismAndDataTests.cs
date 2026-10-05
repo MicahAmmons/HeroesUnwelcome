@@ -93,7 +93,8 @@ public class DeterminismAndDataTests
         GameDefinitions defs = GameDefinitions.Parse(
             File.ReadAllText(Path.Combine(data, "rooms.json")),
             File.ReadAllText(Path.Combine(data, "tuning.json")),
-            File.ReadAllText(Path.Combine(data, "heroes.json")));
+            File.ReadAllText(Path.Combine(data, "heroes.json")),
+            File.ReadAllText(Path.Combine(data, "classes.json")));
         RunSetup setup = GameDefinitions.ParseSetup(File.ReadAllText(Path.Combine(data, "run-setup.json")));
 
         Run run = Run.Create(defs, setup);
@@ -101,6 +102,7 @@ public class DeterminismAndDataTests
         run.AdvanceTo(200);
 
         Assert.Equal(5, run.Dungeon.Rooms.Count);
+        Assert.Equal(["Warrior", "Thief"], defs.Classes.Select(c => c.Id));
         Assert.Equal(3, run.Dungeon.Rooms.Count(r => r.Kind.Id == "Goblin"));
         Assert.NotEmpty(run.Of<AttemptStarted>());
     }

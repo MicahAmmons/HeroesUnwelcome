@@ -1,0 +1,12 @@
+{
+  // Hero specializations. A hero earns a class when their BASE skill in its
+  // category reaches the threshold (the class bonus doesn't count), and loses it
+  // if rust drops them back below. One class at a time: whichever is reached
+  // first. If two are met at once, the one listed first wins.
+  //
+  // Rust settings (how unpractised skills decay) are in tuning.json.
+  "classes": [
+    { "id": "Warrior", "category": "Combat", "threshold": 3.5, "skillBonus": 0.5 },
+    { "id": "Thief",   "category": "Trap",   "threshold": 3.5, "skillBonus": 0.5 }
+  ]
+}

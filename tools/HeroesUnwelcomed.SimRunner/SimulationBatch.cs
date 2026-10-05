@@ -5,7 +5,7 @@ using HeroesUnwelcomed.Core.Simulation;
 namespace HeroesUnwelcomed.SimRunner;
 
 /// <summary>A snapshot of one run at one moment.</summary>
-public readonly record struct Sample(double Beat, double CombatSkill, double TrapSkill, double BossSkill, int Souls);
+public readonly record struct Sample(double Beat, double CombatSkill, double TrapSkill, double BossSkill, int Souls, int Specialized);
 
 /// <summary>What one simulated run produced.</summary>
 public sealed record RunResult(
@@ -19,7 +19,10 @@ public sealed record RunResult(
     int Huddles,
     int HuddlesPickingBest,
     IReadOnlyList<Sample> Samples,
-    IReadOnlyDictionary<string, RoomKindStats> ByRoomKind)
+    IReadOnlyDictionary<string, RoomKindStats> ByRoomKind,
+    int Specializations,
+    int SpecializationsLost,
+    double? FirstSpecializationBeat)
 {
     /// <summary>
     /// Share of huddles where the hero sent first really was the party's most
@@ -69,7 +72,8 @@ public sealed class SimulationBatch(GameDefinitions definitions, RunSetup baseSe
 
         RunMetrics metrics = RunMetrics.From(run);
         return new RunResult(orderingRule, seed, metrics.HeroesWon, metrics.LengthBeats, metrics.PartiesSent,
-            metrics.HeroDeaths, metrics.SoulsEarned, huddles, bestPicks, samples, metrics.ByRoomKind);
+            metrics.HeroDeaths, metrics.SoulsEarned, huddles, bestPicks, samples, metrics.ByRoomKind,
+            metrics.Specializations, metrics.SpecializationsLost, metrics.FirstSpecializationBeat);
     }
 
     private static Sample Snapshot(Run run)
@@ -77,9 +81,10 @@ public sealed class SimulationBatch(GameDefinitions definitions, RunSetup baseSe
         IReadOnlyList<Hero> heroes = run.Heroes.All;
         return new Sample(
             run.Beat,
-            heroes.Average(h => h.Skill(RoomCategory.Combat)),
-            heroes.Average(h => h.Skill(RoomCategory.Trap)),
-            heroes.Average(h => h.Skill(RoomCategory.Boss)),
-            run.Souls.Balance);
+            heroes.Average(h => h.BaseSkill(RoomCategory.Combat)),
+            heroes.Average(h => h.BaseSkill(RoomCategory.Trap)),
+            heroes.Average(h => h.BaseSkill(RoomCategory.Boss)),
+            run.Souls.Balance,
+            heroes.Count(h => h.Class is not null));
     }
 }

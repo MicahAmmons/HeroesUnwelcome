@@ -10,7 +10,8 @@ public static class GameDataLoader
     public static GameDefinitions LoadDefinitions(DataSource data) => GameDefinitions.Parse(
         data.ReadText("game/rooms.json"),
         data.ReadText("game/tuning.json"),
-        data.ReadText("game/heroes.json"));
+        data.ReadText("game/heroes.json"),
+        data.Exists("game/classes.json") ? data.ReadText("game/classes.json") : null);
 
     public static RunSetup LoadSetup(DataSource data, string relativePath = DefaultSetup) =>
         GameDefinitions.ParseSetup(data.ReadText(relativePath));

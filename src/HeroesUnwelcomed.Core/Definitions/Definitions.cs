@@ -120,9 +120,34 @@ public sealed record Tuning
     public double ReputationOnWin { get; init; } = 1.0;
     public double ReputationOnLoss { get; init; } = 0.5;
 
+    /// <summary>
+    /// "Rust": once a hero hasn't attempted a category for this many game beats,
+    /// that skill starts slowly dropping (never below the hero's starting value).
+    /// </summary>
+    public double SkillRustGraceBeats { get; init; } = 200;
+
+    /// <summary>How much an unpractised skill drops per game beat once rust sets in.</summary>
+    public double SkillRustPerBeat { get; init; } = 0.002;
+
+    /// <summary>
+    /// Which skills can rust. By default only those classes are about; Boss skill
+    /// is only practised at the treasure room, so letting it rust would stop heroes
+    /// ever building up to it.
+    /// </summary>
+    public IReadOnlyList<RoomCategory> SkillRustCategories { get; init; } = [RoomCategory.Combat, RoomCategory.Trap];
+
     /// <summary>Automatic spawning: the newest party must be at least this many rooms in before the next one starts.</summary>
     public int SpawnGapRooms { get; init; } = 2;
 }
+
+/// <summary>
+/// A specialization a hero can earn (Warrior, Thief...). Loaded from data/game/classes.json.
+/// </summary>
+/// <param name="Id">The class name shown to the player.</param>
+/// <param name="Category">The skill it's about.</param>
+/// <param name="Threshold">A hero whose base skill in <paramref name="Category"/> reaches this earns the class (if they don't already have one).</param>
+/// <param name="SkillBonus">Added to that skill while the hero holds the class.</param>
+public sealed record HeroClass(string Id, RoomCategory Category, double Threshold, double SkillBonus);
 
 /// <summary>How heroes are created. Loaded from data/game/heroes.json.</summary>
 public sealed record HeroGeneration

@@ -5,8 +5,9 @@ namespace HeroesUnwelcomed.Game.Play;
 
 /// <summary>
 /// Checks every animation against the step it plays in. Each step has a fixed
-/// length, so a clip longer than its step would be cut off. This lists those,
-/// which gives artists exact frame budgets ("Fight must fit in 2 beats").
+/// length, and a step's clip should fill it exactly so it ends on the beat:
+/// longer would be cut off, shorter would end early and freeze. This lists
+/// both, which gives artists exact frame budgets ("Fight is exactly 2 beats").
 /// </summary>
 public static class ChoreographyCheck
 {
@@ -28,7 +29,7 @@ public static class ChoreographyCheck
         ["Defeat"] = t => t.ResultBeats,
     };
 
-    /// <summary>Human-readable problems, e.g. "Orc.Interact is 3 beats but the Action step is 2".</summary>
+    /// <summary>Human-readable problems, e.g. "Orc.Interact lasts 3 beats but its step is 2".</summary>
     public static IReadOnlyList<string> Problems(AnimationLibrary animations, Tuning tuning)
     {
         var problems = new List<string>();
@@ -44,6 +45,10 @@ public static class ChoreographyCheck
                 if (clip.LengthBeats > step + 1e-9)
                 {
                     problems.Add($"{entity.Name}.{clip.Name} lasts {clip.LengthBeats:0.##} beats but its step is {step:0.##}; it will be cut off.");
+                }
+                else if (clip.LengthBeats < step - 1e-9)
+                {
+                    problems.Add($"{entity.Name}.{clip.Name} lasts {clip.LengthBeats:0.##} beats but its step is {step:0.##}; it ends early and holds its last frame.");
                 }
             }
         }

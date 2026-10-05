@@ -29,6 +29,7 @@ Add `--screenshot-devtools` to include the ImGui panel. The play scene needs rea
 - Game logic lives in `Core` (`Run`): change state only through `GameCommand`s, report changes only through `GameEvent`s, keep it deterministic (fixed ticks, seeded forks, no wall-clock time, stable iteration order). Every tunable number belongs in `data/game/*.json`.
 - After changing game logic or balance data, run the SimRunner (`dotnet run --project tools/HeroesUnwelcomed.SimRunner -- --runs 200`) and compare.
 - No static managers for game state; pass dependencies in (see `GameServices`).
+- Step clips must fill their choreography step exactly (frames × beatsPerFrame = step beats) so they end on the beat; `ChoreographyCheck` and a test enforce it.
 - Encounters follow the fixed choreography (docs/ARCHITECTURE.md): timing lives in Core (`PartyPhase` + tuning), visuals only follow `PartyStepStarted`. A party moves as one formation; never give heroes independent targets. Positions come from `RoomLayout` anchors (data/game/layout.json).
 - Visuals and audio react to `Run` events; they never change simulation state. Musical reactions and party sounds are data (data/audio/reactions.json), scaled by camera influence (`PartyAudio`). Player actions go through `BuildController`-style intent methods, then Core commands.
 - Game code reads input only through `InputService` / `GameAction`. No hover-only interactions; everything must work with a gamepad.

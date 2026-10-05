@@ -76,7 +76,8 @@ public class AnimationLibraryTests
     [Fact]
     public void ShippedAnimations_FitTheirChoreographySteps()
     {
-        // Guards the real data: every clip must fit inside the step it plays in.
+        // Guards the real data: every step clip fills its step exactly, so it ends on
+        // the beat its step ends (e.g. Death React finishes before the line steps up).
         string data = Path.Combine(RepoRoot(), "data");
         var library = AnimationLibrary.Parse(File.ReadAllText(Path.Combine(data, AnimationLibrary.FilePath)));
         var tuning = HeroesUnwelcomed.Core.Definitions.GameDefinitions.Parse(

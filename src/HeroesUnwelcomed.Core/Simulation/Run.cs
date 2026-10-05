@@ -165,6 +165,8 @@ public sealed class Run
             Raise(new HeroRespawned(Beat, hero.Id));
         }
 
+        RustAndReviewClasses();
+
         if (Door == DoorState.Open && Rules.Spawn.ShouldSpawn(this))
         {
             SpawnParty();
@@ -342,6 +344,8 @@ public sealed class Run
         Codex.RecordAttempt(hero.Id, room.Kind.Id, result.Success);
         Rules.Growth.Apply(hero, room, result.Success);
         Rules.Ordering.Record(hero, room.Kind, result.Success, Codex);
+        hero.MarkPractised(room.Kind.Category, Beat);
+        ReviewClass(hero);
         party.LastAttemptSucceeded = result.Success;
 
         if (result.Success)
@@ -399,6 +403,50 @@ public sealed class Run
         }
 
         StartAttempt(party, PartyPhase.StepUp);
+    }
+
+    // ---- Specialization -----------------------------------------------------
+
+    // Every tick: skills a hero hasn't practised for a while slowly rust; then
+    // anyone whose skills crossed a class threshold either way gets reviewed.
+    private void RustAndReviewClasses()
+    {
+        Tuning tuning = Definitions.Tuning;
+        double rustPerTick = tuning.SkillRustPerBeat / TicksPerBeat;
+
+        foreach (Hero hero in Heroes.All)
+        {
+            if (rustPerTick > 0)
+            {
+                foreach (RoomCategory category in tuning.SkillRustCategories)
+                {
+                    if (Beat - hero.LastPractised(category) > tuning.SkillRustGraceBeats)
+                    {
+                        hero.Rust(category, rustPerTick);
+                    }
+                }
+            }
+            ReviewClass(hero);
+        }
+    }
+
+    /// <summary>
+    /// One class at a time. Below the threshold (base skill) → lose it. With no
+    /// class → take the first class (in data order) whose threshold is met.
+    /// </summary>
+    private void ReviewClass(Hero hero)
+    {
+        if (hero.Class is { } current && hero.BaseSkill(current.Category) < current.Threshold)
+        {
+            hero.Class = null;
+            Raise(new HeroLostSpecialization(Beat, hero.Id, current.Id));
+        }
+
+        if (hero.Class is null && Definitions.Classes.FirstOrDefault(c => hero.BaseSkill(c.Category) >= c.Threshold) is { } earned)
+        {
+            hero.Class = earned;
+            Raise(new HeroSpecialized(Beat, hero.Id, earned.Id));
+        }
     }
 
     // Survivors of a party that finished without being wiped go back to the pool.

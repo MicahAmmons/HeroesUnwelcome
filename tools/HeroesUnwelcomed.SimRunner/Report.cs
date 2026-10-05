@@ -19,19 +19,19 @@ public static class Report
 
     public static void WriteCsv(IReadOnlyList<RunResult> results, string folder)
     {
-        var runs = new StringBuilder("rule,seed,heroes_won,length_beats,parties,deaths,souls_earned,best_pick_rate\n");
+        var runs = new StringBuilder("rule,seed,heroes_won,length_beats,parties,deaths,souls_earned,best_pick_rate,specializations,specializations_lost,first_specialization_beat\n");
         foreach (RunResult r in results)
         {
-            runs.Append(Invariant, $"{r.Rule},{r.Seed},{r.HeroesWon},{r.LengthBeats},{r.Parties},{r.Deaths},{r.SoulsEarned},{r.BestPickRate:0.####}\n");
+            runs.Append(Invariant, $"{r.Rule},{r.Seed},{r.HeroesWon},{r.LengthBeats},{r.Parties},{r.Deaths},{r.SoulsEarned},{r.BestPickRate:0.####},{r.Specializations},{r.SpecializationsLost},{r.FirstSpecializationBeat}\n");
         }
         File.WriteAllText(Path.Combine(folder, "runs.csv"), runs.ToString());
 
-        var samples = new StringBuilder("rule,seed,beat,avg_combat_skill,avg_trap_skill,avg_boss_skill,souls\n");
+        var samples = new StringBuilder("rule,seed,beat,avg_combat_skill,avg_trap_skill,avg_boss_skill,souls,specialized_heroes\n");
         foreach (RunResult r in results)
         {
             foreach (Sample s in r.Samples)
             {
-                samples.Append(Invariant, $"{r.Rule},{r.Seed},{s.Beat},{s.CombatSkill:0.###},{s.TrapSkill:0.###},{s.BossSkill:0.###},{s.Souls}\n");
+                samples.Append(Invariant, $"{r.Rule},{r.Seed},{s.Beat},{s.CombatSkill:0.###},{s.TrapSkill:0.###},{s.BossSkill:0.###},{s.Souls},{s.Specialized}\n");
             }
         }
         File.WriteAllText(Path.Combine(folder, "samples.csv"), samples.ToString());
@@ -62,6 +62,11 @@ public static class Report
                     survival = Survival(mine, maxBeats),
                     combat = MeanCurve(mine, sampleEvery, maxBeats, s => s.CombatSkill),
                     trap = MeanCurve(mine, sampleEvery, maxBeats, s => s.TrapSkill),
+                    specialized = MeanCurve(mine, sampleEvery, maxBeats, s => s.Specialized),
+                    firstClassBeat = mine.Any(r => r.FirstSpecializationBeat is not null)
+                        ? Math.Round(Median(mine.Where(r => r.FirstSpecializationBeat is not null).Select(r => r.FirstSpecializationBeat!.Value)))
+                        : (double?)null,
+                    avgClassesLost = Math.Round(mine.Average(r => r.SpecializationsLost), 1),
                     kills = kinds.Select(kind =>
                     {
                         int attempts = mine.Sum(r => r.ByRoomKind.TryGetValue(kind, out var k) ? k.Attempts : 0);
@@ -195,6 +200,13 @@ public static class Report
       <div><h2 style="font-size:14px">Combat</h2><div class="chart" id="combat"></div></div>
       <div><h2 style="font-size:14px">Trap</h2><div class="chart" id="trap"></div></div>
     </div>
+  </section>
+
+  <section class="card">
+    <h2>Specialized heroes over time</h2>
+    <p class="note">Average number of heroes holding a class (Warrior, Thief...) at each moment, across runs still going.</p>
+    <div class="legend" id="legend-classes"></div>
+    <div class="chart" id="specialized"></div>
   </section>
 
   <section class="card">
@@ -338,10 +350,12 @@ document.getElementById("tiles").innerHTML = DATA.rules.map((r, i) => `
       <div class="stat"><div class="v">${num(r.medianBeats)}</div><div class="l">median beats to win</div></div>
       <div class="stat"><div class="v">${pct(r.bestPick)}</div><div class="l">huddles sent the best hero first</div></div>
       <div class="stat"><div class="v">${num(r.avgDeaths)}</div><div class="l">hero deaths per run</div></div>
+      <div class="stat"><div class="v">${num(r.firstClassBeat)}</div><div class="l">median beat of first class</div></div>
+      <div class="stat"><div class="v">${num(r.avgClassesLost)}</div><div class="l">classes lost to rust per run</div></div>
     </div>
   </div>`).join("");
 
-["legend-survival", "legend-skill", "legend-kills"].forEach(legend);
+["legend-survival", "legend-skill", "legend-classes", "legend-kills"].forEach(legend);
 const beatFmt = v => num(Math.round(v)) + " b";
 lineChart("survival", DATA.rules.map((r, i) => ({ name: r.name, color: COLORS[i], points: r.survival })),
   { yMax: 1, yFormat: pct, xFormat: beatFmt });
@@ -349,13 +363,15 @@ const skillMax = niceMax(Math.max(...DATA.rules.flatMap(r => [...r.combat, ...r.
 ["combat", "trap"].forEach(key => lineChart(key,
   DATA.rules.map((r, i) => ({ name: r.name, color: COLORS[i], points: r[key] })),
   { yMax: skillMax, yFormat: v => v.toFixed(1), xFormat: beatFmt }));
+lineChart("specialized", DATA.rules.map((r, i) => ({ name: r.name, color: COLORS[i], points: r.specialized })),
+  { yFormat: v => v.toFixed(1), xFormat: beatFmt });
 const kinds = DATA.rules[0].kills.map(k => k.kind);
 barChart("kills", kinds, DATA.rules.map((r, i) => ({
   name: r.name, color: COLORS[i], values: r.kills.map(k => k.rate), counts: r.kills.map(k => k.attempts) })), { yFormat: pct });
 
 document.getElementById("table").innerHTML =
-  `<tr><th>Rule</th><th>Runs</th><th>Heroes won</th><th>Median beats</th><th>Best pick</th><th>Deaths/run</th><th>Parties/run</th><th>Souls/run</th></tr>` +
-  DATA.rules.map(r => `<tr><td>${r.name}</td><td>${r.runs}</td><td>${r.won}</td><td>${num(r.medianBeats)}</td><td>${pct(r.bestPick)}</td><td>${r.avgDeaths}</td><td>${r.avgParties}</td><td>${r.avgSouls}</td></tr>`).join("");
+  `<tr><th>Rule</th><th>Runs</th><th>Heroes won</th><th>Median beats</th><th>Best pick</th><th>Deaths/run</th><th>Parties/run</th><th>Souls/run</th><th>First class</th></tr>` +
+  DATA.rules.map(r => `<tr><td>${r.name}</td><td>${r.runs}</td><td>${r.won}</td><td>${num(r.medianBeats)}</td><td>${pct(r.bestPick)}</td><td>${r.avgDeaths}</td><td>${r.avgParties}</td><td>${r.avgSouls}</td><td>${num(r.firstClassBeat)}</td></tr>`).join("");
 </script>
 </body>
 </html>

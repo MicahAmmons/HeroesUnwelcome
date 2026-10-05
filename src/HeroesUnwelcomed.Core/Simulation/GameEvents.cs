@@ -51,6 +51,12 @@ public sealed record HeroDied(double Beat, int PartyId, int HeroId, int RoomId, 
 
 public sealed record HeroRespawned(double Beat, int HeroId) : GameEvent(Beat);
 
+/// <summary>A hero's base skill reached a class threshold: they're now a <paramref name="ClassId"/>.</summary>
+public sealed record HeroSpecialized(double Beat, int HeroId, string ClassId) : GameEvent(Beat);
+
+/// <summary>A hero's base skill rusted below their class threshold: they're no longer a <paramref name="ClassId"/>.</summary>
+public sealed record HeroLostSpecialization(double Beat, int HeroId, string ClassId) : GameEvent(Beat);
+
 // ---- Player and economy ---------------------------------------------------
 
 /// <summary>The soul balance changed. Positive = earned, negative = spent.</summary>

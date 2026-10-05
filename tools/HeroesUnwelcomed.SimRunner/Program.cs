@@ -23,7 +23,8 @@ const double sampleEvery = 50;
 GameDefinitions definitions = GameDefinitions.Parse(
     File.ReadAllText(Path.Combine(dataFolder, "rooms.json")),
     File.ReadAllText(Path.Combine(dataFolder, "tuning.json")),
-    File.ReadAllText(Path.Combine(dataFolder, "heroes.json")));
+    File.ReadAllText(Path.Combine(dataFolder, "heroes.json")),
+    File.Exists(Path.Combine(dataFolder, "classes.json")) ? File.ReadAllText(Path.Combine(dataFolder, "classes.json")) : null);
 RunSetup setup = GameDefinitions.ParseSetup(File.ReadAllText(Path.Combine(dataFolder, "run-setup.json")));
 
 Console.WriteLine($"Simulating {runs} runs x {rules.Length} rules (up to {maxBeats} beats each) using {dataFolder}");

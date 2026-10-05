@@ -24,7 +24,10 @@ public sealed record RunMetrics(
     int SoulsEarned,
     int SoulsSpent,
     IReadOnlyDictionary<string, RoomKindStats> ByRoomKind,
-    IReadOnlyDictionary<int, int> DeathsByRoomId)
+    IReadOnlyDictionary<int, int> DeathsByRoomId,
+    int Specializations,
+    int SpecializationsLost,
+    double? FirstSpecializationBeat)
 {
     public static RunMetrics From(Run run)
     {
@@ -54,6 +57,9 @@ public sealed record RunMetrics(
             souls.Where(s => s.Amount > 0).Sum(s => s.Amount),
             -souls.Where(s => s.Amount < 0).Sum(s => s.Amount),
             byKind,
-            deaths.GroupBy(d => d.RoomId).ToDictionary(g => g.Key, g => g.Count()));
+            deaths.GroupBy(d => d.RoomId).ToDictionary(g => g.Key, g => g.Count()),
+            events.OfType<HeroSpecialized>().Count(),
+            events.OfType<HeroLostSpecialization>().Count(),
+            events.OfType<HeroSpecialized>().FirstOrDefault()?.Beat);
     }
 }

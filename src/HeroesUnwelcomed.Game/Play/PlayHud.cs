@@ -132,7 +132,8 @@ public sealed class PlayHud(GameServices services)
             double reputation = run.Codex.Get(hero.Id, room.Kind.Id)?.Reputation ?? 0;
             bool dead = hero.State == HeroState.Dead;
             var at = new Vector2(panel.X + 20 + i * columnWidth, panel.Y + 54);
-            Draw.Text(batch, $"{i + 1}. {hero.Name}{(dead ? " (dead)" : "")}", at, dead ? Muted : Color.White, 0.5f);
+            string heroClass = hero.Class is { } c ? $" [{c.Id}]" : "";
+            Draw.Text(batch, $"{i + 1}. {hero.Name}{heroClass}{(dead ? " (dead)" : "")}", at, dead ? Muted : hero.Class is null ? Color.White : Color.Gold, 0.5f);
             Draw.Text(batch, $"rep {reputation:+0.0;-0.0;0}   skill {hero.Skill(room.Kind.Category):0.0}", at + new Vector2(22, 36), Muted, 0.42f);
         }
     }

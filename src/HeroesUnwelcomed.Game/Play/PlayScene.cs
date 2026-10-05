@@ -266,9 +266,17 @@ public sealed class PlayScene : IScene
         _choreographer.Handle(gameEvent);
         _partyAudio.Handle(gameEvent);
 
-        if (gameEvent is RunEnded ended)
+        switch (gameEvent)
         {
-            _hud.Toast($"{_run.Heroes.ById(ended.WinningHeroId).Name} reached the treasure!", _seconds);
+            case RunEnded ended:
+                _hud.Toast($"{_run.Heroes.ById(ended.WinningHeroId).Name} reached the treasure!", _seconds);
+                break;
+            case HeroSpecialized promoted:
+                _hud.Toast($"{_run.Heroes.ById(promoted.HeroId).Name} became a {promoted.ClassId}!", _seconds);
+                break;
+            case HeroLostSpecialization lost:
+                _hud.Toast($"{_run.Heroes.ById(lost.HeroId).Name} is no longer a {lost.ClassId}: out of practice.", _seconds);
+                break;
         }
     }
 
@@ -283,7 +291,9 @@ public sealed class PlayScene : IScene
             int top = (int)(feet.Y - view.Animator.Entity.Size.Y * WorldLayout.SpriteScale);
             var nameArea = new Rectangle((int)feet.X - 250, top - 120, 500, 70);
             float nameScale = DungeonRenderer.ScreenSteadyScale(0.75f, _camera.Zoom, 1.6f);
-            _services.Draw.TextCentered(batch, view.Name, nameArea, Color.White, nameScale);
+            string? heroClass = _run.Heroes.ById(view.HeroId).Class?.Id;
+            string label = heroClass is null ? view.Name : $"{view.Name} ({heroClass})";
+            _services.Draw.TextCentered(batch, label, nameArea, heroClass is null ? Color.White : Color.Gold, nameScale);
         }
     }
 

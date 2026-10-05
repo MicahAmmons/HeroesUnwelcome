@@ -34,6 +34,15 @@
   "skillOnWin": 0.05,
   "skillOnLoss": 0.3,
 
+  // Rust: once a hero hasn't attempted a category for this many beats, that skill
+  // drops by skillRustPerBeat each beat (never below their starting value).
+  // Only the listed categories rust (Boss is only practised at the treasure room).
+  // SimRunner comparison (200 runs): 120/0.005 → heroes won 17/200; 200/0.002 → 191/200,
+  // ~7 classes earned and ~4 lost per run; no rust → 200/200, nothing ever lost.
+  "skillRustGraceBeats": 200,
+  "skillRustPerBeat": 0.002,
+  "skillRustCategories": ["Combat", "Trap"],
+
   // "reputation" ordering rule: reputation change per result.
   "reputationOnWin": 1.0,
   "reputationOnLoss": 0.5,

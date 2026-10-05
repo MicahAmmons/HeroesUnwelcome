@@ -6,9 +6,10 @@
   //   loop           true = repeats; false = plays once, then holds its last frame
   //   clock          "music" keeps moving while paused (idles); "sim" freezes while paused (everything else)
   //
-  // Choreography rule: each step in data/game/tuning.json has a fixed length. A clip
-  // shorter than its step holds its last frame; a longer one gets cut off (the dev
-  // panel's Run inspector lists any that are too long).
+  // Choreography rule: each step in data/game/tuning.json has a fixed length, and step
+  // clips should fill it exactly (frames x beatsPerFrame = the step's beats), so they end
+  // on the beat. A shorter clip holds its last frame; a longer one gets cut off (the dev
+  // panel's Run inspector lists both).
   //
   // Heroes:     Idle, Walk, EncounterEntrance, Ready, Fight / Disarm / Puzzle / Magic,
   //             Victory, VictoryReact, Death, DeathReact, PortalEntrance, PortalExit
@@ -20,16 +21,16 @@
       "clips": {
         "Idle": { "frames": 3, "beatsPerFrame": 1, "loop": true, "clock": "music" },
         "Walk": { "frames": 3, "beatsPerFrame": 0.5, "loop": true, "clock": "sim" },
-        "EncounterEntrance": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Ready": { "frames": 3, "beatsPerFrame": 0.33, "loop": false, "clock": "sim" },
-        "Fight": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Disarm": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Puzzle": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Magic": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Victory": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "VictoryReact": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Death": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "DeathReact": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "EncounterEntrance": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Ready": { "frames": 2, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Fight": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Disarm": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Puzzle": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Magic": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Victory": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "VictoryReact": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Death": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "DeathReact": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
         "PortalEntrance": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
         "PortalExit": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
       }
@@ -39,11 +40,11 @@
       "size": [180, 200],
       "clips": {
         "Idle": { "frames": 3, "beatsPerFrame": 1, "loop": true, "clock": "music" },
-        "HeroEnter": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Ready": { "frames": 3, "beatsPerFrame": 0.33, "loop": false, "clock": "sim" },
-        "Interact": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Victory": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Defeat": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
+        "HeroEnter": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Ready": { "frames": 2, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Interact": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Victory": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Defeat": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
       }
     },
     "Orc": {
@@ -51,11 +52,11 @@
       "size": [220, 260],
       "clips": {
         "Idle": { "frames": 3, "beatsPerFrame": 1, "loop": true, "clock": "music" },
-        "HeroEnter": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Ready": { "frames": 3, "beatsPerFrame": 0.33, "loop": false, "clock": "sim" },
-        "Interact": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Victory": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Defeat": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
+        "HeroEnter": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Ready": { "frames": 2, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Interact": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Victory": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Defeat": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
       }
     },
     "Vampire": {
@@ -63,11 +64,11 @@
       "size": [200, 300],
       "clips": {
         "Idle": { "frames": 3, "beatsPerFrame": 2, "loop": true, "clock": "music" },
-        "HeroEnter": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Ready": { "frames": 3, "beatsPerFrame": 0.33, "loop": false, "clock": "sim" },
-        "Interact": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Victory": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Defeat": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
+        "HeroEnter": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Ready": { "frames": 2, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Interact": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Victory": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Defeat": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
       }
     },
     "SpikeTrap": {
@@ -75,11 +76,11 @@
       "size": [260, 110],
       "clips": {
         "Idle": { "frames": 3, "beatsPerFrame": 1, "loop": true, "clock": "music" },
-        "HeroEnter": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Ready": { "frames": 3, "beatsPerFrame": 0.33, "loop": false, "clock": "sim" },
-        "Interact": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Victory": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Defeat": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
+        "HeroEnter": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Ready": { "frames": 2, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Interact": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Victory": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Defeat": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
       }
     },
     "PitFall": {
@@ -87,11 +88,11 @@
       "size": [300, 90],
       "clips": {
         "Idle": { "frames": 3, "beatsPerFrame": 2, "loop": true, "clock": "music" },
-        "HeroEnter": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Ready": { "frames": 3, "beatsPerFrame": 0.33, "loop": false, "clock": "sim" },
-        "Interact": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Victory": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Defeat": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
+        "HeroEnter": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Ready": { "frames": 2, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Interact": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Victory": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Defeat": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
       }
     },
     // The treasure room's guardian: the player's avatar.
@@ -100,11 +101,11 @@
       "size": [240, 360],
       "clips": {
         "Idle": { "frames": 3, "beatsPerFrame": 2, "loop": true, "clock": "music" },
-        "HeroEnter": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Ready": { "frames": 3, "beatsPerFrame": 0.33, "loop": false, "clock": "sim" },
-        "Interact": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Victory": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
-        "Defeat": { "frames": 3, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
+        "HeroEnter": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Ready": { "frames": 2, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Interact": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Victory": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" },
+        "Defeat": { "frames": 4, "beatsPerFrame": 0.5, "loop": false, "clock": "sim" }
       }
     }
   }

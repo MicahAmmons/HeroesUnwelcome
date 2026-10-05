@@ -20,8 +20,13 @@ public sealed class GameDefinitions
 
     private readonly Dictionary<string, RoomKind> _rooms;
 
-    public GameDefinitions(IEnumerable<RoomKind> rooms, Tuning tuning, HeroGeneration heroes)
+    public GameDefinitions(IEnumerable<RoomKind> rooms, Tuning tuning, HeroGeneration heroes, IEnumerable<HeroClass>? classes = null)
     {
+        Classes = classes?.ToList() ?? [];
+        if (Classes.Select(c => c.Id).Distinct().Count() != Classes.Count)
+        {
+            throw new InvalidDataException("Two hero classes have the same name.");
+        }
         _rooms = [];
         foreach (RoomKind room in rooms)
         {
@@ -42,17 +47,21 @@ public sealed class GameDefinitions
     public Tuning Tuning { get; }
     public HeroGeneration Heroes { get; }
 
+    /// <summary>Classes heroes can specialize into, in priority order (if two qualify at once, the earlier one wins).</summary>
+    public IReadOnlyList<HeroClass> Classes { get; }
+
     public RoomKind Room(string id) =>
         _rooms.TryGetValue(id, out var kind) ? kind : throw new KeyNotFoundException($"No room kind named '{id}'.");
 
     public bool HasRoom(string id) => _rooms.ContainsKey(id);
 
-    public static GameDefinitions Parse(string roomsJson, string tuningJson, string heroesJson)
+    public static GameDefinitions Parse(string roomsJson, string tuningJson, string heroesJson, string? classesJson = null)
     {
         var rooms = Deserialize<RoomsFile>(roomsJson, "rooms").Rooms;
         var tuning = Deserialize<Tuning>(tuningJson, "tuning");
         var heroes = Deserialize<HeroGeneration>(heroesJson, "heroes");
-        return new GameDefinitions(rooms, tuning, heroes);
+        var classes = classesJson is null ? [] : Deserialize<ClassesFile>(classesJson, "classes").Classes;
+        return new GameDefinitions(rooms, tuning, heroes, classes);
     }
 
     public static RunSetup ParseSetup(string json) => Deserialize<RunSetup>(json, "run setup");
@@ -71,6 +80,8 @@ public sealed class GameDefinitions
     }
 
     private sealed record RoomsFile(IReadOnlyList<RoomKind> Rooms);
+
+    private sealed record ClassesFile(IReadOnlyList<HeroClass> Classes);
 
     // Lets JSON write grid positions compactly as [x, y].
     private sealed class GridPointConverter : JsonConverter<GridPoint>

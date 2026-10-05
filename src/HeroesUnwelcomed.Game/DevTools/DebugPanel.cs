@@ -133,9 +133,9 @@ public sealed class DebugPanel
         }
 
         ImGui.SeparatorText("Heroes");
-        if (ImGui.BeginTable("heroes", 6, ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInnerH | ImGuiTableFlags.SizingStretchProp))
+        if (ImGui.BeginTable("heroes", 7, ImGuiTableFlags.RowBg | ImGuiTableFlags.BordersInnerH | ImGuiTableFlags.SizingStretchProp))
         {
-            foreach (string column in new[] { "Name", "State", "Combat", "Trap", "Boss", "Deaths" })
+            foreach (string column in new[] { "Name", "Class", "State", "Combat", "Trap", "Boss", "Deaths" })
             {
                 ImGui.TableSetupColumn(column);
             }
@@ -144,10 +144,11 @@ public sealed class DebugPanel
             {
                 ImGui.TableNextRow();
                 ImGui.TableNextColumn(); ImGui.Text(hero.Name);
+                ImGui.TableNextColumn(); ImGui.Text(hero.Class?.Id ?? "-");
                 ImGui.TableNextColumn(); ImGui.Text(hero.State == HeroState.Dead ? $"Dead ({hero.RespawnAtBeat - run.Beat:0})" : hero.State.ToString());
-                ImGui.TableNextColumn(); ImGui.Text($"{hero.Skill(RoomCategory.Combat):0.00}");
-                ImGui.TableNextColumn(); ImGui.Text($"{hero.Skill(RoomCategory.Trap):0.00}");
-                ImGui.TableNextColumn(); ImGui.Text($"{hero.Skill(RoomCategory.Boss):0.00}");
+                ImGui.TableNextColumn(); ImGui.Text($"{hero.BaseSkill(RoomCategory.Combat):0.00}");
+                ImGui.TableNextColumn(); ImGui.Text($"{hero.BaseSkill(RoomCategory.Trap):0.00}");
+                ImGui.TableNextColumn(); ImGui.Text($"{hero.BaseSkill(RoomCategory.Boss):0.00}");
                 ImGui.TableNextColumn(); ImGui.Text(hero.Deaths.ToString());
             }
             ImGui.EndTable();

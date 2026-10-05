@@ -77,7 +77,7 @@ Developer tools live in `src/HeroesUnwelcomed.Game/DevTools/` and are compiled *
 - **M3.5: Choreography** ✅. Beat-scripted encounter flow (see below), party moves as one formation, banner reorder, room anchor points as data, the full animation vocabulary, choreography length check, no-overlap tests.
 - **M4:** Multiple parties polish (most of it already works: queueing, waiting, auto spawning).
 - **M5: Music reacting to parties** ✅. Influence-weighted stem reactions (strongest wins, on the beat), positional party sounds, Local/Global music mode, placeholder sound effects, reactions as data.
-- **M6:** Specialization into classes, balance pass.
+- **M6: Specialization** ✅. Classes from data (Warrior/Combat, Thief/Trap), flat skill bonus, skill rust, one class at a time (first reached), promotion/demotion events, labels, SimRunner specialization chart. Balance pass to follow once targets are set.
 - **Later:** save mid-run, hero pool screen, costs, music brief for the composer, real art, Steam integration, Deck Verified, mobile port.
 
 ## How the game logic works (M2)
@@ -87,6 +87,15 @@ Developer tools live in `src/HeroesUnwelcomed.Game/DevTools/` and are compiled *
 - **Determinism:** one seed → forked random streams (`heroes`, `challenge`, `party-selection`). The same seed plus the recorded commands at their beats reproduces a run exactly (tested).
 - **Events** (`GameEvent` records) are the only output. Visuals, audio and metrics subscribe to `Run.EventRaised`; `RunMetrics` is calculated purely from `Run.Events`.
 - **Data:** `data/game/rooms.json`, `tuning.json`, `heroes.json`, `run-setup.json`. Core parses JSON text but never touches files; callers load the text.
+
+## Specialization (M6)
+
+- **Classes** (`data/game/classes.json`): Warrior (Combat) and Thief (Trap), threshold 3.5, +0.5 bonus to that skill while held. More classes are just more entries.
+- **Base skill vs skill:** `Hero.BaseSkill` is what practice built; `Hero.Skill` adds the class bonus. Earning and losing a class is judged on base skill, so the bonus can't keep a hero in a class.
+- **One class at a time, whichever is reached first.** If two qualify at once, the one listed first wins. After losing a class, any other already-earned class takes over immediately.
+- **Rust:** a category not attempted for `skillRustGraceBeats` (200) drops `skillRustPerBeat` (0.002) per beat, never below the starting value. Only `skillRustCategories` (Combat, Trap) rust; Boss is only practised at the treasure room, and letting it rust stopped heroes ever winning (17/200 runs).
+- `Run` reviews classes after every attempt and every tick (rust), raising `HeroSpecialized` / `HeroLostSpecialization`. Labels for now: "Name (Class)" in gold, "[Class]" in the rankings bar, promotion/demotion toasts.
+- SimRunner (200 runs, gentle rust): heroes win 191/200, median 5,419 beats; first class around beat 760; ~7 classes earned and ~4 lost per run.
 
 ## Music reacting to parties (M5)
 

@@ -16,19 +16,30 @@ public enum HeroState
 /// One hero. Lives for the whole run: dies, respawns, and keeps everything it learned.
 /// </summary>
 /// <remarks>
+/// <para>
 /// <see cref="Skill"/> is what the hero can actually do, per category. What the
 /// heroes *believe* about each other is kept separately in the <see cref="HeroCodex"/>.
 /// The gap between the two is where the "getting smarter" story lives.
+/// </para>
+/// <para>
+/// <b>Base skill vs. skill.</b> <see cref="BaseSkill"/> is what practice has built.
+/// <see cref="Skill"/> adds the bonus of the hero's class, if any. Earning and
+/// losing a class is judged on base skill, so a class's own bonus can never
+/// keep a hero in it.
+/// </para>
 /// </remarks>
 public sealed class Hero
 {
     private readonly Dictionary<RoomCategory, double> _skills;
+    private readonly Dictionary<RoomCategory, double> _startingSkills;
+    private readonly Dictionary<RoomCategory, double> _lastPractised = [];
 
     internal Hero(int id, string name, Dictionary<RoomCategory, double> skills)
     {
         Id = id;
         Name = name;
         _skills = skills;
+        _startingSkills = new Dictionary<RoomCategory, double>(skills);
     }
 
     public int Id { get; }
@@ -39,11 +50,37 @@ public sealed class Hero
     public int Deaths { get; internal set; }
     public int RoomsCleared { get; internal set; }
 
+    /// <summary>Base skills (without any class bonus).</summary>
     public IReadOnlyDictionary<RoomCategory, double> Skills => _skills;
 
-    public double Skill(RoomCategory category) => _skills.GetValueOrDefault(category);
+    /// <summary>The hero's class (Warrior, Thief...), or null if not specialized.</summary>
+    public HeroClass? Class { get; internal set; }
 
-    internal void AddSkill(RoomCategory category, double amount) => _skills[category] = Skill(category) + amount;
+    /// <summary>Skill built by practice, without any class bonus.</summary>
+    public double BaseSkill(RoomCategory category) => _skills.GetValueOrDefault(category);
+
+    /// <summary>Effective skill: base skill plus the class bonus if the class is about this category.</summary>
+    public double Skill(RoomCategory category) =>
+        BaseSkill(category) + (Class is { } c && c.Category == category ? c.SkillBonus : 0);
+
+    /// <summary>The skill rust can't go below.</summary>
+    public double StartingSkill(RoomCategory category) => _startingSkills.GetValueOrDefault(category);
+
+    /// <summary>Game beat this hero last attempted a room of <paramref name="category"/> (0 if never).</summary>
+    public double LastPractised(RoomCategory category) => _lastPractised.GetValueOrDefault(category);
+
+    internal void AddSkill(RoomCategory category, double amount) => _skills[category] = BaseSkill(category) + amount;
+
+    internal void MarkPractised(RoomCategory category, double beat) => _lastPractised[category] = beat;
+
+    /// <summary>Lowers a skill by <paramref name="amount"/>, but never below the starting value.</summary>
+    internal void Rust(RoomCategory category, double amount)
+    {
+        if (_skills.TryGetValue(category, out double skill))
+        {
+            _skills[category] = Math.Max(StartingSkill(category), skill - amount);
+        }
+    }
 
     public override string ToString() => $"{Name}#{Id}";
 }
