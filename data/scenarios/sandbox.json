@@ -1,0 +1,5 @@
+{
+  // Input playground: move one selection with keyboard, gamepad or mouse.
+  "description": "Input playground. One selection that keyboard, gamepad and mouse all move. Preview of how picking a dungeon room will work.",
+  "scene": "sandbox"
+}

@@ -40,3 +40,7 @@ AppPackages/
 
 # OneDrive temp files
 ~$*
+
+# Dev tools output
+imgui.ini
+Screenshots/

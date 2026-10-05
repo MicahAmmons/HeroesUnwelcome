@@ -1,0 +1,5 @@
+{
+  // Pinned panels at all nine anchors. Try different window sizes from the Dev Tools panel.
+  "description": "UI scaling check. A panel at each of the nine anchors plus the 1920x1080 reference outline. Change window size to see the layout adapt.",
+  "scene": "ui-layout"
+}

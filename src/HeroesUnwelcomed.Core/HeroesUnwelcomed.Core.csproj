@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    The game's rules and state: heroes, rooms, parties, souls.
+    Deliberately has NO reference to MonoGame. Nothing in here can draw,
+    play sound or read input, which keeps it testable, simulatable and
+    saveable.
+  -->
+  <ItemGroup>
+    <InternalsVisibleTo Include="HeroesUnwelcomed.Core.Tests" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    The Windows / macOS / Linux / Steam Deck launcher. Intentionally tiny:
+    it reads launch arguments and starts the shared game.
+  -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>HeroesUnwelcomed</AssemblyName>
+    <RollForward>Major</RollForward>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <TieredCompilation>false</TieredCompilation>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Icon.ico" />
+    <None Remove="Icon.bmp" />
+    <EmbeddedResource Include="Icon.ico" LogicalName="Icon.ico" />
+    <EmbeddedResource Include="Icon.bmp" LogicalName="Icon.bmp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HeroesUnwelcomed.Game\HeroesUnwelcomed.Game.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.DesktopGL" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" />
+  </ItemGroup>
+
+  <!-- Art, fonts and audio are compiled from the shared Game project's content file. -->
+  <ItemGroup>
+    <MonoGameContentReference Include="..\HeroesUnwelcomed.Game\Content\Content.mgcb" />
+  </ItemGroup>
+
+  <!-- JSON data (scenarios, tuning) lives at the repo root in /data and is copied next to the exe as /Data. -->
+  <ItemGroup>
+    <Content Include="..\..\data\**\*.json" LinkBase="Data" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,19 @@
+{
+  "profiles": {
+    "Sandbox": {
+      "commandName": "Project",
+      "commandLineArgs": "--scenario sandbox"
+    },
+    "UI Layout (1080p)": {
+      "commandName": "Project",
+      "commandLineArgs": "--scenario ui-layout --window 1920x1080"
+    },
+    "UI Layout (Steam Deck 1280x800)": {
+      "commandName": "Project",
+      "commandLineArgs": "--scenario ui-layout --window 1280x800"
+    },
+    "Game (no scenario)": {
+      "commandName": "Project"
+    }
+  }
+}

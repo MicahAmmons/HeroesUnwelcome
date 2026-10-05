@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Everything the player sees and hears: rendering, animation, audio, input,
+    UI. Shared by every platform launcher (Desktop now; iOS/Android later).
+  -->
+  <ItemGroup>
+    <ProjectReference Include="..\HeroesUnwelcomed.Core\HeroesUnwelcomed.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- PrivateAssets: each launcher brings its own platform's MonoGame. -->
+    <PackageReference Include="MonoGame.Framework.DesktopGL" PrivateAssets="All" />
+  </ItemGroup>
+
+  <!--
+    Developer tools (debug panel, scenarios, screenshot capture) exist only in
+    Debug builds. In Release they are not compiled at all, so they can never
+    ship to players.
+  -->
+  <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <PackageReference Include="ImGui.NET" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)' != 'Debug'">
+    <Compile Remove="DevTools\**" />
+  </ItemGroup>
+</Project>
