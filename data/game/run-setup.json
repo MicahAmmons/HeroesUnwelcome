@@ -1,0 +1,24 @@
+{
+  // How a new run starts. Scenarios and the SimRunner can override parts of this.
+  "seed": 12345,
+  "gridWidth": 8,
+  "gridHeight": 5,
+
+  // In order: entrance first, treasure (Boss) last. Facing defaults to Right.
+  "rooms": [
+    { "kind": "Entrance", "position": [0, 2] },
+    { "kind": "Goblin",   "position": [1, 2] },
+    { "kind": "Goblin",   "position": [2, 2] },
+    { "kind": "Goblin",   "position": [3, 2] },
+    { "kind": "LichLord", "position": [4, 2] }
+  ],
+
+  "heroPoolSize": 5,
+  "partySize": 4,
+  "startingSouls": 20,
+
+  // "ladder" (win = up a place, lose = down a place) or "reputation" (numeric score).
+  "orderingRule": "ladder",
+  // "manual" (only when sent) or "auto" (pool + gap rule).
+  "spawnRule": "manual"
+}

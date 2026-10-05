@@ -1,0 +1,11 @@
+{
+  // Hero generation. Names are drawn without repeats.
+  "names": [
+    "Brakka", "Elric", "Mira", "Thorne", "Sable", "Quill", "Rook", "Ysolde",
+    "Garrick", "Fenna", "Osric", "Lark", "Tamsin", "Bram", "Isolde", "Corwin",
+    "Nyx", "Hale", "Wren", "Darrow", "Pell", "Juniper", "Voss", "Ember"
+  ],
+  // Starting skill per category, nudged randomly by up to +/- skillVariation.
+  "startingSkill": { "Combat": 1.0, "Trap": 1.0, "Boss": 0.5 },
+  "skillVariation": 0.3
+}

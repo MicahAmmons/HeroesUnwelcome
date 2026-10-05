@@ -26,6 +26,8 @@ Add `--screenshot-devtools` to include the ImGui panel. Check visual changes at 
 
 - `HeroesUnwelcomed.Core` and `HeroesUnwelcomed.Audio` must never reference MonoGame.
 - Anything that moves is timed in beats from `AudioEngine.Time` (`BeatTime`), never in seconds or frames. Actions use the sim (game) beat; ambient loops use the music beat.
+- Game logic lives in `Core` (`Run`): change state only through `GameCommand`s, report changes only through `GameEvent`s, keep it deterministic (fixed ticks, seeded forks, no wall-clock time, stable iteration order). Every tunable number belongs in `data/game/*.json`.
+- After changing game logic or balance data, run the SimRunner (`dotnet run --project tools/HeroesUnwelcomed.SimRunner -- --runs 200`) and compare.
 - No static managers for game state; pass dependencies in (see `GameServices`).
 - Game code reads input only through `InputService` / `GameAction`. No hover-only interactions; everything must work with a gamepad.
 - UI is laid out in UI units on `UiCanvas` and anchored with `UiCanvas.Place`.

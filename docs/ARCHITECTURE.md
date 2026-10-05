@@ -28,11 +28,12 @@ Undecided design questions are isolated behind replaceable rules, so changing on
 
 | Rule | First version | Planned alternatives |
 |---|---|---|
-| Room order | Build order | Preset grid path, player-defined |
-| Party spawning | Manual "send next party" | Pool size + 2-room gap + all-dead fallback |
-| Run end | First party reaches treasure | Treasure health, X heroes through |
-| Challenge outcome | Skill vs room stat + luck | Anything |
-| Growth | Skill up on a loss, reputation up on a win | Anything |
+| Room order | `BuildOrderRule`: new rooms go just before the treasure room | Preset grid path, player-defined |
+| Party spawning | `ManualSpawnRule` (debug "send next party") and `PoolAndGapSpawnRule` (pool full + newest party ≥ 2 rooms in; all dead → send whoever's ready) | Anything |
+| Run end | `TreasureDefeatedRule`: first hero to beat the treasure room | Treasure health, X heroes through |
+| Challenge outcome | `LogisticChallengeRule`: chance = 1/(1+e^−(skill−difficulty)/steepness) | Anything |
+| Growth | `PracticeGrowthRule`: skill +0.3 on a loss, +0.05 on a win, in the room's category | Anything |
+| Huddle order | `LadderOrderingRule` (win = up one place, loss = down one) and `ReputationOrderingRule` (numeric score, category fallback, tie-break by skill → deaths → id) | Decided by SimRunner results |
 
 ## Design decisions so far
 
@@ -40,7 +41,8 @@ Undecided design questions are isolated behind replaceable rules, so changing on
 - **Room cells** are half travel area, half room. Rooms can be flipped so heroes travel left or right.
 - **Door lock cycle:** Open → Locking (no new parties; current ones finish) → Locked (building allowed) → Open.
 - **Pause** freezes Core (no ticks). Actors show idle animations and resume exactly where they were. Pause has calmer music.
-- **Heroes:** per-room-type *skill* (grows with practice) and per-room-type *reputation* (the party's belief about who's best, which orders the huddle; it can be wrong for a while).
+- **Heroes:** *skill* per category (what they can actually do; grows with practice). Reputation (what the heroes *believe*) lives in the **Hero Codex**, per hero per room *kind* (Goblin, Pit Fall), shared by all rooms of that kind. Rooms ask the codex "rank the heroes for me"; heroes ask "what am I known for?".
+- **Treasure room = the player's avatar** (lich lord, dragon…; skins later): a Boss-category challenge that can be upgraded. Beating it ends the run.
 - **Multiple parties:** each room holds one party at a time; later parties wait (idle) at the previous room.
 - **Economy and metrics:** souls go through a ledger where every gain and spend is recorded. Costs live in data (zero at first). Metrics are an event log, so future prestige formulas are just maths over it. Runs are self-contained for now.
 - **Music:** one global beat (from game speed) that never stops. One shared track made of stems. Parties request *augments* (cut stems, play stingers) weighted by their camera-based *influence*, and the strongest request wins. Party sounds play with volume and stereo pan by proximity. Global or Local mode is a player option.
@@ -59,7 +61,7 @@ Undecided design questions are isolated behind replaceable rules, so changing on
 | `tests/HeroesUnwelcomed.Core.Tests` | xUnit tests for Core. |
 | `tests/HeroesUnwelcomed.Audio.Tests` | Sample-accurate tests for the music system. |
 | `tests/HeroesUnwelcomed.Game.Tests` | Tests for Game logic that needs no window (animation timing, data parsing). |
-| `tools/HeroesUnwelcomed.SimRunner` *(M2)* | Runs thousands of runs without graphics and outputs balance charts. |
+| `tools/HeroesUnwelcomed.SimRunner` | Plays hundreds of runs without graphics (bot dungeon master) and writes CSVs + an HTML balance report to `sim-output/`. |
 | `data/` | JSON: scenarios, speed levels, animations; rooms, tuning and costs later. Copied next to the exe as `Data/`. Debug builds read the repo's `data/` directly and live-reload it. |
 
 Versions are pinned: .NET SDK in `global.json`, NuGet packages in `Directory.Packages.props`, MonoGame content tools in `.config/dotnet-tools.json` (keep these in sync with the MonoGame packages). Shared build settings are in `Directory.Build.props`.
@@ -70,12 +72,29 @@ Developer tools live in `src/HeroesUnwelcomed.Game/DevTools/` and are compiled *
 
 - **M0: Foundation** ✅. Solution, pinned versions, window that works at any resolution, input actions layer, UI canvas, ImGui dev panel, scenarios + launch profiles, automated screenshots, deterministic random generator + tests.
 - **M1: Beat clock and audio prototype** ✅. Custom mixer that doubles as the master clock, generated placeholder stems per speed level (calm pause track included), speed changes on the beat, stem mute/unmute on the beat, animation system (music/sim clocks, one-shots, rate curves, pause shows idle), animation gallery, live JSON reload.
-- **M2: Core game logic, no graphics.** Grid, build-order rule, connection calculation, flipping, one party: walk → huddle → reorder → attempt; death → souls → respawn; skill/reputation growth; run end; door lock cycle; commands, events, metrics; tests; first SimRunner chart.
+- **M2: Core game logic, no graphics** ✅. Data-driven room kinds/tuning/heroes/run setup (`data/game/`), dungeon grid + order + calculated connections + flipping, hero pool and codex, parties (travel → huddle → reorder → attempt → die/clear → wait/queue), souls ledger, door lock cycle, commands with refusal reasons, event log + replay, metrics, both ordering rules, SimRunner with bot DM and HTML report.
 - **M3: First playable.** Draw Core's state: rooms, hallways/doors/portals, heroes, huddle reorder. Camera. Placing/upgrading rooms with controller and mouse. Debug hero inspector.
 - **M4:** Multiple parties, room queues, waiting idles.
 - **M5:** Music augments by influence, positional sound, Fear animation.
 - **M6:** Specialization into classes, balance pass.
 - **Later:** save mid-run, hero pool screen, costs, music brief for the composer, real art, Steam integration, Deck Verified, mobile port.
+
+## How the game logic works (M2)
+
+- **`Run`** owns everything for one play-through. `AdvanceTo(gameBeat)` steps in fixed ticks (8 per beat); each tick: respawns → spawn rule → step each active party (oldest first) → finish locking the door if empty. `Execute(command)` applies a player command at the current beat or refuses it with a reason.
+- **A party holds** the room it's at or traveling to, so parties never overlap; a party whose next room is held waits where it is.
+- **Determinism:** one seed → forked random streams (`heroes`, `challenge`, `party-selection`). The same seed plus the recorded commands at their beats reproduces a run exactly (tested).
+- **Events** (`GameEvent` records) are the only output. Visuals, audio and metrics subscribe to `Run.EventRaised`; `RunMetrics` is calculated purely from `Run.Events`.
+- **Data:** `data/game/rooms.json`, `tuning.json`, `heroes.json`, `run-setup.json`. Core parses JSON text but never touches files; callers load the text.
+
+### First SimRunner findings (200 runs per rule, default data, bot DM)
+
+| Rule | Heroes won | Median beats to win | Huddle sent the most skilled hero first |
+|---|---|---|---|
+| ladder | 98% | 3,344 | 66% |
+| reputation | 100% | 3,545 | 81% |
+
+The numeric reputation rule picks the truly best hero noticeably more often; the ladder adapts more slowly (one place per result). Both are kept; the choice is open. Balance numbers are placeholders.
 
 ## How time works (M1)
 

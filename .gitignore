@@ -44,3 +44,6 @@ AppPackages/
 # Dev tools output
 imgui.ini
 Screenshots/
+
+# SimRunner reports
+sim-output/

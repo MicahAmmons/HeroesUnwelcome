@@ -1,0 +1,21 @@
+{
+  // Room kinds. Difficulty is compared against a hero's skill in the room's category.
+  //   difficulty          at level 0
+  //   difficultyPerLevel  added per upgrade
+  //   maxLevel            upgrades allowed
+  //   souls               earned each time a hero dies here
+  //   placeCost           souls to build one (placeholder numbers; costs get designed later)
+  //   upgradeCost         first upgrade cost; each next upgrade costs this x the level reached
+  //   buildable           false for the entrance and the treasure room
+  "rooms": [
+    { "id": "Entrance", "category": "Entrance", "buildable": false },
+
+    { "id": "Goblin",     "category": "Combat", "difficulty": 2.0, "difficultyPerLevel": 0.5, "maxLevel": 5, "souls": 3, "placeCost": 10, "upgradeCost": 6 },
+    { "id": "Orc",        "category": "Combat", "difficulty": 2.6, "difficultyPerLevel": 0.6, "maxLevel": 5, "souls": 4, "placeCost": 16, "upgradeCost": 8 },
+    { "id": "SpikeTrap",  "category": "Trap",   "difficulty": 2.2, "difficultyPerLevel": 0.5, "maxLevel": 5, "souls": 3, "placeCost": 12, "upgradeCost": 6 },
+    { "id": "PitFall",    "category": "Trap",   "difficulty": 2.8, "difficultyPerLevel": 0.6, "maxLevel": 5, "souls": 4, "placeCost": 18, "upgradeCost": 8 },
+
+    // The treasure room: the player's avatar. Beating it ends the run.
+    { "id": "LichLord",   "category": "Boss",   "difficulty": 4.0, "difficultyPerLevel": 0.8, "maxLevel": 10, "souls": 10, "upgradeCost": 20, "buildable": false }
+  ]
+}

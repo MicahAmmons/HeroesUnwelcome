@@ -10,4 +10,7 @@
     <Project Path="tests/HeroesUnwelcomed.Core.Tests/HeroesUnwelcomed.Core.Tests.csproj" />
     <Project Path="tests/HeroesUnwelcomed.Game.Tests/HeroesUnwelcomed.Game.Tests.csproj" />
   </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/HeroesUnwelcomed.SimRunner/HeroesUnwelcomed.SimRunner.csproj" />
+  </Folder>
 </Solution>

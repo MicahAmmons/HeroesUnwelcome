@@ -52,6 +52,16 @@ A 2D reverse-dungeon auto-battler built in C# with MonoGame. Desktop and Steam D
 --screenshot-devtools      include the dev panel in screenshots
 ```
 
+## Balance simulations (SimRunner)
+
+Plays hundreds of complete runs with no graphics, using a simple bot as the dungeon master, and compares the two huddle-ordering rules. Takes a few seconds.
+
+```bash
+dotnet run --project tools/HeroesUnwelcomed.SimRunner -- --runs 200
+```
+
+Open `sim-output/report.html` for the charts (CSVs are next to it). Options: `--runs`, `--max-beats`, `--rules ladder,reputation`, `--data`, `--out`. Edit `data/game/*.json` and run it again to see how balance changes.
+
 ## Running the tests
 
 In Visual Studio: **Test → Run All Tests**. From a terminal:

@@ -1,0 +1,24 @@
+{
+  // Every simulation number that isn't about a specific room.
+  // Durations are in game beats (at 1x speed, 100 bpm: 1 beat = 0.6 s).
+  "hallwayBeats": 4,
+  "portalBeats": 3,
+  "huddleBeats": 4,
+  "attemptBeats": 4,
+  "respawnBeats": 32,
+
+  // Success chance = 1 / (1 + e^(-(skill - difficulty) / steepness)).
+  // Equal skill and difficulty = 50%. Smaller steepness = less luck.
+  "challengeSteepness": 0.8,
+
+  // Growth: skill gained in a room's category after an attempt (heroes learn most from dying).
+  "skillOnWin": 0.05,
+  "skillOnLoss": 0.3,
+
+  // "reputation" ordering rule: reputation change per result.
+  "reputationOnWin": 1.0,
+  "reputationOnLoss": 0.5,
+
+  // "auto" spawn rule: the newest party must be this many rooms in before the next enters.
+  "spawnGapRooms": 2
+}

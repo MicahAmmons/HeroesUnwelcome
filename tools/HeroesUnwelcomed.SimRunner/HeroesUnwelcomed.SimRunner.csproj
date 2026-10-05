@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Plays many complete runs with no graphics, driven by a simple bot dungeon
+    master, and writes CSV files plus an HTML chart report. Used for balancing.
+    Run it from Visual Studio (set as startup project) or:
+      dotnet run with project tools/HeroesUnwelcomed.SimRunner (see Program.cs for options)
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\HeroesUnwelcomed.Core\HeroesUnwelcomed.Core.csproj" />
+  </ItemGroup>
+</Project>
