@@ -51,6 +51,11 @@ public sealed class StemChannel
 
     internal float RightGain { get; private set; }
 
+    /// <summary>Party-reaction multiplier currently applied (1 = untouched), glided toward <see cref="AugmentTarget"/>.</summary>
+    internal float AugmentGain { get; set; } = 1f;
+
+    internal float AugmentTarget { get; set; } = 1f;
+
     /// <summary>The current version's samples for this stem, or null if that version doesn't use it.</summary>
     internal float[]? Buffer { get; set; }
 

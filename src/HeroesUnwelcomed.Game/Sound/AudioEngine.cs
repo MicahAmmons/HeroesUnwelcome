@@ -63,8 +63,11 @@ public sealed class AudioEngine : IDisposable
     private double _lastMusicBeat;
     private double _lastSimBeat;
 
-    public AudioEngine(IReadOnlyList<SpeedLevel> levels, MusicTrack track)
+    public AudioEngine(IReadOnlyList<SpeedLevel> levels, MusicTrack track,
+        IReadOnlyDictionary<string, float[]>? sounds = null, ReactionSettings? reactions = null)
     {
+        Sounds = sounds ?? new Dictionary<string, float[]>();
+        Reactions = reactions ?? new ReactionSettings();
         Levels = levels;
         _pauseLevel = levels.FirstOrDefault(l => l.IsPause)
             ?? throw new InvalidDataException("speeds.json needs a level with simRate 0 (pause).");
@@ -77,6 +80,7 @@ public sealed class AudioEngine : IDisposable
         CurrentLevel = _lastPlayingLevel = _playingLevels[0];
         _mixer = new MusicMixer(track, CurrentLevel.Name, CurrentLevel.SimRate);
         _mixer.Channel(MetronomeStem).RampTo(0f, 0); // metronome starts off
+        Mode = Reactions.DefaultMode;
     }
 
     /// <summary>Builds the engine with generated placeholder music, using data/audio/speeds.json.</summary>
@@ -84,7 +88,9 @@ public sealed class AudioEngine : IDisposable
     {
         var file = data.ReadJson<SpeedsFile>("audio/speeds.json");
         MusicTrack track = PlaceholderMusic.Create(file.Levels, AudioOutput.SampleRate);
-        return new AudioEngine(file.Levels, track);
+        double fillBpm = file.Levels.First(l => !l.IsPause).Bpm;
+        var sounds = PlaceholderSounds.Create(AudioOutput.SampleRate, fillBpm);
+        return new AudioEngine(file.Levels, track, sounds, ReactionSettings.Load(data));
     }
 
     public IReadOnlyList<SpeedLevel> Levels { get; }
@@ -106,6 +112,50 @@ public sealed class AudioEngine : IDisposable
 
     public MusicMixer Mixer => _mixer;
     public AudioOutput Output => _output;
+
+    /// <summary>Sound effects by name (placeholder sounds for now).</summary>
+    public IReadOnlyDictionary<string, float[]> Sounds { get; }
+
+    /// <summary>How music and sounds react to party events (data/audio/reactions.json).</summary>
+    public ReactionSettings Reactions { get; set; }
+
+    /// <summary>Local: parties near the camera shape the music. Global: the track plays untouched.</summary>
+    public MusicMode Mode
+    {
+        get => _mixer.Augments.Enabled ? MusicMode.Local : MusicMode.Global;
+        set => _mixer.Augments.Enabled = value == MusicMode.Local;
+    }
+
+    /// <summary>The music beat the mixer is about to render: the earliest a new change can be heard.</summary>
+    public double RenderBeat => _mixer.RenderBeat;
+
+    /// <summary>Plays a named sound effect. Unknown names are ignored (missing sounds never break the game).</summary>
+    public void PlaySound(string name, float volume, float pan, double? atMusicBeat = null)
+    {
+        if (Sounds.TryGetValue(name, out float[]? samples))
+        {
+            _mixer.PlaySound(samples, volume, pan, atMusicBeat);
+        }
+    }
+
+    /// <summary>
+    /// Starts a musical reaction (from data) for a source such as a party, on
+    /// the next grid line, and schedules its stinger leading into the return.
+    /// </summary>
+    public ActiveAugment? React(int sourceId, string reaction, float stingerVolume = 1f, float stingerPan = 0f)
+    {
+        if (!Reactions.MusicReactions.TryGetValue(reaction, out AugmentDefinition? definition))
+        {
+            return null;
+        }
+
+        ActiveAugment placed = _mixer.Augments.Add(sourceId, definition, _mixer.RenderBeat, _mixer.CurrentVersion.BeatsPerBar);
+        if (Mode == MusicMode.Local && definition.Stinger is { } stinger)
+        {
+            PlaySound(stinger, stingerVolume, stingerPan, placed.ReturnBeat - definition.StingerLeadBeats);
+        }
+        return placed;
+    }
 
     public void Update(double deltaSeconds)
     {

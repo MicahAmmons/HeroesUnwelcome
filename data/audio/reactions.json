@@ -1,0 +1,38 @@
+{
+  // How the music and sounds react to what parties do.
+  //
+  // "local"  = the party you're looking at shapes the music (zoom in on a party to hear its drama).
+  // "global" = the track plays untouched; party sounds still play.
+  "defaultMode": "local",
+
+  // Musical reactions. "stems": which stems to cut and how deeply (1 = silent).
+  // The cut lands on the next "startGrid" line (0.5 = next half-beat), holds at least
+  // "holdBeats", returns on the next bar line, fading back over "releaseBeats".
+  // "stinger" plays "stingerLeadBeats" before the return (the drum fill leading back in).
+  "musicReactions": {
+    "heroDied": {
+      "stems": { "drums": 1, "bass": 1, "lead": 1, "pad": 0.8 },
+      "startGrid": 0.5,
+      "holdBeats": 2,
+      "returnOnBar": true,
+      "releaseBeats": 0.25,
+      "stinger": "fill",
+      "stingerLeadBeats": 1
+    }
+  },
+
+  // One-off sounds for party moments (placeholder sounds: gasp, hit, cheer, whoosh, fill).
+  "sounds": {
+    "heroDied": "hit",
+    "deathReact": "gasp",
+    "roomCleared": "cheer",
+    "bannerDown": "whoosh"
+  },
+
+  // How much a party "owns" the music, from the camera.
+  //   zoomedOut / zoomedIn: below zoomedOut no party has influence; at zoomedIn and closer, full influence
+  //   (multiplied by how close to the centre of the screen the party is).
+  //   minSoundVolume: party sounds never go quieter than this, so you hear far-off drama faintly.
+  //   panWidth: how far left/right sounds are placed (1 = hard left/right at the screen edge).
+  "proximity": { "zoomedOut": 0.15, "zoomedIn": 0.45, "minSoundVolume": 0.2, "panWidth": 0.8 }
+}

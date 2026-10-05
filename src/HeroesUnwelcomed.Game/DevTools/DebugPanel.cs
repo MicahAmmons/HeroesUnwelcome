@@ -40,14 +40,14 @@ public sealed class DebugPanel
     public void Layout(GameTime gameTime)
     {
         ImGui.SetNextWindowPos(new NumVector2(16, 16), ImGuiCond.FirstUseEver);
-        ImGui.SetNextWindowSize(new NumVector2(480, 760), ImGuiCond.FirstUseEver);
+        ImGui.SetNextWindowSize(new NumVector2(500, 1000), ImGuiCond.FirstUseEver);
 
         if (ImGui.Begin("Dev Tools  (F1 / Back to hide)"))
         {
             DrawStats(gameTime);
             DrawScenarios();
-            DrawRun();
             DrawAudio();
+            DrawRun();
             DrawDisplay();
             DrawInput();
             DrawData();
@@ -129,7 +129,7 @@ public sealed class DebugPanel
         foreach (Party party in run.ActiveParties)
         {
             string room = run.Dungeon.Rooms[party.RoomIndex].Kind.Id;
-            ImGui.Text($"#{party.Id} {party.Phase} → {room}: {string.Join(", ", party.Members.Select(h => h.Name))}");
+            ImGui.Text($"#{party.Id} {party.Phase} -> {room}: {string.Join(", ", party.Members.Select(h => h.Name))}");
         }
 
         ImGui.SeparatorText("Heroes");
@@ -186,6 +186,26 @@ public sealed class DebugPanel
         }
         ImGui.NewLine();
 
+        bool local = audio.Mode == MusicMode.Local;
+        if (ImGui.Checkbox("Local music (parties near the camera shape it)", ref local))
+        {
+            audio.Mode = local ? MusicMode.Local : MusicMode.Global;
+        }
+        if (_game.CurrentScene is PlayScene play && play.PartyInfluence.Count > 0)
+        {
+            foreach (var (partyId, influence) in play.PartyInfluence.OrderBy(p => p.Key))
+            {
+                ImGui.ProgressBar(influence, new NumVector2(220, 0), $"party {partyId}: {influence:P0}");
+            }
+        }
+        ImGui.Text($"Active reactions: {audio.Mixer.Augments.Active.Count}   sounds playing: {audio.Mixer.ActiveSounds}");
+        foreach (string sound in audio.Sounds.Keys)
+        {
+            if (ImGui.SmallButton(sound)) audio.PlaySound(sound, 1f, 0f);
+            ImGui.SameLine();
+        }
+        ImGui.NewLine();
+
         bool metronome = audio.MetronomeOn;
         if (ImGui.Checkbox("Metronome", ref metronome))
         {
@@ -221,28 +241,21 @@ public sealed class DebugPanel
                 audio.ScheduleStemGain(channel.Name, on ? 1f : 0f, When.NextBeat);
             }
             ImGui.SameLine();
-            ImGui.ProgressBar(channel.Gain, new NumVector2(-1, 0), "");
+            float reaction = audio.Mixer.AugmentGainOf(channel.Name);
+            ImGui.ProgressBar(channel.Gain * reaction, new NumVector2(-1, 0), reaction < 0.99f ? $"reaction {reaction:P0}" : "");
         }
 
-        // Preview of the planned "hero died" music reaction (M5): cut everything
-        // but the hats on the next beat, then bring it all back on a bar line.
-        if (ImGui.Button("Test: fear cut"))
+        // Trigger the real "hero died" reaction at full strength, as if zoomed in on a party.
+        if (ImGui.Button("Test: hero died reaction"))
         {
-            string[] cut = ["drums", "bass", "lead", "pad"];
-            double cutBeat = 0;
-            foreach (string stem in cut)
-            {
-                cutBeat = audio.ScheduleStemGain(stem, 0f, When.NextBeat);
-            }
-            double returnBeat = Quantize.NextMultiple(cutBeat + 4, time.BeatsPerBar);
-            foreach (string stem in cut)
-            {
-                audio.Mixer.ScheduleStemGain(stem, 1f, returnBeat, rampBeats: 0.25);
-            }
+            const int testSource = -1;
+            audio.Mixer.Augments.SetInfluence(testSource, 1f);
+            var placed = audio.React(testSource, "heroDied");
+            audio.PlaySound(audio.Reactions.Sounds.GetValueOrDefault("deathReact", "gasp"), 1f, 0f, placed?.StartBeat);
         }
         if (ImGui.IsItemHovered())
         {
-            ImGui.SetTooltip("Cuts drums, bass, lead and pad on the next beat (hats keep time),\nthen brings them back on the bar line at least one bar later.");
+            ImGui.SetTooltip("The heroDied reaction from data/audio/reactions.json at full strength:\ncut on the next half-beat (hats keep time), gasp, drum fill, return on the bar line.");
         }
     }
 

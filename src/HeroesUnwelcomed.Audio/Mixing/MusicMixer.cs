@@ -29,16 +29,33 @@ namespace HeroesUnwelcomed.Audio.Mixing;
 /// beat, because the position comes from the beat, not from the stem. Bringing
 /// it back later lands exactly where it would have been, always in time.
 /// </para>
+/// <para>
+/// <b>Two layers of stem volume.</b> Each stem's own volume (set by
+/// <see cref="ScheduleStemGain"/>, e.g. debug mutes) is multiplied by the
+/// <see cref="Augments"/> layer (party reactions), which is re-read every few
+/// milliseconds at the render position so reactions land on their beats.
+/// </para>
+/// <para>
+/// <b>Sound effects</b> (<see cref="PlaySound"/>) are added on top of the music,
+/// unaffected by stem cuts, each with its own volume and left/right position.
+/// </para>
 /// </remarks>
 public sealed class MusicMixer
 {
     // Shortest allowed volume glide (5 ms) so mutes never click.
     private const double MinimumRampSeconds = 0.005;
 
+    // How often (in frames) the augment layer is re-read: 128 frames ≈ 2.7 ms.
+    private const int AugmentBlockFrames = 128;
+
+    // Smoothing for augment volume changes: about an 8 ms glide, so cuts never click.
+    private const float AugmentSmoothing = 0.0026f;
+
     private readonly MusicTrack _track;
     private readonly Dictionary<string, StemChannel> _channels;
     private readonly StemChannel[] _channelList;
     private readonly List<ScheduledChange> _schedule = [];
+    private readonly List<Voice> _voices = [];
     private MusicVersion _version;
 
     public MusicMixer(MusicTrack track, string startVersion, double startSimRate)
@@ -64,6 +81,18 @@ public sealed class MusicMixer
     public MusicVersion CurrentVersion => _version;
     public IReadOnlyList<StemChannel> Channels => _channelList;
     public float MasterGain { get; set; } = 0.7f;
+
+    /// <summary>Volume of sound effects relative to the music.</summary>
+    public float SoundGain { get; set; } = 1f;
+
+    /// <summary>Party reactions layered on the stems (see <see cref="AugmentController"/>).</summary>
+    public AugmentController Augments { get; } = new();
+
+    /// <summary>Sound effects currently playing or waiting for their beat.</summary>
+    public int ActiveSounds => _voices.Count;
+
+    /// <summary>The augment multiplier currently applied to a stem (for the debug panel).</summary>
+    public float AugmentGainOf(string stem) => Channel(stem).AugmentGain;
 
     /// <summary>Changes not yet applied (for the debug panel).</summary>
     public int PendingChanges => _schedule.Count;
@@ -93,6 +122,19 @@ public sealed class MusicMixer
         AddToSchedule(new ScheduledChange(atBeat, ChangeKind.Gain, stem, gain, rampBeats, 0));
     }
 
+    /// <summary>
+    /// Plays a one-off sound on top of the music.
+    /// </summary>
+    /// <param name="samples">Mono samples at the mixer's sample rate.</param>
+    /// <param name="gain">Volume (1 = as recorded).</param>
+    /// <param name="pan">-1 = left, 0 = centre, 1 = right.</param>
+    /// <param name="atBeat">Start exactly on this music beat, or at once if null (or already past).</param>
+    public void PlaySound(float[] samples, float gain, float pan, double? atBeat = null)
+    {
+        float angle = (Math.Clamp(pan, -1f, 1f) + 1f) * MathF.PI / 4f;
+        _voices.Add(new Voice(samples, gain, MathF.Cos(angle), MathF.Sin(angle), atBeat));
+    }
+
     /// <summary>Fills <paramref name="output"/> with interleaved stereo samples (L, R, L, R...).</summary>
     public void Render(Span<float> output)
     {
@@ -100,6 +142,11 @@ public sealed class MusicMixer
         for (int i = 0; i < frames; i++)
         {
             double beat = Tempo.BeatAt(RenderFrame);
+
+            if (i % AugmentBlockFrames == 0)
+            {
+                ReadAugments(beat);
+            }
 
             while (_schedule.Count > 0 && _schedule[0].Beat <= beat + 1e-9)
             {
@@ -114,7 +161,16 @@ public sealed class MusicMixer
 
             foreach (StemChannel channel in _channelList)
             {
-                float gain = channel.NextGain();
+                float augment = channel.AugmentGain;
+                float augmentTarget = channel.AugmentTarget;
+                if (augment != augmentTarget)
+                {
+                    augment += (augmentTarget - augment) * AugmentSmoothing;
+                    if (MathF.Abs(augmentTarget - augment) < 1e-4f) augment = augmentTarget;
+                    channel.AugmentGain = augment;
+                }
+
+                float gain = channel.NextGain() * augment;
                 if (gain == 0f || channel.Buffer is not { } buffer)
                 {
                     continue;
@@ -125,9 +181,36 @@ public sealed class MusicMixer
                 right += sample * channel.RightGain;
             }
 
+            MixVoices(beat, ref left, ref right);
+
             output[i * 2] = SoftClip(left * MasterGain);
             output[i * 2 + 1] = SoftClip(right * MasterGain);
             RenderFrame++;
+        }
+
+        _voices.RemoveAll(v => v.Finished);
+    }
+
+    private void ReadAugments(double beat)
+    {
+        IReadOnlyDictionary<string, float> multipliers = Augments.Multipliers(beat);
+        foreach (StemChannel channel in _channelList)
+        {
+            channel.AugmentTarget = multipliers.GetValueOrDefault(channel.Name, 1f);
+        }
+    }
+
+    private void MixVoices(double beat, ref float left, ref float right)
+    {
+        foreach (Voice voice in _voices)
+        {
+            if (voice.Finished) continue;
+            if (voice.StartBeat is { } start && beat < start - 1e-9) continue; // not its beat yet
+
+            float sample = voice.Samples[voice.Position] * voice.Gain * SoundGain;
+            left += sample * voice.Left;
+            right += sample * voice.Right;
+            voice.Position++;
         }
     }
 
@@ -196,6 +279,17 @@ public sealed class MusicMixer
     {
         Version,
         Gain,
+    }
+
+    private sealed class Voice(float[] samples, float gain, float left, float right, double? startBeat)
+    {
+        public float[] Samples { get; } = samples;
+        public float Gain { get; } = gain;
+        public float Left { get; } = left;
+        public float Right { get; } = right;
+        public double? StartBeat { get; } = startBeat;
+        public int Position { get; set; }
+        public bool Finished => Position >= Samples.Length;
     }
 
     private readonly record struct ScheduledChange(double Beat, ChangeKind Kind, string Target, float Gain, double RampBeats, double SimRate);

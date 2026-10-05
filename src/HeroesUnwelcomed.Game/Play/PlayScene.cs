@@ -54,6 +54,7 @@ public sealed class PlayScene : IScene
     private Run _run = null!;
     private BuildController _build = null!;
     private Choreographer _choreographer = null!;
+    private PartyAudio _partyAudio = null!;
     private double _startSimBeat;
     private double _gameBeat;
     private double _seconds;
@@ -76,6 +77,9 @@ public sealed class PlayScene : IScene
     /// <summary>The current run (read by the dev tools' inspector).</summary>
     public Run Run => _run;
 
+    /// <summary>Each party's current influence over the music (shown in the dev tools).</summary>
+    public IReadOnlyDictionary<int, float> PartyInfluence => _partyAudio.Influence;
+
     /// <summary>Animations too long for their choreography step (shown in the dev tools).</summary>
     public IReadOnlyList<string> ChoreographyProblems => ChoreographyCheck.Problems(_animations, _definitions.Tuning);
 
@@ -90,6 +94,8 @@ public sealed class PlayScene : IScene
         _heroViews.Clear();
         _encounters.Clear();
         _choreographer = new Choreographer(_run, _layout, ViewFor, EncounterFor);
+        _services.Audio.Mixer.Augments.Clear();
+        _partyAudio = new PartyAudio(_choreographer, ViewFor, _services.Audio);
         _run.EventRaised += OnRunEvent;
         _build = new BuildController(_run);
         _build.Message += message => _hud.Toast(message, _seconds);
@@ -121,6 +127,7 @@ public sealed class PlayScene : IScene
         _run.AdvanceTo(_gameBeat);
 
         SyncEncounters();
+        _partyAudio.Update(_camera, viewport, _gameBeat);
     }
 
     public void Draw(SpriteBatch batch)
@@ -257,6 +264,7 @@ public sealed class PlayScene : IScene
     private void OnRunEvent(GameEvent gameEvent)
     {
         _choreographer.Handle(gameEvent);
+        _partyAudio.Handle(gameEvent);
 
         if (gameEvent is RunEnded ended)
         {
@@ -368,6 +376,18 @@ public sealed class PlayScene : IScene
                 _hud.Toast($"Couldn't reload animations: {ex.Message}", _seconds);
             }
         }
+        else if (path == ReactionSettings.FilePath)
+        {
+            try
+            {
+                _services.Audio.Reactions = ReactionSettings.Load(_services.Data);
+                _hud.Toast("Music reactions reloaded.", _seconds);
+            }
+            catch (Exception ex) when (ex is InvalidDataException or System.Text.Json.JsonException or IOException)
+            {
+                _hud.Toast($"Couldn't reload reactions: {ex.Message}", _seconds);
+            }
+        }
         else if (path == RoomLayout.FilePath)
         {
             try
@@ -390,5 +410,6 @@ public sealed class PlayScene : IScene
     {
         _services.Data.FileChanged -= OnDataFileChanged;
         _run.EventRaised -= OnRunEvent;
+        _services.Audio.Mixer.Augments.Clear();
     }
 }
